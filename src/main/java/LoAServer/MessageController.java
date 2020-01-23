@@ -28,7 +28,7 @@ public class MessageController {
 
         MessageDatabase msgDatabaseDeepCopy = new Gson().fromJson(new Gson().toJson(masterDatabase.getMasterBroadcastContentManager().get(gameName).getCurrentBroadcastContent()), MessageDatabase.class);
 
-        msgDatabaseDeepCopy.add(new Message(new Player("username", "password", "#123"), "1234", false));
+        msgDatabaseDeepCopy.add(m);
         masterDatabase.getMasterBroadcastContentManager().get(gameName).updateBroadcastContent(msgDatabaseDeepCopy);
     }
 }
