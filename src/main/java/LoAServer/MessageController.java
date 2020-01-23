@@ -1,5 +1,6 @@
 package LoAServer;
 
+import com.google.gson.Gson;
 import eu.kartoffelquadrat.asyncrestlib.ResponseGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,23 +14,21 @@ public class MessageController {
 
     @RequestMapping(method=RequestMethod.GET, value="/getAllMsgs")
     public ArrayList<Message> getAllMsgs(@RequestBody String gameName) {
-        return masterDatabase.getSingleMessageDatabase(gameName).getMessages();
+        return masterDatabase.getMasterBroadcastContentManager().get(gameName).getCurrentBroadcastContent().getMessages();
     }
 
     @RequestMapping(method=RequestMethod.GET, value="/{gameName}/getMsg")
     public DeferredResult<ResponseEntity<String>> asyncGetMsg(@PathVariable String gameName) {
-        masterDatabase.addMessageDatabase("game1"); // TEST DELETE AFTER!!!!!!!!!!!!!!!!!!!!!
-
         return ResponseGenerator.getAsyncUpdate(5000, masterDatabase.getMasterBroadcastContentManager().get(gameName));
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/sendMsg")
     public void sendMsg(@PathVariable String gameName, @RequestBody Message m) {
-        for (MessageDatabase msgDatabase : masterDatabase.getMasterMessageDatabase()) {
-            if (msgDatabase.getGameName().equals(gameName)) {
-                msgDatabase.add(m);
-                masterDatabase.getMasterBroadcastContentManager().get(gameName).updateBroadcastContent(masterDatabase.getSingleMessageDatabase(gameName));
-            }
-        }
+        System.out.println(m.getMsg());
+
+        MessageDatabase msgDatabaseDeepCopy = new Gson().fromJson(new Gson().toJson(masterDatabase.getMasterBroadcastContentManager().get(gameName).getCurrentBroadcastContent()), MessageDatabase.class);
+
+        msgDatabaseDeepCopy.add(new Message(new Player("username", "password", "#123"), "1234", false));
+        masterDatabase.getMasterBroadcastContentManager().get(gameName).updateBroadcastContent(msgDatabaseDeepCopy);
     }
 }

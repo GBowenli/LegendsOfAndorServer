@@ -29,15 +29,4 @@ public class MessageDatabase implements BroadcastContent {
     public boolean isEmpty() {
         return messages.isEmpty();
     }
-
-    @Override
-    public String serialize() {
-        return "";
-    }
-
-    @Override
-    public boolean equalsByMD5(BroadcastContent broadcastContent) {
-        return false;
-        //return BroadcastContentHasher.hash(this).equals(BroadcastContentHasher.hash(broadcastContent)); cannot do this because sometimes does not detect change
-    }
 }

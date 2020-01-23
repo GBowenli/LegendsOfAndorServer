@@ -1,7 +1,6 @@
 package LoAServer;
 
 import eu.kartoffelquadrat.asyncrestlib.BroadcastContent;
-import eu.kartoffelquadrat.asyncrestlib.BroadcastContentHasher;
 
 public class Message {
     private Player player;
