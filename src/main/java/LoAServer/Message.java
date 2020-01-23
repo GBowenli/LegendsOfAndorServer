@@ -4,22 +4,24 @@ import eu.kartoffelquadrat.asyncrestlib.BroadcastContent;
 import eu.kartoffelquadrat.asyncrestlib.BroadcastContentHasher;
 
 public class Message {
-    private String username;
+    private Player player;
     private String msg;
+    private boolean belongsToCurrentUser;
 
     public Message() {}
 
-    public Message (String username, String msg) {
-        this.username = username;
+    public Message (Player player, String msg, boolean belongsToCurrentUser) {
+        this.player = player;
         this.msg = msg;
+        this.belongsToCurrentUser = belongsToCurrentUser;
     }
 
-    public String getUsername() {
-        return username;
+    public Player getPlayer() {
+        return player;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public String getMsg() {
@@ -28,5 +30,13 @@ public class Message {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public boolean isBelongsToCurrentUser() {
+        return belongsToCurrentUser;
+    }
+
+    public void setBelongsToCurrentUser(boolean belongsToCurrentUser) {
+        this.belongsToCurrentUser = belongsToCurrentUser;
     }
 }
