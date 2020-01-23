@@ -13,6 +13,10 @@ public class MessageDatabase implements BroadcastContent {
         messages = new ArrayList<>();
     }
 
+    public ArrayList<Message> getMessages() {
+        return messages;
+    }
+
     public String getGameName() {
         return gameName;
     }

@@ -5,9 +5,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.util.ArrayList;
+
 @RestController
 public class MessageController {
     private MasterDatabase masterDatabase = MasterDatabase.getInstance();
+
+    @RequestMapping(method=RequestMethod.GET, value="/getAllMsgs")
+    public ArrayList<Message> getAllMsgs(@RequestBody String gameName) {
+        return masterDatabase.getSingleMessageDatabase(gameName).getMessages();
+    }
 
     @RequestMapping(method=RequestMethod.GET, value="/{gameName}/getMsg")
     public DeferredResult<ResponseEntity<String>> asyncGetMsg(@PathVariable String gameName) {
