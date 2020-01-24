@@ -1,6 +1,7 @@
 package LoAServer;
 
 import com.google.gson.Gson;
+import eu.kartoffelquadrat.asyncrestlib.BroadcastContentManager;
 import eu.kartoffelquadrat.asyncrestlib.ResponseGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,23 +13,29 @@ import java.util.ArrayList;
 public class MessageController {
     private MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
-    @RequestMapping(method=RequestMethod.GET, value="/getAllMsgs")
-    public ArrayList<Message> getAllMsgs(@RequestBody String gameName) {
-        return masterDatabase.getMasterBroadcastContentManager().get(gameName).getCurrentBroadcastContent().getMessages();
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/getAllMsgs")
+    public ArrayList<Message> getAllMsgs(@PathVariable String gameName) {
+        return masterDatabase.getSingleMessageDatabase(gameName).getMessages();
     }
 
-    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/getMsg")
-    public DeferredResult<ResponseEntity<String>> asyncGetMsg(@PathVariable String gameName) {
-        return ResponseGenerator.getAsyncUpdate(5000, masterDatabase.getMasterBroadcastContentManager().get(gameName));
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getMsg")
+    public DeferredResult<ResponseEntity<String>> asyncGetMsg(@PathVariable String gameName, @PathVariable String username) {
+        return ResponseGenerator.getAsyncUpdate(5000, masterDatabase.getMasterMessageDatabaseDBCM().get(username));
     }
 
-    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/sendMsg")
-    public void sendMsg(@PathVariable String gameName, @RequestBody Message m) {
-        System.out.println(m.getMsg());
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/sendMsg")
+    public void sendMsg(@PathVariable String gameName, @PathVariable String username, @RequestBody Message m) {
+        System.out.println("new message: " + m.getMsg());
 
-        MessageDatabase msgDatabaseDeepCopy = new Gson().fromJson(new Gson().toJson(masterDatabase.getMasterBroadcastContentManager().get(gameName).getCurrentBroadcastContent()), MessageDatabase.class);
+        masterDatabase.getSingleMessageDatabase(gameName).add(m);
 
+        // CHANGE THIS!!! when add create/join game do all players in GAME!!!!
+        MessageDatabase msgDatabaseDeepCopy = new Gson().fromJson(new Gson().toJson(masterDatabase.getMasterMessageDatabaseDBCM().get("User 1").getCurrentBroadcastContent()), MessageDatabase.class);
         msgDatabaseDeepCopy.add(m);
-        masterDatabase.getMasterBroadcastContentManager().get(gameName).updateBroadcastContent(msgDatabaseDeepCopy);
+        masterDatabase.getMasterMessageDatabaseDBCM().get("User 1").updateBroadcastContent(msgDatabaseDeepCopy);
+
+        MessageDatabase msgDatabaseDeepCopy2 = new Gson().fromJson(new Gson().toJson(masterDatabase.getMasterMessageDatabaseDBCM().get("User 2").getCurrentBroadcastContent()), MessageDatabase.class);
+        msgDatabaseDeepCopy2.add(m);
+        masterDatabase.getMasterMessageDatabaseDBCM().get("User 2").updateBroadcastContent(msgDatabaseDeepCopy2);
     }
 }

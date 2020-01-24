@@ -3,7 +3,7 @@ package LoAServer;
 import java.util.ArrayList;
 
 enum LoginResponses {
-    LOGIN_SUCCESS, NEW_LOGIN_CREATED, LOGIN_ERROR_INCORRECT_PASSWORD;
+    LOGIN_SUCCESS, NEW_LOGIN_CREATED, LOGIN_ERROR_INCORRECT_PASSWORD, LOGIN_ERROR_ALREADY_LOGGED_IN
 }
 
 public class PlayerDatabase {
@@ -25,12 +25,18 @@ public class PlayerDatabase {
         for (Player p: players) {
             if (player.getUsername().equals(p.getUsername())) {
                 if (player.getPassword().equals(p.getPassword())) {
-                    return LoginResponses.LOGIN_SUCCESS;
+                    if (p.isLoggedIn()) {
+                        return LoginResponses.LOGIN_ERROR_ALREADY_LOGGED_IN;
+                    } else {
+                        p.setLoggedIn(true);
+                        return LoginResponses.LOGIN_SUCCESS;
+                    }
                 } else {
                     return LoginResponses.LOGIN_ERROR_INCORRECT_PASSWORD;
                 }
             }
         }
+        player.setLoggedIn(true);
         players.add(player);
         return LoginResponses.NEW_LOGIN_CREATED;
     }
