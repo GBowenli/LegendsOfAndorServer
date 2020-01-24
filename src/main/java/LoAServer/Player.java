@@ -1,9 +1,17 @@
 package LoAServer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Player {
     private String username;
     private String password;
     private String color;
+    private Hero hero;
+    private int willPower;
+    private int strength;
+    private int currentSpace;
+    private boolean hasEndedDay;
     private boolean isLoggedIn;
 
     public Player() {
@@ -39,5 +47,12 @@ public class Player {
     }
     public void setLoggedIn(boolean loggedIn) {
         isLoggedIn = loggedIn;
+    }
+
+    public Hero getHero() {
+        return hero;
+    }
+    public void setHero(Hero hero) {
+        this.hero = hero;
     }
 }
