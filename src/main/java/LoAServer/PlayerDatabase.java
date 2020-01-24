@@ -13,14 +13,6 @@ public class PlayerDatabase {
         players = new ArrayList<Player>();
     }
 
-    public ArrayList<Player> getPlayers() {
-        return players;
-    }
-
-    public void setPlayers(ArrayList<Player> players) {
-        this.players = players;
-    }
-
     public LoginResponses login(Player player) {
         for (Player p: players) {
             if (player.getUsername().equals(p.getUsername())) {
@@ -33,5 +25,14 @@ public class PlayerDatabase {
         }
         players.add(player);
         return LoginResponses.NEW_LOGIN_CREATED;
+    }
+
+    public Player getPlayer(String username){
+        for(Player p : this.players){
+            if (p.getUsername().equals(username)){
+                return p;
+            }
+        }
+        return null;
     }
 }

@@ -1,12 +1,17 @@
 package LoAServer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Player {
     private String username;
     private String password;
     private String color;
-
-    public Player() {
-    }
+    private Hero hero;
+    private int willPower;
+    private int strength;
+    private int currentSpace;
+    private boolean hasEndedDay;
 
     public Player(String username, String password, String color) {
         this.username = username;
@@ -31,5 +36,12 @@ public class Player {
     }
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Hero getHero() {
+        return hero;
+    }
+    public void setHero(Hero hero) {
+        this.hero = hero;
     }
 }
