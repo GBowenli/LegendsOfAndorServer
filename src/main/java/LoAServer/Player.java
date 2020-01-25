@@ -7,7 +7,7 @@ public class Player {
     private String username;
     private String password;
     private String color;
-    //private Hero hero;
+    private Hero hero;
     private int willPower;
     private int strength;
     private int currentSpace;
@@ -49,10 +49,10 @@ public class Player {
         isLoggedIn = loggedIn;
     }
 
-/*    public Hero getHero() {
+    public Hero getHero() {
         return hero;
     }
     public void setHero(Hero hero) {
         this.hero = hero;
-    }*/
+    }
 }
