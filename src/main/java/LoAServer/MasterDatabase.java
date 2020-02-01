@@ -10,8 +10,11 @@ public class MasterDatabase {
     private static MasterDatabase singletonMasterDatabase = null;
 
     private PlayerDatabase masterPlayerDatabase = new PlayerDatabase();
+    private GameDatabase masterGameDatabase = new GameDatabase();
+
     private ArrayList<MessageDatabase> masterMessageDatabase = new ArrayList<>();
-    private HashMap<String, BroadcastContentManager<MessageDatabase>> masterMessageDatabaseDBCM = new HashMap<>(); // one message database BCM per Player
+    private HashMap<String, BroadcastContentManager<MessageDatabase>> masterMessageDatabaseBCM = new HashMap<>(); // one message database BCM per Player
+    private HashMap<String, BroadcastContentManager<Game>> masterGameBCM = new HashMap<>();
 
     private MasterDatabase() {}
 
@@ -30,12 +33,24 @@ public class MasterDatabase {
     public void addMessageDatabaseBCM(String username, String gameName) { // need to call this method when Player creates a new Game
         for (MessageDatabase md : masterMessageDatabase) {
             if (md.getGameName().equals(gameName)) {
-                MessageDatabase msgDatabaseDeepCopy = new Gson().fromJson(new Gson().toJson(md), MessageDatabase.class);
-                masterMessageDatabaseDBCM.put(username, new BroadcastContentManager<>(msgDatabaseDeepCopy));
+                masterMessageDatabaseBCM.put(username, new BroadcastContentManager<>(md));
                 break;
             }
         }
     }
+
+    public void removeMessageDatabaseBCM(String username) {
+        masterMessageDatabaseBCM.remove(username);
+    }
+
+    public void addGameBCM(String username, String gameName) {
+        masterGameBCM.put(username, new BroadcastContentManager<>(masterGameDatabase.getGame(gameName)));
+    }
+
+    public void removeGameBCM(String username) {
+        masterGameBCM.remove(username);
+    }
+
 
     public MessageDatabase getSingleMessageDatabase(String gameName) {
         for (MessageDatabase md : masterMessageDatabase) {
@@ -51,10 +66,18 @@ public class MasterDatabase {
     }
 
     public HashMap<String, BroadcastContentManager<MessageDatabase>> getMasterMessageDatabaseDBCM() {
-        return masterMessageDatabaseDBCM;
+        return masterMessageDatabaseBCM;
     }
 
     public ArrayList<MessageDatabase> getMasterMessageDatabase() {
         return masterMessageDatabase;
+    }
+
+    public GameDatabase getMasterGameDatabase() {
+        return masterGameDatabase;
+    }
+
+    public HashMap<String, BroadcastContentManager<Game>> getMasterGameBCM() {
+        return masterGameBCM;
     }
 }

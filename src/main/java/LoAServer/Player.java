@@ -7,12 +7,13 @@ public class Player {
     private String username;
     private String password;
     private String color;
+    private boolean isLoggedIn;
     private Hero hero;
+    private boolean isReady;
     private int willPower;
     private int strength;
     private int currentSpace;
     private boolean hasEndedDay;
-    private boolean isLoggedIn;
 
     public Player() {
     }
@@ -48,11 +49,16 @@ public class Player {
     public void setLoggedIn(boolean loggedIn) {
         isLoggedIn = loggedIn;
     }
-
     public Hero getHero() {
         return hero;
     }
     public void setHero(Hero hero) {
         this.hero = hero;
+    }
+    public boolean isReady() {
+        return isReady;
+    }
+    public void setReady(boolean ready) {
+        isReady = ready;
     }
 }
