@@ -100,7 +100,7 @@ public class GameDatabase {
             gameDeepCopy.removePlayer(username);
 
             for (int i = 0; i < gameDeepCopy.getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(gameDeepCopy.getPlayers()[i].getUsername()).updateBroadcastContent(gameDeepCopy);
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).updateBroadcastContent(gameDeepCopy);
             }
 
             getGame(gameName).removePlayer(username);
@@ -110,7 +110,7 @@ public class GameDatabase {
     public IsReadyResponses playerIsReady(String gameName, String username) { // add logic in android that if it is the player himself do not update changes (update after clicked)
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
-        if (masterDatabase.getMasterPlayerDatabase().getPlayer(username).getHero() == null) {
+        if (getGame(gameName).getSinglePlayer(username).getHero() == null) {
             return IsReadyResponses.ERROR_NO_SELECTED_HERO;
         } else {
             Game gameDeepCopy = new Gson().fromJson(new Gson().toJson(getGame(gameName)), Game.class);

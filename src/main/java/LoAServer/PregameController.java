@@ -38,6 +38,7 @@ public class PregameController {
     @RequestMapping(method=RequestMethod.DELETE, value="/{gameName}/{username}/leavePregame")
     public void leavePregame(@PathVariable String gameName, @PathVariable String username) {
         masterDatabase.getMasterGameDatabase().leavePregame(gameName, username);
+        System.out.println(new Gson().toJson(masterDatabase.getMasterGameDatabase()));
     }
 
     @RequestMapping(method=RequestMethod.GET, value="/{username}/getPregameUpdate")

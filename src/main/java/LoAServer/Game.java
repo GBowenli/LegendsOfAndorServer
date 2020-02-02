@@ -9,6 +9,8 @@ public class Game implements BroadcastContent {
     private String gameName;
     private boolean isActive;
 
+    public Game() {}
+
     public Game(Player p, int maxNumPlayers, String gameName) {
         this.gameName = gameName;
         this.maxNumPlayers = maxNumPlayers;
