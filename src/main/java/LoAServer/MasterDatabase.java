@@ -30,6 +30,15 @@ public class MasterDatabase {
         masterMessageDatabase.add(m);
     }
 
+    public void deleteMessageDatabase(String gameName) {
+        for (int i = 0; i < masterMessageDatabase.size(); i++) {
+            if (masterMessageDatabase.get(i).getGameName().equals(gameName)) {
+                masterMessageDatabase.remove(i);
+                return;
+            }
+        }
+    }
+
     public void addMessageDatabaseBCM(String username, String gameName) { // need to call this method when Player creates a new Game
         for (MessageDatabase md : masterMessageDatabase) {
             if (md.getGameName().equals(gameName)) {

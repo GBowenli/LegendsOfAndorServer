@@ -2,6 +2,8 @@ package LoAServer;
 
 import eu.kartoffelquadrat.asyncrestlib.BroadcastContent;
 
+import java.util.ArrayList;
+
 public class Game implements BroadcastContent {
     private int maxNumPlayers;
     private int currentNumPlayers;
@@ -88,6 +90,14 @@ public class Game implements BroadcastContent {
                 return;
             }
         }
+    }
+
+    public ArrayList<Hero> getAllHeroes() {
+        ArrayList<Hero> heroes = new ArrayList<>();
+        for (int i = 0; i < currentNumPlayers; i++) {
+            heroes.add(players[i].getHero());
+        }
+        return heroes;
     }
 
     @Override

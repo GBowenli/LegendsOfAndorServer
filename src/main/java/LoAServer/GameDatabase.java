@@ -20,7 +20,7 @@ enum IsReadyResponses {
 }
 
 enum SelectHeroResponses {
-    SELECT_HERO_SUCCESS, ERROR_HERO_ALREADY_SELECTED
+    SELECT_HERO_SUCCESS, ERROR_HERO_ALREADY_SELECTED, ERROR_DUPLICATE_HERO
 }
 
 public class GameDatabase {
@@ -44,6 +44,7 @@ public class GameDatabase {
 
         if (getGame(g.getGameName()) == null) {
             games.add(g);
+            masterDatabase.addMessageDatabase(g.getGameName());
             masterDatabase.addGameBCM(g.getPlayers()[0].getUsername(), g.getGameName());
             masterDatabase.addMessageDatabaseBCM(g.getPlayers()[0].getUsername(), g.getGameName()); // when running/testing this remove hardcode in MessageController
             return HostGameResponses.HOST_GAME_SUCCESS;
@@ -95,6 +96,7 @@ public class GameDatabase {
 
         if (getGame(gameName).getCurrentNumPlayers() == 1) {
             games.remove(getGame(gameName));
+            masterDatabase.deleteMessageDatabase(gameName);
         } else {
             Game gameDeepCopy = new Gson().fromJson(new Gson().toJson(getGame(gameName)), Game.class);
             gameDeepCopy.removePlayer(username);
@@ -134,6 +136,12 @@ public class GameDatabase {
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
         if (getGame(gameName).getSinglePlayer(username).getHero() == null) {
+            for (Hero h : getGame(gameName).getAllHeroes()) {
+                if (h.equals(hero)) {
+                    return SelectHeroResponses.ERROR_DUPLICATE_HERO;
+                }
+            }
+
             Game gameDeepCopy = new Gson().fromJson(new Gson().toJson(getGame(gameName)), Game.class);
             for (Player p : gameDeepCopy.getPlayers()) {
                 if (p.getUsername().equals(username)) {
