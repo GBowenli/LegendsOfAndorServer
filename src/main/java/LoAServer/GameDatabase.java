@@ -105,7 +105,6 @@ public class GameDatabase {
 
         if (getGame(gameName).getCurrentNumPlayers() == 1) {
             games.remove(getGame(gameName));
-            masterDatabase.deleteMessageDatabase(gameName);
         } else {
             Game gameDeepCopy = new Gson().fromJson(new Gson().toJson(getGame(gameName)), Game.class);
             gameDeepCopy.removePlayer(username);
