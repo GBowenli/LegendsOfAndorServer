@@ -23,6 +23,7 @@ enum SelectHeroResponses {
     SELECT_HERO_SUCCESS, ERROR_HERO_ALREADY_SELECTED, ERROR_DUPLICATE_HERO
 }
 
+
 public class GameDatabase {
     private List<Game> games;
 
@@ -53,6 +54,7 @@ public class GameDatabase {
         }
     }
 
+
     public JoinGameResponses joinGame(String gameName, String username) {
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
@@ -81,6 +83,13 @@ public class GameDatabase {
     }
 
     public ArrayList<String> getAllGames() {
+        if(games.size() == 0){
+            ArrayList<String> demo = new ArrayList<>();
+            demo.add("GAME 1");
+            demo.add("GAME 2");
+            return demo;
+        }
+
         ArrayList<String> gamesStr = new ArrayList<>();
         for (Game g: games) {
             gamesStr.add(g.getGameName());
@@ -160,4 +169,6 @@ public class GameDatabase {
         }
 
     }
+
+
 }

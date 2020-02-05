@@ -48,6 +48,8 @@ public class MasterDatabase {
         }
     }
 
+
+
     public void removeMessageDatabaseBCM(String username) {
         masterMessageDatabaseBCM.remove(username);
     }
