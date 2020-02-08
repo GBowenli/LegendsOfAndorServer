@@ -95,9 +95,20 @@ public class Game implements BroadcastContent {
     public ArrayList<Hero> getAllHeroes() {
         ArrayList<Hero> heroes = new ArrayList<>();
         for (int i = 0; i < currentNumPlayers; i++) {
-            heroes.add(players[i].getHero());
+            if (players[i].getHero() != null) {
+                heroes.add(players[i].getHero());
+            }
         }
         return heroes;
+    }
+
+    public boolean allReady() {
+        for (int i = 0; i < currentNumPlayers; i++) {
+            if (!players[i].isReady()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

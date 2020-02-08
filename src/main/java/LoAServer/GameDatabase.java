@@ -19,9 +19,13 @@ enum SelectHeroResponses {
     SELECT_HERO_SUCCESS, ERROR_HERO_ALREADY_SELECTED, ERROR_DUPLICATE_HERO
 }
 
+enum StartGameResponses {
+    START_GAME_SUCCESS, ERROR_PLAYER_NOT_READY, ERROR_NOT_HOST, ERROR_NOT_ENOUGH_PLAYERS
+}
+
 
 public class GameDatabase {
-    private List<Game> games;
+    private ArrayList<Game> games;
 
     public GameDatabase(){
         games = new ArrayList<Game>();
@@ -76,12 +80,8 @@ public class GameDatabase {
         }
     }
 
-    public ArrayList<String> getAllGames() {
-        ArrayList<String> gamesStr = new ArrayList<>();
-        for (Game g: games) {
-            gamesStr.add(g.getGameName());
-        }
-        return gamesStr;
+    public ArrayList<Game> getAllGames() {
+        return games;
     }
 
     public void leavePregame(String gameName, String username) {
@@ -139,8 +139,27 @@ public class GameDatabase {
         } else {
             return SelectHeroResponses.ERROR_HERO_ALREADY_SELECTED;
         }
-
     }
 
+    public StartGameResponses startGame(String gameName, String username) {
+        if (getGame(gameName).getCurrentNumPlayers() == 1) {
+            return StartGameResponses.ERROR_NOT_ENOUGH_PLAYERS;
+        }
+        if (!getGame(gameName).getPlayers()[0].getUsername().equals(username)) {
+            return StartGameResponses.ERROR_NOT_HOST;
+        }
+        if (getGame(gameName).allReady()) {
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            getGame(gameName).setActive(true);
 
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().setActive(true);
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+            return StartGameResponses.START_GAME_SUCCESS;
+        } else {
+            return StartGameResponses.ERROR_PLAYER_NOT_READY;
+        }
+    }
 }
