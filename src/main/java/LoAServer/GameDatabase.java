@@ -77,13 +77,6 @@ public class GameDatabase {
     }
 
     public ArrayList<String> getAllGames() {
-        if(games.size() == 0){
-            ArrayList<String> demo = new ArrayList<>();
-            demo.add("GAME 1");
-            demo.add("GAME 2");
-            return demo;
-        }
-
         ArrayList<String> gamesStr = new ArrayList<>();
         for (Game g: games) {
             gamesStr.add(g.getGameName());
@@ -118,7 +111,7 @@ public class GameDatabase {
             getGame(gameName).getSinglePlayer(username).setReady(!getGame(gameName).getSinglePlayer(username).isReady());
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                //masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().getSinglePlayer(username).setReady(!getGame(gameName).getSinglePlayer(username).isReady());
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().getSinglePlayer(username).setReady(getGame(gameName).getSinglePlayer(username).isReady());
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
             return IsReadyResponses.IS_READY_SUCCESS;
