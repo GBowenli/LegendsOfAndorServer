@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.github.kartoffelquadrat</groupId>
             <artifactId>AsyncRestLib</artifactId>
-            <version>v1.4</version>
+            <version>v1.5</version>
         </dependency>
     </dependencies>
 </project>

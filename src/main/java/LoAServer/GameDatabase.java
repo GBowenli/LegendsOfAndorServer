@@ -1,9 +1,5 @@
 package LoAServer;
 
-import com.google.gson.Gson;
-import eu.kartoffelquadrat.asyncrestlib.BroadcastContent;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,11 +59,9 @@ public class GameDatabase {
             int maxNumPlayers = getGame(gameName).getMaxNumPlayers();
 
             if (currentNumPlayers < maxNumPlayers) {
-                Game gameDeepCopy = new Gson().fromJson(new Gson().toJson(getGame(gameName)), Game.class);
-                gameDeepCopy.addPlayer(masterDatabase.getMasterPlayerDatabase().getPlayer(username));
-
                 for (int i = 0; i < currentNumPlayers; i++) {
-                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).updateBroadcastContent(gameDeepCopy);
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().addPlayer(masterDatabase.getMasterPlayerDatabase().getPlayer(username));
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
                 }
 
                 getGame(gameName).addPlayer(masterDatabase.getMasterPlayerDatabase().getPlayer(username));
@@ -97,14 +91,12 @@ public class GameDatabase {
         if (getGame(gameName).getCurrentNumPlayers() == 1) {
             games.remove(getGame(gameName));
         } else {
-            Game gameDeepCopy = new Gson().fromJson(new Gson().toJson(getGame(gameName)), Game.class);
-            gameDeepCopy.removePlayer(username);
-
-            for (int i = 0; i < gameDeepCopy.getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).updateBroadcastContent(gameDeepCopy);
-            }
-
             getGame(gameName).removePlayer(username);
+
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().removePlayer(username);
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
         }
     }
 
@@ -114,18 +106,11 @@ public class GameDatabase {
         if (getGame(gameName).getSinglePlayer(username).getHero() == null) {
             return IsReadyResponses.ERROR_NO_SELECTED_HERO;
         } else {
-            Game gameDeepCopy = new Gson().fromJson(new Gson().toJson(getGame(gameName)), Game.class);
-            gameDeepCopy.getSinglePlayer(username).setReady(!gameDeepCopy.getSinglePlayer(username).isReady());
+            getGame(gameName).getSinglePlayer(username).setReady(!getGame(gameName).getSinglePlayer(username).isReady());
 
-            for (int i = 0; i < gameDeepCopy.getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(gameDeepCopy.getPlayers()[i].getUsername()).updateBroadcastContent(gameDeepCopy);
-            }
-
-            for (Player p : getGame(gameName).getPlayers()) {
-                if (p.getUsername().equals(username)) {
-                    p.setReady(!p.isReady());
-                    break;
-                }
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                //masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().getSinglePlayer(username).setReady(!getGame(gameName).getSinglePlayer(username).isReady());
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
             return IsReadyResponses.IS_READY_SUCCESS;
         }
@@ -141,18 +126,13 @@ public class GameDatabase {
                 }
             }
 
-            Game gameDeepCopy = new Gson().fromJson(new Gson().toJson(getGame(gameName)), Game.class);
-            for (Player p : gameDeepCopy.getPlayers()) {
-                if (p.getUsername().equals(username)) {
-                    p.setHero(hero);
-                    break;
-                }
-            }
-            for (int i = 0; i < gameDeepCopy.getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(gameDeepCopy.getPlayers()[i].getUsername()).updateBroadcastContent(gameDeepCopy);
+            getGame(gameName).getSinglePlayer(username).setHero(hero);
+
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().getSinglePlayer(username).setHero(hero);
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
 
-            getGame(gameName).getSinglePlayer(username).setHero(hero);
             return SelectHeroResponses.SELECT_HERO_SUCCESS;
         } else {
             return SelectHeroResponses.ERROR_HERO_ALREADY_SELECTED;

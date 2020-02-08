@@ -1,7 +1,5 @@
 package LoAServer;
 
-import com.google.gson.Gson;
-import eu.kartoffelquadrat.asyncrestlib.BroadcastContentManager;
 import eu.kartoffelquadrat.asyncrestlib.ResponseGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,23 +24,12 @@ public class MessageController {
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/sendMsg")
     public void sendMsg(@PathVariable String gameName, @PathVariable String username, @RequestBody Message m) {
         System.out.println("new message: " + m.getMsg());
-//
-//        masterDatabase.getSingleMessageDatabase(gameName).add(m);
-//
-//        // CHANGE THIS!!! when add create/join game do all players in GAME!!!!
-//        MessageDatabase msgDatabaseDeepCopy = new Gson().fromJson(new Gson().toJson(masterDatabase.getMasterMessageDatabaseDBCM().get("User 1").getCurrentBroadcastContent()), MessageDatabase.class);
-//        msgDatabaseDeepCopy.add(m);
-//        masterDatabase.getMasterMessageDatabaseDBCM().get("User 1").updateBroadcastContent(msgDatabaseDeepCopy);
-//
-//        MessageDatabase msgDatabaseDeepCopy2 = new Gson().fromJson(new Gson().toJson(masterDatabase.getMasterMessageDatabaseDBCM().get("User 2").getCurrentBroadcastContent()), MessageDatabase.class);
-//        msgDatabaseDeepCopy2.add(m);
-//        masterDatabase.getMasterMessageDatabaseDBCM().get("User 2").updateBroadcastContent(msgDatabaseDeepCopy2);
+
         masterDatabase.getSingleMessageDatabase(gameName).add(m);
 
         for (Player p : masterDatabase.getMasterGameDatabase().getGame(gameName).getPlayers()) {
-            MessageDatabase msgDatabaseDeepCopy = new Gson().fromJson(new Gson().toJson(masterDatabase.getMasterMessageDatabaseDBCM().get(username).getCurrentBroadcastContent()), MessageDatabase.class);
-            msgDatabaseDeepCopy.add(m);
-            masterDatabase.getMasterMessageDatabaseDBCM().get(username).updateBroadcastContent(msgDatabaseDeepCopy);
+            masterDatabase.getMasterMessageDatabaseDBCM().get(username).getCurrentBroadcastContent().add(m);
+            masterDatabase.getMasterMessageDatabaseDBCM().get(username).touch();
         }
     }
 }
