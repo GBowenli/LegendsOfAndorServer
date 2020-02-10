@@ -46,8 +46,9 @@ public class GameDatabase {
         if (getGame(g.getGameName()) == null) {
             games.add(g);
             masterDatabase.addMessageDatabase(g.getGameName());
-            masterDatabase.addGameBCM(g.getPlayers()[0].getUsername(), g.getGameName());
             masterDatabase.addMessageDatabaseBCM(g.getPlayers()[0].getUsername(), g.getGameName()); // when running/testing this remove hardcode in MessageController
+            masterDatabase.addGameBCM(g.getPlayers()[0].getUsername(), g.getGameName());
+
             return HostGameResponses.HOST_GAME_SUCCESS;
         } else {
             return HostGameResponses.ERROR_GAME_ALREADY_EXISTS;
@@ -65,12 +66,12 @@ public class GameDatabase {
             int maxNumPlayers = getGame(gameName).getMaxNumPlayers();
 
             if (currentNumPlayers < maxNumPlayers) {
+                getGame(gameName).addPlayer(masterDatabase.getMasterPlayerDatabase().getPlayer(username));
+
                 for (int i = 0; i < currentNumPlayers; i++) {
-                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().addPlayer(masterDatabase.getMasterPlayerDatabase().getPlayer(username));
                     masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
                 }
 
-                getGame(gameName).addPlayer(masterDatabase.getMasterPlayerDatabase().getPlayer(username));
                 masterDatabase.addGameBCM(username, gameName);
                 masterDatabase.addMessageDatabaseBCM(username, gameName);
                 return JoinGameResponses.JOIN_GAME_SUCCESS;
@@ -92,11 +93,11 @@ public class GameDatabase {
 
         if (getGame(gameName).getCurrentNumPlayers() == 1) {
             games.remove(getGame(gameName));
+            masterDatabase.deleteMessageDatabase(gameName);
         } else {
             getGame(gameName).removePlayer(username);
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().removePlayer(username);
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
         }
@@ -111,7 +112,6 @@ public class GameDatabase {
             getGame(gameName).getSinglePlayer(username).setReady(!getGame(gameName).getSinglePlayer(username).isReady());
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().getSinglePlayer(username).setReady(getGame(gameName).getSinglePlayer(username).isReady());
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
             return IsReadyResponses.IS_READY_SUCCESS;
@@ -131,7 +131,6 @@ public class GameDatabase {
             getGame(gameName).getSinglePlayer(username).setHero(hero);
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().getSinglePlayer(username).setHero(hero);
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
 
@@ -153,7 +152,6 @@ public class GameDatabase {
             getGame(gameName).setActive(true);
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).getCurrentBroadcastContent().setActive(true);
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
 

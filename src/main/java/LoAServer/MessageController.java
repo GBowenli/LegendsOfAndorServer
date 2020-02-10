@@ -1,5 +1,6 @@
 package LoAServer;
 
+import com.google.gson.Gson;
 import eu.kartoffelquadrat.asyncrestlib.ResponseGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ public class MessageController {
 
     @RequestMapping(method=RequestMethod.GET, value="/{gameName}/getAllMsgs")
     public ArrayList<Message> getAllMsgs(@PathVariable String gameName) {
+        System.out.println(new Gson().toJson(masterDatabase.getSingleMessageDatabase(gameName).getMessages()));
         return masterDatabase.getSingleMessageDatabase(gameName).getMessages();
     }
 
@@ -27,9 +29,8 @@ public class MessageController {
 
         masterDatabase.getSingleMessageDatabase(gameName).add(m);
 
-        for (Player p : masterDatabase.getMasterGameDatabase().getGame(gameName).getPlayers()) {
-            masterDatabase.getMasterMessageDatabaseDBCM().get(username).getCurrentBroadcastContent().add(m);
-            masterDatabase.getMasterMessageDatabaseDBCM().get(username).touch();
+        for (int i = 0; i < masterDatabase.getMasterGameDatabase().getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterMessageDatabaseDBCM().get(masterDatabase.getMasterGameDatabase().getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
     }
 }
