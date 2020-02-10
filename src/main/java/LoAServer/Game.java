@@ -79,6 +79,7 @@ public class Game implements BroadcastContent {
     public void removePlayer(String username) {
         for (int i = 0; i < currentNumPlayers; i++) {
             if (players[i].getUsername().equals(username)) {
+                players[i].setHero(null);
                 for (int j = i; j < maxNumPlayers; j++) {
                     if (j == maxNumPlayers-1) {
                         players[j] = null;
