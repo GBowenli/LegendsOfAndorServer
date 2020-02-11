@@ -18,6 +18,12 @@ public class PregameController {
         return masterDatabase.getMasterPlayerDatabase().login(p);
     }
 
+    @RequestMapping(method=RequestMethod.POST, value="/logout")
+    public LogoutResponses logout(@RequestBody Player p) {
+        System.out.println("LOGGING OUT: " +p.getUsername() + p.getPassword());
+        return masterDatabase.getMasterPlayerDatabase().logout(p);
+    }
+
     // new controllers here not yet tested
     // missing - choose hero, distribute items
     @RequestMapping(method=RequestMethod.GET, value="/getAllGames")
