@@ -46,7 +46,7 @@ public class Player {
     public boolean isLoggedIn() {
         return isLoggedIn;
     }
-    public void setLoggedIn(Boolean loggedIn) {
+    public void setLoggedIn(boolean loggedIn) {
         isLoggedIn = loggedIn;
     }
     public Hero getHero() {
