@@ -6,6 +6,10 @@ enum LoginResponses {
     LOGIN_SUCCESS, NEW_LOGIN_CREATED, LOGIN_ERROR_INCORRECT_PASSWORD, LOGIN_ERROR_ALREADY_LOGGED_IN
 }
 
+enum LogoutResponses {
+    LOGOUT_SUCCESS, LOGOUT_FAILURE
+}
+
 public class PlayerDatabase {
     private ArrayList<Player> players;
 
@@ -40,5 +44,16 @@ public class PlayerDatabase {
             }
         }
         return null;
+    }
+
+    //logout a player from the app
+    public LogoutResponses logout(Player player){
+        for(Player p : players){
+            if(p.getUsername().equals(player.getUsername())){
+                p.setLoggedIn(false);
+                return LogoutResponses.LOGOUT_SUCCESS;
+            }
+        }
+        return LogoutResponses.LOGOUT_FAILURE;
     }
 }

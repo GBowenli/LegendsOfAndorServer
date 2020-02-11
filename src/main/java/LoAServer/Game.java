@@ -80,6 +80,7 @@ public class Game implements BroadcastContent {
         for (int i = 0; i < currentNumPlayers; i++) {
             if (players[i].getUsername().equals(username)) {
                 players[i].setHero(null);
+                players[i].setReady(false);
                 for (int j = i; j < maxNumPlayers; j++) {
                     if (j == maxNumPlayers-1) {
                         players[j] = null;
