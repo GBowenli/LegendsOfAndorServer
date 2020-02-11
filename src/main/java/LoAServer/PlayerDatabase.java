@@ -46,7 +46,7 @@ public class PlayerDatabase {
         return null;
     }
 
-    //logout a player
+    //logout a player from the app
     public LogoutResponses logout(Player player){
         for(Player p : players){
             if(p.getUsername().equals(player.getUsername())){
