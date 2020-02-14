@@ -118,17 +118,17 @@ public class GameDatabase {
         }
     }
 
-    public SelectHeroResponses playerSelectHero(String gameName, String username, Hero hero) {
+    public SelectHeroResponses playerSelectHero(String gameName, String username, HeroClass hero) {
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
         if (getGame(gameName).getSinglePlayer(username).getHero() == null) {
-            for (Hero h : getGame(gameName).getAllHeroes()) {
+            for (HeroClass h : getGame(gameName).getAllHeroes()) {
                 if (h.equals(hero)) {
                     return SelectHeroResponses.ERROR_DUPLICATE_HERO;
                 }
             }
 
-            getGame(gameName).getSinglePlayer(username).setHero(hero);
+            getGame(gameName).getSinglePlayer(username).setHero(new Hero(hero));
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();

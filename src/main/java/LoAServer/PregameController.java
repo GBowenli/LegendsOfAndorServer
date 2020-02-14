@@ -24,8 +24,6 @@ public class PregameController {
         return masterDatabase.getMasterPlayerDatabase().logout(p);
     }
 
-    // new controllers here not yet tested
-    // missing - choose hero, distribute items
     @RequestMapping(method=RequestMethod.GET, value="/getAllGames")
     public ArrayList<Game> getAllGames() {
         return masterDatabase.getMasterGameDatabase().getAllGames();
@@ -58,7 +56,7 @@ public class PregameController {
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/selectHero")
-    public SelectHeroResponses selectHero(@PathVariable String gameName, @PathVariable String username, @RequestBody Hero hero) {
+    public SelectHeroResponses selectHero(@PathVariable String gameName, @PathVariable String username, @RequestBody HeroClass hero) {
         return masterDatabase.getMasterGameDatabase().playerSelectHero(gameName, username, hero);
     }
 

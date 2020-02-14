@@ -15,6 +15,7 @@ public class Region {
     private boolean fountainStatus;
     private boolean merchant;
     private boolean bridge;
+    private int gold;
     private ArrayList<Region> adjacentRegions;
     private Region bridgeAdjacentRegion;
     private Region nextRegion;
@@ -84,6 +85,14 @@ public class Region {
 
     public void setBridge(boolean bridge) {
         this.bridge = bridge;
+    }
+
+    public int getGold() {
+        return gold;
+    }
+
+    public void setGold(int gold) {
+        this.gold = gold;
     }
 
     public ArrayList<Region> getAdjacentRegions() {
