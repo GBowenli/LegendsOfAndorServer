@@ -10,6 +10,7 @@ public class Game implements BroadcastContent {
     private Player[] players;
     private String gameName;
     private boolean isActive;
+    private boolean itemsDistributed;
 
     public Game() {}
 
@@ -55,6 +56,14 @@ public class Game implements BroadcastContent {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public boolean isItemsDistributed() {
+        return itemsDistributed;
+    }
+
+    public void setItemsDistributed(boolean itemsDistributed) {
+        this.itemsDistributed = itemsDistributed;
     }
 
     public Player getSinglePlayer(String username) {

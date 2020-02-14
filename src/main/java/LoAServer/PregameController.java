@@ -64,4 +64,9 @@ public class PregameController {
     public StartGameResponses startGame(@PathVariable String gameName, @PathVariable String username) {
         return masterDatabase.getMasterGameDatabase().startGame(gameName, username);
     }
+
+    @RequestMapping(method=RequestMethod.POST, value = "/{gameName}/distributeItems")
+    public void distributeItems(@PathVariable String gameName, @RequestBody ItemDistribution itemDistribution) {
+        masterDatabase.getMasterGameDatabase().distributeItems(gameName, itemDistribution);
+    }
 }

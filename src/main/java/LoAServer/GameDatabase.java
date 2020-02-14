@@ -155,9 +155,30 @@ public class GameDatabase {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
 
+            masterDatabase.addRegionDatabase(gameName, new RegionDatabase());
+
             return StartGameResponses.START_GAME_SUCCESS;
         } else {
             return StartGameResponses.ERROR_PLAYER_NOT_READY;
         }
+    }
+
+    public void distributeItems(String gameName, ItemDistribution itemDistribution) {
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            if (i == 0) {
+                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer1Gold());
+                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer1Items());
+            } else if (i == 1) {
+                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer2Gold());
+                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer2Items());
+            } else if (i == 2) {
+                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer3Gold());
+                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer3Items());
+            } else { // i = 3
+                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer4Gold());
+                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer4Items());
+            }
+        }
+        getGame(gameName).setItemsDistributed(true);
     }
 }

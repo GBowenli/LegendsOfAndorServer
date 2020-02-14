@@ -16,6 +16,8 @@ public class MasterDatabase {
     private HashMap<String, BroadcastContentManager<MessageDatabase>> masterMessageDatabaseBCM = new HashMap<>(); // one message database BCM per Player
     private HashMap<String, BroadcastContentManager<Game>> masterGameBCM = new HashMap<>();
 
+    private HashMap<String, RegionDatabase> masterRegionDatabase = new HashMap<>();
+
     private MasterDatabase() {}
 
     public static MasterDatabase getInstance() {
@@ -48,7 +50,9 @@ public class MasterDatabase {
         }
     }
 
-
+    public void addRegionDatabase(String gameName, RegionDatabase regionDatabase) {
+        masterRegionDatabase.put(gameName, regionDatabase);
+    }
 
     public void removeMessageDatabaseBCM(String username) {
         masterMessageDatabaseBCM.remove(username);
@@ -90,5 +94,9 @@ public class MasterDatabase {
 
     public HashMap<String, BroadcastContentManager<Game>> getMasterGameBCM() {
         return masterGameBCM;
+    }
+
+    public HashMap<String, RegionDatabase> getMasterRegionDatabase() {
+        return masterRegionDatabase;
     }
 }

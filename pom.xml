@@ -20,13 +20,6 @@
         <version>1.4.2.RELEASE</version>
     </parent>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -40,9 +33,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.kartoffelquadrat</groupId>
-            <artifactId>AsyncRestLib</artifactId>
-            <version>v1.5</version>
+            <groupId>eu.kartoffelquadrat</groupId>
+            <artifactId>asyncrestlib</artifactId>
+            <version>1.5.1</version>
         </dependency>
     </dependencies>
 </project>

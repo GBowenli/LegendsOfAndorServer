@@ -1,5 +1,5 @@
 package LoAServer;
 
-public interface Item {
-    void useItem();
+public abstract class Item {
+
 }
