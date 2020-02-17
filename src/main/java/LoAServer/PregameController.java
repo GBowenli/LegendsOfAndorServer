@@ -47,6 +47,7 @@ public class PregameController {
 
     @RequestMapping(method=RequestMethod.GET, value="/{username}/getPregameUpdate")
     public DeferredResult<ResponseEntity<String>> getPregameUpdate(@PathVariable String username) {
+        System.out.println("k");
         return ResponseGenerator.getAsyncUpdate(5000, masterDatabase.getMasterGameBCM().get(username));
     }
 

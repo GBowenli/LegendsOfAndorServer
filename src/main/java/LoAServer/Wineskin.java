@@ -16,4 +16,3 @@ public class Wineskin extends Item {
         this.uses = uses;
     }
 }
-
