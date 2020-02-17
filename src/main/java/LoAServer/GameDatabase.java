@@ -179,13 +179,13 @@ public class GameDatabase {
                 getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer4Items());
             }
         }
+        getGame(gameName).setItemsDistributed(true);
+
 
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
-
-        getGame(gameName).setItemsDistributed(true);
     }
 }
