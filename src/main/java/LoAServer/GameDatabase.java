@@ -23,6 +23,9 @@ enum StartGameResponses {
     START_GAME_SUCCESS, ERROR_PLAYER_NOT_READY, ERROR_NOT_HOST, ERROR_NOT_ENOUGH_PLAYERS
 }
 
+enum DistributeItemsResponses{
+    DISTRIBUTE_ITEMS_SUCCESS, DISTRIBUTE_ITEMS_FAILURE
+}
 
 public class GameDatabase {
     private ArrayList<Game> games;
@@ -163,29 +166,35 @@ public class GameDatabase {
         }
     }
 
-    public void distributeItems(String gameName, ItemDistribution itemDistribution) {
+    public DistributeItemsResponses distributeItems(String gameName, ItemDistribution itemDistribution) {
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             if (i == 0) {
                 getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer1Gold());
                 getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer1Items());
+                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getPlayer1Gold() + " Gold and " + itemDistribution.getPlayer1Items().size() + " Wineskins");
             } else if (i == 1) {
                 getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer2Gold());
                 getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer2Items());
+                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getPlayer2Gold() + " Gold and " + itemDistribution.getPlayer2Items().size() + " Wineskins");
             } else if (i == 2) {
                 getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer3Gold());
                 getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer3Items());
+                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getPlayer3Gold() + " Gold and " + itemDistribution.getPlayer3Items().size() + " Wineskins");
             } else { // i = 3
                 getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer4Gold());
                 getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer4Items());
+                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getPlayer4Gold() + " Gold and " + itemDistribution.getPlayer4Items().size() + " Wineskins");
             }
         }
-        getGame(gameName).setItemsDistributed(true);
-
 
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
+
+        getGame(gameName).setItemsDistributed(true);
+        return DistributeItemsResponses.DISTRIBUTE_ITEMS_SUCCESS;
+
     }
 }

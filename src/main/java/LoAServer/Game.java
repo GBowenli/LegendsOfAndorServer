@@ -11,6 +11,7 @@ public class Game implements BroadcastContent {
     private String gameName;
     private boolean isActive;
     private boolean itemsDistributed;
+    private String itemsDistributedMessage;
 
     public Game() {}
 
@@ -125,5 +126,13 @@ public class Game implements BroadcastContent {
     @Override
     public boolean isEmpty() {
         return (players.length == 0);
+    }
+
+    public void appendToDistributedItemsMessage(String message){
+        this.itemsDistributedMessage += message + "/n";
+    }
+
+    public String getItemsDistributedMessage(){
+        return itemsDistributedMessage;
     }
 }
