@@ -129,7 +129,7 @@ public class Game implements BroadcastContent {
     }
 
     public void appendToDistributedItemsMessage(String message){
-        this.itemsDistributedMessage += message + "/n";
+        this.itemsDistributedMessage += message + "\n";
     }
 
     public String getItemsDistributedMessage(){
