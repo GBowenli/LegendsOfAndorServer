@@ -29,11 +29,11 @@ enum DistributeItemsResponses{
 }
 
 enum GetAvailableRegionsReponses {
-    NotCurrentTurn, DeductWillpower, NotEnoughWillpower, CurrentHourMaxed, CannotMoveAfterFight, Success
+    NOT_CURRENT_TURN, DEDUCT_WILLPOWER, NOT_ENOUGH_WILLPOWER, CURRENT_HOUR_MAXED, CANNOT_MOVE_AFTER_FIGHT, SUCCESS
 }
 
 enum MoveResponses {
-    PickUpFarmer, Success
+    PICK_UP_FARMER, MERCHANT_INTERACTION, EMPTY_WELL, NO_OTHER_ACTIONS
 }
 
 public class GameDatabase {
@@ -163,7 +163,7 @@ public class GameDatabase {
             MasterDatabase masterDatabase = MasterDatabase.getInstance();
             getGame(gameName).setActive(true);
             getGame(gameName).setCurrentHero(getGame(gameName).getSinglePlayer(username).getHero());
-            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.None);
+            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
             if (getGame(gameName).getCurrentNumPlayers() == 2) {
                 getGame(gameName).setGoldenShields(3);
@@ -219,16 +219,16 @@ public class GameDatabase {
 
         if (getGame(gameName).getCurrentHero().equals(p.getHero())) {
             if (p.getHero().getCurrentHour() == 10) {
-                return Arrays.asList(null, GetAvailableRegionsReponses.CurrentHourMaxed);
+                return Arrays.asList(null, GetAvailableRegionsReponses.CURRENT_HOUR_MAXED);
             } else {
-                if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.Fight) {
-                    return Arrays.asList(null, GetAvailableRegionsReponses.CannotMoveAfterFight);
-                } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.None) {
-                    getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.Move);
+                if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.FIGHT) {
+                    return Arrays.asList(null, GetAvailableRegionsReponses.CANNOT_MOVE_AFTER_FIGHT);
+                } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.NONE) {
+                    getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.MOVE);
                 }
 
                 if (p.getHero().getCurrentHour() >= 7 && p.getHero().getWillPower() <= 2) {
-                    return Arrays.asList(null, GetAvailableRegionsReponses.NotEnoughWillpower);
+                    return Arrays.asList(null, GetAvailableRegionsReponses.NOT_ENOUGH_WILLPOWER);
                 }
 
                 ArrayList<Integer> adjacentRegions = new ArrayList<>();
@@ -241,13 +241,13 @@ public class GameDatabase {
                 }
 
                 if (p.getHero().getCurrentHour() >= 7) {
-                    return Arrays.asList(adjacentRegions, GetAvailableRegionsReponses.DeductWillpower);
+                    return Arrays.asList(adjacentRegions, GetAvailableRegionsReponses.DEDUCT_WILLPOWER);
                 } else {
-                    return Arrays.asList(adjacentRegions, GetAvailableRegionsReponses.Success);
+                    return Arrays.asList(adjacentRegions, GetAvailableRegionsReponses.SUCCESS);
                 }
             }
         } else {
-            return Arrays.asList(null, GetAvailableRegionsReponses.NotCurrentTurn);
+            return Arrays.asList(null, GetAvailableRegionsReponses.NOT_CURRENT_TURN);
         }
     }
 

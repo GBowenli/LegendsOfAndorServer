@@ -5,7 +5,7 @@ import eu.kartoffelquadrat.asyncrestlib.BroadcastContent;
 import java.util.ArrayList;
 
 enum TurnOptions{
-    Move, Fight, None
+    MOVE, FIGHT, NONE
 }
 
 public class Game implements BroadcastContent {
