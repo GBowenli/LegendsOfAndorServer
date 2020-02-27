@@ -1,4 +1,4 @@
-package LoAServer;
+package LoAServer.Item;
 
 public class Item {
 

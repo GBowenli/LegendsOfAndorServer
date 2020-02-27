@@ -1,5 +1,4 @@
-package LoAServer;
-
+package LoAServer.Item;
 
 public class Wineskin extends Item {
     int uses;

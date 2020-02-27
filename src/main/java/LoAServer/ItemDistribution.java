@@ -1,5 +1,7 @@
 package LoAServer;
 
+import LoAServer.Item.Item;
+
 import java.util.ArrayList;
 
 public class ItemDistribution {

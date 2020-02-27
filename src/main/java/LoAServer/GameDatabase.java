@@ -1,6 +1,8 @@
 package LoAServer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 enum HostGameResponses {
     HOST_GAME_SUCCESS, ERROR_GAME_ALREADY_EXISTS
@@ -24,6 +26,14 @@ enum StartGameResponses {
 
 enum DistributeItemsResponses{
     DISTRIBUTE_ITEMS_SUCCESS, DISTRIBUTE_ITEMS_FAILURE
+}
+
+enum GetAvailableRegionsReponses {
+    NotCurrentTurn, DeductWillpower, NotEnoughWillpower, CurrentHourMaxed, CannotMoveAfterFight, Success
+}
+
+enum MoveResponses {
+    PickUpFarmer, Success
 }
 
 public class GameDatabase {
@@ -152,6 +162,16 @@ public class GameDatabase {
         if (getGame(gameName).allReady()) {
             MasterDatabase masterDatabase = MasterDatabase.getInstance();
             getGame(gameName).setActive(true);
+            getGame(gameName).setCurrentHero(getGame(gameName).getSinglePlayer(username).getHero());
+            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.None);
+
+            if (getGame(gameName).getCurrentNumPlayers() == 2) {
+                getGame(gameName).setGoldenShields(3);
+            } else if (getGame(gameName).getCurrentNumPlayers() == 3) {
+                getGame(gameName).setGoldenShields(2);
+            } else { // equals 4
+                getGame(gameName).setGoldenShields(1);
+            }
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
@@ -192,6 +212,46 @@ public class GameDatabase {
 
         getGame(gameName).setItemsDistributed(true);
         return DistributeItemsResponses.DISTRIBUTE_ITEMS_SUCCESS;
+    }
 
+    public List<Object> getAvailableRegions (String gameName, String username) {
+        Player p = getGame(gameName).getSinglePlayer(username);
+
+        if (getGame(gameName).getCurrentHero().equals(p.getHero())) {
+            if (p.getHero().getCurrentHour() == 10) {
+                return Arrays.asList(null, GetAvailableRegionsReponses.CurrentHourMaxed);
+            } else {
+                if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.Fight) {
+                    return Arrays.asList(null, GetAvailableRegionsReponses.CannotMoveAfterFight);
+                } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.None) {
+                    getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.Move);
+                }
+
+                if (p.getHero().getCurrentHour() >= 7 && p.getHero().getWillPower() <= 2) {
+                    return Arrays.asList(null, GetAvailableRegionsReponses.NotEnoughWillpower);
+                }
+
+                ArrayList<Integer> adjacentRegions = new ArrayList<>();
+                RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+
+                adjacentRegions.addAll(regionDatabase.getRegion(p.getHero().getCurrentSpace()).getAdjacentRegions());
+
+                if (regionDatabase.getRegion(p.getHero().getCurrentSpace()).isBridge()) {
+                    adjacentRegions.add(regionDatabase.getRegion(p.getHero().getCurrentSpace()).getBridgeAdjacentRegion());
+                }
+
+                if (p.getHero().getCurrentHour() >= 7) {
+                    return Arrays.asList(adjacentRegions, GetAvailableRegionsReponses.DeductWillpower);
+                } else {
+                    return Arrays.asList(adjacentRegions, GetAvailableRegionsReponses.Success);
+                }
+            }
+        } else {
+            return Arrays.asList(null, GetAvailableRegionsReponses.NotCurrentTurn);
+        }
+    }
+
+    public MoveResponses move(String gameName, String username, Integer targetRegion) { // do the verification on android (checking if is feasible adjacent)
+        return null;
     }
 }

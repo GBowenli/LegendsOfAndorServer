@@ -11,6 +11,7 @@ enum TurnOptions{
 public class Game implements BroadcastContent {
     private int maxNumPlayers;
     private int currentNumPlayers;
+    private int goldenShields;
     private Player[] players;
     private String gameName;
     private boolean isActive;
@@ -18,7 +19,9 @@ public class Game implements BroadcastContent {
     private String itemsDistributedMessage;
     private RegionDatabase regionDatabase;
     private Hero currentHero;
+    private Hero firstHeroInNextDay;
     private TurnOptions currentHeroSelectedOption;
+    private ArrayList<Farmer> farmers;
 
     public Game() {}
 
@@ -29,6 +32,7 @@ public class Game implements BroadcastContent {
         this.players = new Player[maxNumPlayers];
         this.players[0] = p;
         regionDatabase = new RegionDatabase(Difficulty.Hard); // hardcoded change when add Difficulty attribute
+        farmers = new ArrayList<Farmer>();
     }
 
     public int getMaxNumPlayers() {
@@ -45,6 +49,14 @@ public class Game implements BroadcastContent {
 
     public void setCurrentNumPlayers(int currentNumPlayers) {
         this.currentNumPlayers = currentNumPlayers;
+    }
+
+    public int getGoldenShields() {
+        return goldenShields;
+    }
+
+    public void setGoldenShields(int goldenShields) {
+        this.goldenShields = goldenShields;
     }
 
     public Player[] getPlayers() {
@@ -143,6 +155,14 @@ public class Game implements BroadcastContent {
         this.currentHero = currentHero;
     }
 
+    public Hero getFirstHeroInNextDay() {
+        return firstHeroInNextDay;
+    }
+
+    public void setFirstHeroInNextDay(Hero firstHeroInNextDay) {
+        this.firstHeroInNextDay = firstHeroInNextDay;
+    }
+
     public TurnOptions getCurrentHeroSelectedOption() {
         return currentHeroSelectedOption;
     }
@@ -151,16 +171,24 @@ public class Game implements BroadcastContent {
         this.currentHeroSelectedOption = currentHeroSelectedOption;
     }
 
-    @Override
-    public boolean isEmpty() {
-        return (players.length == 0);
-    }
-
     public void appendToDistributedItemsMessage(String message){
         this.itemsDistributedMessage += message + "\n";
     }
 
     public String getItemsDistributedMessage(){
         return itemsDistributedMessage;
+    }
+
+    public ArrayList<Farmer> getFarmers() {
+        return farmers;
+    }
+
+    public void setFarmers(ArrayList<Farmer> farmers) {
+        this.farmers = farmers;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return (players.length == 0);
     }
 }

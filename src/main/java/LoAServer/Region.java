@@ -1,5 +1,8 @@
 package LoAServer;
 
+import LoAServer.Creature.Creature;
+import LoAServer.Item.Item;
+
 import java.util.ArrayList;
 
 enum FogKind {
@@ -19,6 +22,9 @@ public class Region {
     private Integer bridgeAdjacentRegion;
     private Integer nextRegion;
     private Integer bridgeNextRegion;
+    private ArrayList<Item> items;
+    private Creature currentCreature;
+    private ArrayList<Farmer> farmers;
 
     public Region() {}
 
@@ -31,6 +37,8 @@ public class Region {
         this.merchant = merchant;
         this.bridge = bridge;
         adjacentRegions = new ArrayList<>();
+        items = new ArrayList<>();
+        farmers = new ArrayList<>();
     }
     public int getNumber() {
         return number;
@@ -100,6 +108,14 @@ public class Region {
         return adjacentRegions;
     }
 
+    public Integer getBridgeAdjacentRegion() {
+        return bridgeAdjacentRegion;
+    }
+
+    public Integer getBridgeNextRegion() {
+        return bridgeNextRegion;
+    }
+
     public void setAdjacentRegions(ArrayList<Integer> adjacentRegions) {
         this.adjacentRegions = adjacentRegions;
     }
@@ -118,5 +134,29 @@ public class Region {
 
     public void setBridgeNextRegion(Integer bridgeNextRegion) {
         this.bridgeNextRegion = bridgeNextRegion;
+    }
+
+    public ArrayList<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(ArrayList<Item> items) {
+        this.items = items;
+    }
+
+    public Creature getCurrentCreature() {
+        return currentCreature;
+    }
+
+    public void setCurrentCreature(Creature currentCreature) {
+        this.currentCreature = currentCreature;
+    }
+
+    public ArrayList<Farmer> getFarmers() {
+        return farmers;
+    }
+
+    public void setFarmers(ArrayList<Farmer> farmers) {
+        this.farmers = farmers;
     }
 }

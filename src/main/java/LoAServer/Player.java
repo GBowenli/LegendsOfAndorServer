@@ -47,7 +47,6 @@ public class Player {
     public Hero getHero() {
         return hero;
     }
-
     public void setHero(Hero hero) {
         this.hero = hero;
     }
