@@ -4,6 +4,10 @@ import eu.kartoffelquadrat.asyncrestlib.BroadcastContent;
 
 import java.util.ArrayList;
 
+enum TurnOptions{
+    Move, Fight, None
+}
+
 public class Game implements BroadcastContent {
     private int maxNumPlayers;
     private int currentNumPlayers;
@@ -12,6 +16,9 @@ public class Game implements BroadcastContent {
     private boolean isActive;
     private boolean itemsDistributed;
     private String itemsDistributedMessage;
+    private RegionDatabase regionDatabase;
+    private Hero currentHero;
+    private TurnOptions currentHeroSelectedOption;
 
     public Game() {}
 
@@ -21,6 +28,7 @@ public class Game implements BroadcastContent {
         this.currentNumPlayers = 1;
         this.players = new Player[maxNumPlayers];
         this.players[0] = p;
+        regionDatabase = new RegionDatabase(Difficulty.Hard); // hardcoded change when add Difficulty attribute
     }
 
     public int getMaxNumPlayers() {
@@ -121,6 +129,26 @@ public class Game implements BroadcastContent {
             }
         }
         return true;
+    }
+
+    public RegionDatabase getRegionDatabase() {
+        return regionDatabase;
+    }
+
+    public Hero getCurrentHero() {
+        return currentHero;
+    }
+
+    public void setCurrentHero(Hero currentHero) {
+        this.currentHero = currentHero;
+    }
+
+    public TurnOptions getCurrentHeroSelectedOption() {
+        return currentHeroSelectedOption;
+    }
+
+    public void setCurrentHeroSelectedOption(TurnOptions currentHeroSelectedOption) {
+        this.currentHeroSelectedOption = currentHeroSelectedOption;
     }
 
     @Override

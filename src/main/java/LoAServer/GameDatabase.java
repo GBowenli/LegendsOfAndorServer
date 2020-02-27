@@ -1,7 +1,6 @@
 package LoAServer;
 
 import java.util.ArrayList;
-import java.util.List;
 
 enum HostGameResponses {
     HOST_GAME_SUCCESS, ERROR_GAME_ALREADY_EXISTS
@@ -106,7 +105,7 @@ public class GameDatabase {
         }
     }
 
-    public IsReadyResponses playerIsReady(String gameName, String username) { // add logic in android that if it is the player himself do not update changes (update after clicked)
+    public IsReadyResponses playerIsReady(String gameName, String username) {
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
         if (getGame(gameName).getSinglePlayer(username).getHero() == null) {
@@ -157,8 +156,6 @@ public class GameDatabase {
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
-
-            masterDatabase.addRegionDatabase(gameName, new RegionDatabase());
 
             return StartGameResponses.START_GAME_SUCCESS;
         } else {

@@ -1,6 +1,5 @@
 package LoAServer;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 enum FogKind {
@@ -16,10 +15,12 @@ public class Region {
     private boolean merchant;
     private boolean bridge;
     private int gold;
-    private ArrayList<Region> adjacentRegions;
-    private Region bridgeAdjacentRegion;
-    private Region nextRegion;
-    private Region bridgeNextRegion;
+    private ArrayList<Integer> adjacentRegions;
+    private Integer bridgeAdjacentRegion;
+    private Integer nextRegion;
+    private Integer bridgeNextRegion;
+
+    public Region() {}
 
     public Region(int number, FogKind fog, boolean fogRevealed, boolean fountain, boolean fountainStatus, boolean merchant, boolean bridge) {
         this.number = number;
@@ -95,27 +96,27 @@ public class Region {
         this.gold = gold;
     }
 
-    public ArrayList<Region> getAdjacentRegions() {
+    public ArrayList<Integer> getAdjacentRegions() {
         return adjacentRegions;
     }
 
-    public void setAdjacentRegions(ArrayList<Region> adjacentRegions) {
+    public void setAdjacentRegions(ArrayList<Integer> adjacentRegions) {
         this.adjacentRegions = adjacentRegions;
     }
 
-    public void setBridgeAdjacentRegion(Region bridgeAdjacentRegion) {
+    public void setBridgeAdjacentRegion(Integer bridgeAdjacentRegion) {
         this.bridgeAdjacentRegion = bridgeAdjacentRegion;
     }
 
-    public Region getNextRegion() {
+    public Integer getNextRegion() {
         return nextRegion;
     }
 
-    public void setNextRegion(Region nextRegion) {
+    public void setNextRegion(Integer nextRegion) {
         this.nextRegion = nextRegion;
     }
 
-    public void setBridgeNextRegion(Region bridgeNextRegion) {
+    public void setBridgeNextRegion(Integer bridgeNextRegion) {
         this.bridgeNextRegion = bridgeNextRegion;
     }
 }

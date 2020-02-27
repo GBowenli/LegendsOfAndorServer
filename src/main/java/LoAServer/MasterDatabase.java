@@ -1,6 +1,5 @@
 package LoAServer;
 
-import com.google.gson.Gson;
 import eu.kartoffelquadrat.asyncrestlib.BroadcastContentManager;
 
 import java.util.ArrayList;
@@ -15,8 +14,6 @@ public class MasterDatabase {
     private ArrayList<MessageDatabase> masterMessageDatabase = new ArrayList<>();
     private HashMap<String, BroadcastContentManager<MessageDatabase>> masterMessageDatabaseBCM = new HashMap<>(); // one message database BCM per Player
     private HashMap<String, BroadcastContentManager<Game>> masterGameBCM = new HashMap<>();
-
-    private HashMap<String, RegionDatabase> masterRegionDatabase = new HashMap<>();
 
     private MasterDatabase() {}
 
@@ -48,10 +45,6 @@ public class MasterDatabase {
                 break;
             }
         }
-    }
-
-    public void addRegionDatabase(String gameName, RegionDatabase regionDatabase) {
-        masterRegionDatabase.put(gameName, regionDatabase);
     }
 
     public void removeMessageDatabaseBCM(String username) {
@@ -94,9 +87,5 @@ public class MasterDatabase {
 
     public HashMap<String, BroadcastContentManager<Game>> getMasterGameBCM() {
         return masterGameBCM;
-    }
-
-    public HashMap<String, RegionDatabase> getMasterRegionDatabase() {
-        return masterRegionDatabase;
     }
 }
