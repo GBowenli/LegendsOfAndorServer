@@ -22,17 +22,23 @@ public class Game implements BroadcastContent {
     private Hero firstHeroInNextDay;
     private TurnOptions currentHeroSelectedOption;
     private ArrayList<Farmer> farmers;
+    private Boolean difficultMode;
 
     public Game() {}
 
-    public Game(Player p, int maxNumPlayers, String gameName) {
+    public Game(Player p, int maxNumPlayers, String gameName, Boolean difficult) {
         this.gameName = gameName;
         this.maxNumPlayers = maxNumPlayers;
         this.currentNumPlayers = 1;
         this.players = new Player[maxNumPlayers];
         this.players[0] = p;
-        regionDatabase = new RegionDatabase(Difficulty.Hard); // hardcoded change when add Difficulty attribute
+        if(difficult){
+            regionDatabase = new RegionDatabase(Difficulty.HARD);
+        }else{
+            regionDatabase = new RegionDatabase(Difficulty.EASY);
+        }
         farmers = new ArrayList<Farmer>();
+        this.difficultMode = difficult;
     }
 
     public int getMaxNumPlayers() {
@@ -190,5 +196,13 @@ public class Game implements BroadcastContent {
     @Override
     public boolean isEmpty() {
         return (players.length == 0);
+    }
+
+    public Boolean getDifficultMode() {
+        return difficultMode;
+    }
+
+    public void setDifficultMode(Boolean difficultMode) {
+        this.difficultMode = difficultMode;
     }
 }

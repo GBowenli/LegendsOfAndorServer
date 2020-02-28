@@ -110,7 +110,7 @@ public class GameDatabase {
     }
 
     public ArrayList<Game> getAllGames() {
-        return games;
+        return this.games;
     }
 
     public void leavePregame(String gameName, String username) {
