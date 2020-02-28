@@ -2,6 +2,8 @@ package LoAServer;
 
 import LoAServer.Creature.Gor;
 import LoAServer.Creature.Skral;
+import LoAServer.Creature.Troll;
+import LoAServer.Creature.Wardraks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -291,6 +293,55 @@ public class RegionDatabase {
 
     public Region getRegion(int i) {
         return regionDatabase.get(i);
+    }
+
+    public ArrayList<Region> getAllRegionsWithCreatures() { // add in the order of Gor, Skral, Wardrak, Troll
+        ArrayList<Region> regionsWithCreatures = new ArrayList<>();
+
+        for (Region region : regionDatabase) {
+            if (region.getCurrentCreature() instanceof Gor) {
+                regionsWithCreatures.add(region);
+            }
+        }
+        for (Region region : regionDatabase) {
+            if (region.getCurrentCreature() instanceof Skral) {
+                regionsWithCreatures.add(region);
+            }
+        }
+        for (Region region : regionDatabase) {
+            if (region.getCurrentCreature() instanceof Wardraks) {
+                regionsWithCreatures.add(region);
+            }
+        }
+        for (Region region : regionDatabase) {
+            if (region.getCurrentCreature() instanceof Troll) {
+                regionsWithCreatures.add(region);
+            }
+        }
+
+        return regionsWithCreatures;
+    }
+
+    public ArrayList<Region> getAllRegionsWithWardraks() {
+        ArrayList<Region> regionsWithWardraks = new ArrayList<>();
+        for (Region region : regionDatabase) {
+            if (region.getCurrentCreature() instanceof Wardraks) {
+                regionsWithWardraks.add(region);
+            }
+        }
+
+        return regionsWithWardraks;
+    }
+
+    public ArrayList<Region> getAllRegionsWithFountain() {
+        ArrayList<Region> regionsWithFountains = new ArrayList<>();
+
+        regionsWithFountains.add(regionDatabase.get(5));
+        regionsWithFountains.add(regionDatabase.get(35));
+        regionsWithFountains.add(regionDatabase.get(45));
+        regionsWithFountains.add(regionDatabase.get(55));
+
+        return regionsWithFountains;
     }
 
     public ArrayList<Region> getRegionDatabase() {

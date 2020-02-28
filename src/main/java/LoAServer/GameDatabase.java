@@ -1,8 +1,10 @@
 package LoAServer;
 
+import LoAServer.Creature.Creature;
 import LoAServer.Creature.Gor;
 import LoAServer.Item.Wineskin;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +58,7 @@ enum ActivateFogResponses {
 }
 
 enum EndDayResponses {
-    DAY_ALREADY_ENDED, NOT_CURRENT_TURN, NEW_DAY, SUCCESS
+    DAY_ALREADY_ENDED, NOT_CURRENT_TURN, NEW_DAY, GAME_OVER, SUCCESS
 }
 
 public class GameDatabase {
@@ -419,11 +421,81 @@ public class GameDatabase {
                 getGame(gameName).setCurrentHero(getGame(gameName).getFirstHeroInNextDay());
                 getGame(gameName).setFirstHeroInNextDay(null);
 
+                ArrayList<Region> regionsWithCreatures = regionDatabase.getAllRegionsWithCreatures();
+                for (Region r : regionsWithCreatures) { // advance every creature once
+                    Creature creature = r.getCurrentCreature();
+                    r.setCurrentCreature(null);
+                    int newCreatureSpace;
+
+                    do {
+                        if (r.isBridge()) {
+                            newCreatureSpace = r.getBridgeNextRegion();
+                        } else {
+                            newCreatureSpace = r.getNextRegion();
+                        }
+                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreature() != null || newCreatureSpace != 0);
+
+                    if (newCreatureSpace == 0) {
+                        if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
+                            regionDatabase.getRegion(0).getFarmers().remove(regionDatabase.getRegion(0).getFarmers().size()-1);
+                        } else {
+                            getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
+                        }
+                    } else {
+                        regionDatabase.getRegion(newCreatureSpace).setCurrentCreature(creature);
+                    }
+                }
+
+                ArrayList<Region> regionsWithWardraks = regionDatabase.getAllRegionsWithWardraks();
+                for (Region r : regionsWithWardraks) { // advance every wardrak once again
+                    Creature creature = r.getCurrentCreature();
+                    r.setCurrentCreature(null);
+                    int newCreatureSpace;
+
+                    do {
+                        if (r.isBridge()) {
+                            newCreatureSpace = r.getBridgeNextRegion();
+                        } else {
+                            newCreatureSpace = r.getNextRegion();
+                        }
+                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreature() != null || newCreatureSpace != 0);
+
+                    if (newCreatureSpace == 0) {
+                        if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
+                            regionDatabase.getRegion(0).getFarmers().remove(regionDatabase.getRegion(0).getFarmers().size()-1);
+                        } else {
+                            getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
+                        }
+                    } else {
+                        regionDatabase.getRegion(newCreatureSpace).setCurrentCreature(creature);
+                    }
+                }
+
+                ArrayList<Region> regionsWithFountains = regionDatabase.getAllRegionsWithFountain();
+                for (Region r : regionsWithFountains) { // refresh every fountain (except the ones with a Hero on it)
+                    int regionNumber = r.getNumber();
+                    boolean heroOnFountain = false;
+
+                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                        if (getGame(gameName).getPlayers()[i].getHero().getCurrentSpace() == regionNumber) {
+                            heroOnFountain = true;
+                            break;
+                        }
+                    }
+
+                    if (!heroOnFountain) { // refresh all fountains without Hero on it
+                        r.setFountainStatus(true);
+                    }
+                }
+
                 // advance creatures
                 // refresh wells
                 // narrator advances one step
-
-                return Arrays.asList(new LegendCard(), EndDayResponses.NEW_DAY);
+                if (getGame(gameName).getGoldenShields() < 0) {
+                    return Arrays.asList(null, EndDayResponses.GAME_OVER);
+                } else {
+                    return Arrays.asList(new LegendCard(), EndDayResponses.NEW_DAY);
+                }
             } else {
                 return Arrays.asList(null, EndDayResponses.SUCCESS);
             }
