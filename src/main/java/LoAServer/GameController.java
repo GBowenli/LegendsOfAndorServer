@@ -46,4 +46,16 @@ public class GameController {
     public EmptyWellResponses emptyWellResponses(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().emptyWell(gameName, username);
     }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateFog")
+    public List<Object> activateFog(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().activateFog(gameName, username);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/endDay")
+    public List<Object> endDay(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().endDay(gameName, username);
+    }
+
+    // to do... add touch
 }

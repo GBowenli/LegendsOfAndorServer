@@ -8,6 +8,10 @@ enum TurnOptions{
     MOVE, FIGHT, NONE
 }
 
+enum Farmer {
+    FARMER
+}
+
 public class Game implements BroadcastContent {
     private int maxNumPlayers;
     private int currentNumPlayers;
@@ -147,6 +151,27 @@ public class Game implements BroadcastContent {
             }
         }
         return true;
+    }
+
+    public Hero getNextHero(String username) {
+        int currentHeroIndex=0;
+        for (int i = 0; i < currentNumPlayers; i++) {
+            if (players[i].getUsername().equals(username)) {
+                currentHeroIndex = i;
+            }
+        }
+
+        for (int i = 1; i < currentNumPlayers; i++) {
+            if (currentHeroIndex+i == currentNumPlayers) {
+                currentHeroIndex = i * -1;
+            }
+            System.out.println(currentHeroIndex+i);
+            if (!players[currentHeroIndex+i].getHero().isHasEndedDay()) {
+                return players[currentHeroIndex+i].getHero();
+            }
+
+        }
+        return null;
     }
 
     public RegionDatabase getRegionDatabase() {

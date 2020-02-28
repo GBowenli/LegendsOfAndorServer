@@ -1,5 +1,10 @@
 package LoAServer;
 
+import LoAServer.Creature.Creature;
+import LoAServer.Creature.Gor;
+import LoAServer.Item.Wineskin;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +46,7 @@ enum PickUpFarmersResponses {
 }
 
 enum EndMoveResponses {
-    BUY_FROM_MERCHANT, EMPTY_WELL, ACTIVATE_FOG, NONE
+    BUY_FROM_MERCHANT, EMPTY_WELL, ACTIVATE_FOG, MOVE_ALREADY_ENDED, MUST_MOVE_TO_END_MOVE, NONE
 }
 
 enum EmptyWellResponses {
@@ -50,6 +55,10 @@ enum EmptyWellResponses {
 
 enum ActivateFogResponses {
     SUCCESS, FOG_DNE
+}
+
+enum EndDayResponses {
+    DAY_ALREADY_ENDED, NOT_CURRENT_TURN, NEW_DAY, GAME_OVER, SUCCESS
 }
 
 public class GameDatabase {
@@ -271,6 +280,7 @@ public class GameDatabase {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
 
+        h.setMoved(true);
         h.setCurrentSpace(targetRegion);
         if (h.getCurrentHour() >= 7) {
             h.setWillPower(h.getWillPower()-2);
@@ -304,7 +314,7 @@ public class GameDatabase {
             int newFarmersCount = regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().size() - farmers.size();
             regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().clear();
             for (int i = 0; i < newFarmersCount; i++) {
-                regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().add(new Farmer());
+                regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().add(Farmer.FARMER);
             }
 
             if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreature() != null) {
@@ -321,14 +331,25 @@ public class GameDatabase {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
-        if (regionDatabase.getRegion(h.getCurrentSpace()).isMerchant()) {
-            return EndMoveResponses.BUY_FROM_MERCHANT;
-        } else if (regionDatabase.getRegion(h.getCurrentSpace()).isFountain() && regionDatabase.getRegion(h.getCurrentSpace()).isFountainStatus()) {
-            return EndMoveResponses.EMPTY_WELL;
-        } else if (regionDatabase.getRegion(h.getCurrentSpace()).getFog() != FogKind.NONE) {
-            return EndMoveResponses.ACTIVATE_FOG;
+        if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
+            getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
+            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
+
+            if (!h.isMoved()) {
+                return EndMoveResponses.MUST_MOVE_TO_END_MOVE;
+            }
+
+            if (regionDatabase.getRegion(h.getCurrentSpace()).isMerchant()) {
+                return EndMoveResponses.BUY_FROM_MERCHANT;
+            } else if (regionDatabase.getRegion(h.getCurrentSpace()).isFountain() && regionDatabase.getRegion(h.getCurrentSpace()).isFountainStatus()) {
+                return EndMoveResponses.EMPTY_WELL;
+            } else if (regionDatabase.getRegion(h.getCurrentSpace()).getFog() != FogKind.NONE) {
+                return EndMoveResponses.ACTIVATE_FOG; // display a prompt where user must click activate fog
+            } else {
+                return EndMoveResponses.NONE;
+            }
         } else {
-            return EndMoveResponses.NONE;
+            return EndMoveResponses.MOVE_ALREADY_ENDED;
         }
     }
 
@@ -353,17 +374,133 @@ public class GameDatabase {
         }
     }
 
-//    public ActivateFogResponses activateFog(String gameName, String username) {
-//        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
-//        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
-//        FogKind f = regionDatabase.getRegion(h.getCurrentSpace()).getFog();
-//
-//        if (f != FogKind.NONE) {
-//            if (f == FogKind.MONSTER) {
-//
-//            } else if ()
-//        } else {
-//            return ActivateFogResponses.FOG_DNE;
-//        }
-//    }
+    public List<Object> activateFog(String gameName, String username) {
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        FogKind f = regionDatabase.getRegion(h.getCurrentSpace()).getFog();
+
+        if (f != FogKind.NONE) {
+            if (f == FogKind.MONSTER) {
+                regionDatabase.getRegion(h.getCurrentSpace()).setCurrentCreature(new Gor());
+            } else if (f == FogKind.WINESKIN) {
+                h.getItems().add(new Wineskin());
+            } else if (f == FogKind.TWO_WP) {
+                h.setWillPower(h.getWillPower()+2);
+            } else if (f == FogKind.THREE_WP) {
+                h.setWillPower(h.getWillPower()+3);
+            } else if (f == FogKind.SP) {
+                h.setStrength(h.getStrength()+1);
+            } else if (f == FogKind.GOLD) {
+                h.setGold(h.getGold()+1);
+            } else if (f == FogKind.WITCHBREW) { // add Witch Brew object to do this
+
+            } else { // event
+                // return the EventCard here
+            }
+            return Arrays.asList(f, ActivateFogResponses.SUCCESS);
+        } else {
+            return Arrays.asList(null, ActivateFogResponses.FOG_DNE);
+        }
+    }
+
+    public List<Object> endDay(String gameName, String username) {
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        if (!getGame(gameName).getCurrentHero().equals(getGame(gameName).getSinglePlayer(username).getHero())) {
+            return Arrays.asList(null, EndDayResponses.NOT_CURRENT_TURN);
+        }
+
+        if (!h.isHasEndedDay()) {
+            h.setHasEndedDay(true);
+            if (getGame(gameName).getFirstHeroInNextDay() == null) {
+                getGame(gameName).setFirstHeroInNextDay(h);
+            }
+
+            if (getGame(gameName).getCurrentHero() == null) { // new day
+                getGame(gameName).setCurrentHero(getGame(gameName).getFirstHeroInNextDay());
+                getGame(gameName).setFirstHeroInNextDay(null);
+
+                ArrayList<Region> regionsWithCreatures = regionDatabase.getAllRegionsWithCreatures();
+                for (Region r : regionsWithCreatures) { // advance every creature once
+                    Creature creature = r.getCurrentCreature();
+                    r.setCurrentCreature(null);
+                    int newCreatureSpace;
+
+                    do {
+                        if (r.isBridge()) {
+                            newCreatureSpace = r.getBridgeNextRegion();
+                        } else {
+                            newCreatureSpace = r.getNextRegion();
+                        }
+                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreature() != null || newCreatureSpace != 0);
+
+                    if (newCreatureSpace == 0) {
+                        if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
+                            regionDatabase.getRegion(0).getFarmers().remove(regionDatabase.getRegion(0).getFarmers().size()-1);
+                        } else {
+                            getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
+                        }
+                    } else {
+                        regionDatabase.getRegion(newCreatureSpace).setCurrentCreature(creature);
+                    }
+                }
+
+                ArrayList<Region> regionsWithWardraks = regionDatabase.getAllRegionsWithWardraks();
+                for (Region r : regionsWithWardraks) { // advance every wardrak once again
+                    Creature creature = r.getCurrentCreature();
+                    r.setCurrentCreature(null);
+                    int newCreatureSpace;
+
+                    do {
+                        if (r.isBridge()) {
+                            newCreatureSpace = r.getBridgeNextRegion();
+                        } else {
+                            newCreatureSpace = r.getNextRegion();
+                        }
+                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreature() != null || newCreatureSpace != 0);
+
+                    if (newCreatureSpace == 0) {
+                        if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
+                            regionDatabase.getRegion(0).getFarmers().remove(regionDatabase.getRegion(0).getFarmers().size()-1);
+                        } else {
+                            getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
+                        }
+                    } else {
+                        regionDatabase.getRegion(newCreatureSpace).setCurrentCreature(creature);
+                    }
+                }
+
+                ArrayList<Region> regionsWithFountains = regionDatabase.getAllRegionsWithFountain();
+                for (Region r : regionsWithFountains) { // refresh every fountain (except the ones with a Hero on it)
+                    int regionNumber = r.getNumber();
+                    boolean heroOnFountain = false;
+
+                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                        if (getGame(gameName).getPlayers()[i].getHero().getCurrentSpace() == regionNumber) {
+                            heroOnFountain = true;
+                            break;
+                        }
+                    }
+
+                    if (!heroOnFountain) { // refresh all fountains without Hero on it
+                        r.setFountainStatus(true);
+                    }
+                }
+
+                // advance creatures
+                // refresh wells
+                // narrator advances one step
+                if (getGame(gameName).getGoldenShields() < 0) {
+                    return Arrays.asList(null, EndDayResponses.GAME_OVER);
+                } else {
+                    return Arrays.asList(new LegendCard(), EndDayResponses.NEW_DAY);
+                }
+            } else {
+                return Arrays.asList(null, EndDayResponses.SUCCESS);
+            }
+        } else {
+            return Arrays.asList(null, EndDayResponses.DAY_ALREADY_ENDED);
+        }
+    }
 }
