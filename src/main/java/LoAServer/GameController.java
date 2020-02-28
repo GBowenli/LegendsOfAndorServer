@@ -41,4 +41,9 @@ public class GameController {
     public EndMoveResponses endMove(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().endMove(gameName, username);
     }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/emptyWell")
+    public EmptyWellResponses emptyWellResponses(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().emptyWell(gameName, username);
+    }
 }

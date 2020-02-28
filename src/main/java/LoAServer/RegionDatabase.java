@@ -20,7 +20,7 @@ public class RegionDatabase {
         regionDatabase = new ArrayList<>();
 
         for (int i = 0; i < 85; i++) {
-            regionDatabase.add(new Region(i, FogKind.NONE, false, false, false, false));
+            regionDatabase.add(new Region(i, FogKind.NONE, false, false, false, false, false));
         }
         // set bridges
         regionDatabase.get(48).setBridge(true);

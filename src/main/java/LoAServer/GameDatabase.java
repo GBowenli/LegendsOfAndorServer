@@ -44,6 +44,14 @@ enum EndMoveResponses {
     BUY_FROM_MERCHANT, EMPTY_WELL, ACTIVATE_FOG, NONE
 }
 
+enum EmptyWellResponses {
+    SUCCESS, WELL_ALREADY_EMPTY, WELL_DNE
+}
+
+enum ActivateFogResponses {
+    SUCCESS, FOG_DNE
+}
+
 public class GameDatabase {
     private ArrayList<Game> games;
 
@@ -323,4 +331,39 @@ public class GameDatabase {
             return EndMoveResponses.NONE;
         }
     }
+
+    public EmptyWellResponses emptyWell(String gameName, String username) {
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        if (regionDatabase.getRegion(h.getCurrentSpace()).isFountain()) {
+            if (regionDatabase.getRegion(h.getCurrentSpace()).isFountainStatus()) {
+                if (h.getHeroClass() == HeroClass.WARRIOR) {
+                    h.setWillPower(h.getWillPower()+5);
+                } else {
+                    h.setWillPower(h.getWillPower()+3);
+                }
+                regionDatabase.getRegion(h.getCurrentSpace()).setFountainStatus(false);
+                return EmptyWellResponses.SUCCESS;
+            } else {
+                return EmptyWellResponses.WELL_ALREADY_EMPTY;
+            }
+        } else {
+            return EmptyWellResponses.WELL_DNE;
+        }
+    }
+
+//    public ActivateFogResponses activateFog(String gameName, String username) {
+//        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+//        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+//        FogKind f = regionDatabase.getRegion(h.getCurrentSpace()).getFog();
+//
+//        if (f != FogKind.NONE) {
+//            if (f == FogKind.MONSTER) {
+//
+//            } else if ()
+//        } else {
+//            return ActivateFogResponses.FOG_DNE;
+//        }
+//    }
 }
