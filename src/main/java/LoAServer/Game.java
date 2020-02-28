@@ -8,6 +8,10 @@ enum TurnOptions{
     MOVE, FIGHT, NONE
 }
 
+enum Farmer {
+    FARMER
+}
+
 public class Game implements BroadcastContent {
     private int maxNumPlayers;
     private int currentNumPlayers;

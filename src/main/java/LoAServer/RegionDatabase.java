@@ -223,9 +223,9 @@ public class RegionDatabase {
         regionDatabase.get(48).setCurrentCreature(new Gor());
         regionDatabase.get(19).setCurrentCreature(new Skral());
 
-        regionDatabase.get(24).getFarmers().add(new Farmer());
+        regionDatabase.get(24).getFarmers().add(Farmer.FARMER);
         if (difficulty == Difficulty.EASY) {
-            regionDatabase.get(36).getFarmers().add(new Farmer());
+            regionDatabase.get(36).getFarmers().add(Farmer.FARMER);
         }
     }
 
