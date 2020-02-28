@@ -18,6 +18,7 @@ public class Hero {
     private int gold;
     private ArrayList<Item> items;
     private ArrayList<Farmer> farmers;
+    private boolean moved;
 
     public Hero() {}
 
@@ -111,5 +112,13 @@ public class Hero {
 
     public void setFarmers(ArrayList<Farmer> farmers) {
         this.farmers = farmers;
+    }
+
+    public boolean isMoved() {
+        return moved;
+    }
+
+    public void setMoved(boolean moved) {
+        this.moved = moved;
     }
 }

@@ -31,7 +31,7 @@ public class Game implements BroadcastContent {
         this.currentNumPlayers = 1;
         this.players = new Player[maxNumPlayers];
         this.players[0] = p;
-        regionDatabase = new RegionDatabase(Difficulty.Hard); // hardcoded change when add Difficulty attribute
+        regionDatabase = new RegionDatabase(Difficulty.HARD); // hardcoded change when add Difficulty attribute
         farmers = new ArrayList<Farmer>();
     }
 
@@ -141,6 +141,27 @@ public class Game implements BroadcastContent {
             }
         }
         return true;
+    }
+
+    public Hero getNextHero(String username) {
+        int currentHeroIndex=0;
+        for (int i = 0; i < currentNumPlayers; i++) {
+            if (players[i].getUsername().equals(username)) {
+                currentHeroIndex = i;
+            }
+        }
+
+        for (int i = 1; i < currentNumPlayers; i++) {
+            if (currentHeroIndex+i == currentNumPlayers) {
+                currentHeroIndex = i * -1;
+            }
+            System.out.println(currentHeroIndex+i);
+            if (!players[currentHeroIndex+i].getHero().isHasEndedDay()) {
+                return players[currentHeroIndex+i].getHero();
+            }
+
+        }
+        return null;
     }
 
     public RegionDatabase getRegionDatabase() {
