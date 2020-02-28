@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,7 +23,22 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/move")
-    public MoveResponses move(@PathVariable String gameName, @PathVariable String username, @RequestBody Integer targetRegion) { // this is the one to call after they click a region after clicking "Move"
+    public List<Object> move(@PathVariable String gameName, @PathVariable String username, @RequestBody Integer targetRegion) { // this is the one to call after they click a region after clicking "Move"
         return MasterDatabase.getInstance().getMasterGameDatabase().move(gameName, username, targetRegion);
+    }
+
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getFarmers")
+    public ArrayList<Farmer> getFarmers(@PathVariable String gameName, String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().getFarmers(gameName, username);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/pickUpFarmers")
+    public PickUpFarmersResponses pickUpFarmers(@PathVariable String gameName, @PathVariable String username, @RequestBody ArrayList<Farmer> farmers) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().pickUpFarmers(gameName, username, farmers);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/endMove")
+    public EndMoveResponses endMove(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().endMove(gameName, username);
     }
 }

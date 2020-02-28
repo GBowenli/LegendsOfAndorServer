@@ -33,7 +33,15 @@ enum GetAvailableRegionsReponses {
 }
 
 enum MoveResponses {
-    PICK_UP_FARMER, MERCHANT_INTERACTION, EMPTY_WELL, NO_OTHER_ACTIONS
+    PICK_UP_FARMER, FARMERS_DIED, NO_OTHER_ACTIONS
+}
+
+enum PickUpFarmersResponses {
+    FARMERS_DIED, NO_FARMERS, FARMERS_PICKED_UP
+}
+
+enum EndMoveResponses {
+    BUY_FROM_MERCHANT, EMPTY_WELL, ACTIVATE_FOG, NONE
 }
 
 public class GameDatabase {
@@ -251,7 +259,68 @@ public class GameDatabase {
         }
     }
 
-    public MoveResponses move(String gameName, String username, Integer targetRegion) { // do the verification on android (checking if is feasible adjacent)
-        return null;
+    public List<Object> move(String gameName, String username, Integer targetRegion) { // do the verification on android (checking if is feasible adjacent)
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+
+        h.setCurrentSpace(targetRegion);
+        if (h.getCurrentHour() >= 7) {
+            h.setWillPower(h.getWillPower()-2);
+        }
+        h.setCurrentHour(h.getCurrentHour()+1);
+
+        if (regionDatabase.getRegion(targetRegion).getCurrentCreature() != null) {
+            if (h.getFarmers().size() > 0) {
+                h.getFarmers().clear();
+                return Arrays.asList(null, MoveResponses.FARMERS_DIED);
+            }
+        }
+        if (regionDatabase.getRegion(targetRegion).getFarmers().size() > 0) {
+            return Arrays.asList(regionDatabase.getRegion(targetRegion).getFarmers(), MoveResponses.PICK_UP_FARMER);
+        } else {
+            return Arrays.asList(null, MoveResponses.NO_OTHER_ACTIONS);
+        }
+    }
+
+    public ArrayList<Farmer> getFarmers(String gameName, String username) {
+        return getGame(gameName).getRegionDatabase().getRegion(getGame(gameName).getSinglePlayer(username).getHero().getCurrentSpace()).getFarmers();
+    }
+
+    public PickUpFarmersResponses pickUpFarmers(String gameName, String username, ArrayList<Farmer> farmers) {
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        if (farmers.size() == 0) {
+            return PickUpFarmersResponses.NO_FARMERS;
+        } else {
+            int newFarmersCount = regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().size() - farmers.size();
+            regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().clear();
+            for (int i = 0; i < newFarmersCount; i++) {
+                regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().add(new Farmer());
+            }
+
+            if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreature() != null) {
+                h.getFarmers().clear();
+                return PickUpFarmersResponses.FARMERS_DIED;
+            }
+
+            h.getFarmers().addAll(farmers);
+            return PickUpFarmersResponses.FARMERS_PICKED_UP;
+        }
+    }
+
+    public EndMoveResponses endMove(String gameName, String username) { // display end move button after player clicks Move and gets successful return (keep invisible otherwise)
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        if (regionDatabase.getRegion(h.getCurrentSpace()).isMerchant()) {
+            return EndMoveResponses.BUY_FROM_MERCHANT;
+        } else if (regionDatabase.getRegion(h.getCurrentSpace()).isFountain() && regionDatabase.getRegion(h.getCurrentSpace()).isFountainStatus()) {
+            return EndMoveResponses.EMPTY_WELL;
+        } else if (regionDatabase.getRegion(h.getCurrentSpace()).getFog() != FogKind.NONE) {
+            return EndMoveResponses.ACTIVATE_FOG;
+        } else {
+            return EndMoveResponses.NONE;
+        }
     }
 }

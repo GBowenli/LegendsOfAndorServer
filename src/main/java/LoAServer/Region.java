@@ -6,13 +6,12 @@ import LoAServer.Item.Item;
 import java.util.ArrayList;
 
 enum FogKind {
-    None, Monster, Wineskin, TwoWP, ThreeWP, SP, Gold, WitchBrew, Event
+    NONE, MONSTER, WINESKIN, TWO_WP, THREE_WP, SP, GOLD, WITCHBREW, EVENT
 }
 
 public class Region {
     private int number;
     private FogKind fog;
-    private boolean fogRevealed;
     private boolean fountain;
     private boolean fountainStatus;
     private boolean merchant;
@@ -28,10 +27,9 @@ public class Region {
 
     public Region() {}
 
-    public Region(int number, FogKind fog, boolean fogRevealed, boolean fountain, boolean fountainStatus, boolean merchant, boolean bridge) {
+    public Region(int number, FogKind fog, boolean fountain, boolean fountainStatus, boolean merchant, boolean bridge) {
         this.number = number;
         this.fog = fog;
-        this.fogRevealed = fogRevealed;
         this.fountain = fountain;
         this.fountainStatus = fountainStatus;
         this.merchant = merchant;
@@ -54,14 +52,6 @@ public class Region {
 
     public void setFog(FogKind fog) {
         this.fog = fog;
-    }
-
-    public boolean isFogRevealed() {
-        return fogRevealed;
-    }
-
-    public void setFogRevealed(boolean fogRevealed) {
-        this.fogRevealed = fogRevealed;
     }
 
     public boolean isFountain() {
