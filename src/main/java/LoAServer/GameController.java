@@ -17,6 +17,16 @@ public class GameController {
         return ResponseGenerator.getAsyncUpdate(5000, masterDatabase.getMasterGameBCM().get(username));
     }
 
+    @RequestMapping(method = RequestMethod.GET, value="/{username}/isGameStarted")
+    public GameStartedResponses isGameStarted(@PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().isGameStarted(username);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/{username}/getGameByUsername")
+    public Game getGameByUsername(@PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().getGameByUsername(username);
+    }
+
     @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getAvailableRegions") // this is the one to call when you click the button "Move"
     public List<Object> getAvailableRegions (@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().getAvailableRegions(gameName, username);

@@ -14,6 +14,10 @@ enum HostGameResponses {
     HOST_GAME_SUCCESS, ERROR_GAME_ALREADY_EXISTS
 }
 
+enum GameStartedResponses{
+    GAME_STARTED, GAME_NOT_STARTED
+}
+
 enum JoinGameResponses {
     JOIN_GAME_SUCCESS, ERROR_GAME_FULL, ERROR_GAME_DNE
 }
@@ -124,7 +128,13 @@ public class GameDatabase {
     }
 
     public ArrayList<Game> getAllGames() {
-        return this.games;
+        ArrayList<Game> response = new ArrayList<>();
+        for(Game g : games){
+            if(!g.isActive()){
+                response.add(g);
+            }
+        }
+        return response;
     }
 
     public void leavePregame(String gameName, String username) {
@@ -213,29 +223,34 @@ public class GameDatabase {
         }
     }
 
+
+
     public DistributeItemsResponses distributeItems(String gameName, ItemDistribution itemDistribution) {
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-            if (i == 0) {
-                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer1Gold());
-                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer1Items());
-                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getPlayer1Gold() + " Gold and " + itemDistribution.getPlayer1Items().size() + " Wineskins");
-            } else if (i == 1) {
-                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer2Gold());
-                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer2Items());
-                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getPlayer2Gold() + " Gold and " + itemDistribution.getPlayer2Items().size() + " Wineskins");
-            } else if (i == 2) {
-                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer3Gold());
-                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer3Items());
-                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getPlayer3Gold() + " Gold and " + itemDistribution.getPlayer3Items().size() + " Wineskins");
-            } else { // i = 3
-                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getPlayer4Gold());
-                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getPlayer4Items());
-                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getPlayer4Gold() + " Gold and " + itemDistribution.getPlayer4Items().size() + " Wineskins");
+            if(getGame(gameName).getPlayers()[i].getHero().getHeroClass()== HeroClass.WARRIOR){
+                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getWarriorGold());
+                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getWarriorItems());
+                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getWarriorGold() + " Gold and " + itemDistribution.getWarriorItems().size() + " Wineskins");
+            }
+            if(getGame(gameName).getPlayers()[i].getHero().getHeroClass()== HeroClass.WIZARD){
+                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getWizardGold());
+                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getWizardItems());
+                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getWizardGold() + " Gold and " + itemDistribution.getWizardItems().size() + " Wineskins");
+            }
+            if(getGame(gameName).getPlayers()[i].getHero().getHeroClass()== HeroClass.DWARF){
+                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getDwarfGold());
+                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getDwarfItems());
+                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getDwarfGold() + " Gold and " + itemDistribution.getDwarfItems().size() + " Wineskins");
+            }
+            if(getGame(gameName).getPlayers()[i].getHero().getHeroClass()== HeroClass.ARCHER){
+                getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getArcherGold());
+                getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getArcherItems());
+                getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getArcherGold() + " Gold and " + itemDistribution.getArcherItems().size() + " Wineskins");
             }
         }
 
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
-
+        System.out.println(getGame(gameName).getItemsDistributedMessage());
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
@@ -243,6 +258,31 @@ public class GameDatabase {
         getGame(gameName).setItemsDistributed(true);
         return DistributeItemsResponses.DISTRIBUTE_ITEMS_SUCCESS;
     }
+
+    public GameStartedResponses isGameStarted(String username){
+        for(Game g : games){
+            for(int i = 0; i < g.getCurrentNumPlayers(); i++){
+                if(g.getPlayers()[i].getUsername().equals(username)){
+                    if(g.isItemsDistributed()){
+                        return GameStartedResponses.GAME_STARTED;
+                    }
+                }
+            }
+        }
+        return GameStartedResponses.GAME_NOT_STARTED;
+    }
+
+    public Game getGameByUsername(String username){
+        for(Game g : games){
+            for(int i = 0; i < g.getCurrentNumPlayers(); i++){
+                if(g.getPlayers()[i].getUsername().equals(username)){
+                    return g;
+                }
+            }
+        }
+        return null;
+    }
+
 
     public List<Object> getAvailableRegions (String gameName, String username) {
         Player p = getGame(gameName).getSinglePlayer(username);

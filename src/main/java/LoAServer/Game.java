@@ -24,6 +24,7 @@ public class Game implements BroadcastContent {
     private ArrayList<Farmer> farmers;
     private Boolean difficultMode;
 
+
     public Game() {}
 
     public Game(Player p, int maxNumPlayers, String gameName, Boolean difficult) {
@@ -39,6 +40,7 @@ public class Game implements BroadcastContent {
         }
         farmers = new ArrayList<Farmer>();
         this.difficultMode = difficult;
+        itemsDistributedMessage = "";
     }
 
     public int getMaxNumPlayers() {
@@ -226,4 +228,5 @@ public class Game implements BroadcastContent {
     public void setDifficultMode(Boolean difficultMode) {
         this.difficultMode = difficultMode;
     }
+
 }
