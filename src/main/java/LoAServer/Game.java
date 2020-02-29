@@ -23,6 +23,7 @@ public class Game implements BroadcastContent {
     private TurnOptions currentHeroSelectedOption;
     private ArrayList<Farmer> farmers;
     private Boolean difficultMode;
+    private Fight currentFight;
 
 
     public Game() {}
@@ -216,11 +217,6 @@ public class Game implements BroadcastContent {
         this.farmers = farmers;
     }
 
-    @Override
-    public boolean isEmpty() {
-        return (players.length == 0);
-    }
-
     public Boolean getDifficultMode() {
         return difficultMode;
     }
@@ -229,4 +225,16 @@ public class Game implements BroadcastContent {
         this.difficultMode = difficultMode;
     }
 
+    public Fight getCurrentFight() {
+        return currentFight;
+    }
+
+    public void setCurrentFight(Fight currentFight) {
+        this.currentFight = currentFight;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return (players.length == 0);
+    }
 }
