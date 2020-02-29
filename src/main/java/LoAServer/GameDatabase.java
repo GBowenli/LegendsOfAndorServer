@@ -315,7 +315,7 @@ public class GameDatabase {
             int newFarmersCount = regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().size() - farmers.size();
             regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().clear();
             for (int i = 0; i < newFarmersCount; i++) {
-                regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().add(Farmer.FARMER);
+                regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().add(new Farmer());
             }
 
             if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreature() != null) {
