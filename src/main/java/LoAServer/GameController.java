@@ -57,5 +57,9 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().endDay(gameName, username);
     }
 
-    // to do... add touch
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/pass")
+    public PassResponses pass(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().pass(gameName, username);
+    }
+
 }

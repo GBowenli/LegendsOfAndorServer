@@ -62,6 +62,10 @@ enum EndDayResponses {
     DAY_ALREADY_ENDED, NOT_CURRENT_TURN, NEW_DAY, GAME_OVER, SUCCESS
 }
 
+enum PassResponses {
+    PASS_SUCCESSFUL, MUST_END_DAY, NOT_CURRENT_TURN, DAY_ENDED
+}
+
 public class GameDatabase {
     private ArrayList<Game> games;
 
@@ -288,6 +292,11 @@ public class GameDatabase {
         }
         h.setCurrentHour(h.getCurrentHour()+1);
 
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+
         if (regionDatabase.getRegion(targetRegion).getCurrentCreature() != null) {
             if (h.getFarmers().size() > 0) {
                 h.getFarmers().clear();
@@ -314,13 +323,18 @@ public class GameDatabase {
         } else {
             int newFarmersCount = regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().size() - farmers.size();
             regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().clear();
-            for (int i = 0; i < newFarmersCount; i++) {
-                regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().add(new Farmer());
+            for (int i = regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().size()-1; i >= farmers.size(); i--) {
+                regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().remove(i);
             }
 
             if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreature() != null) {
                 h.getFarmers().clear();
                 return PickUpFarmersResponses.FARMERS_DIED;
+            }
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
 
             h.getFarmers().addAll(farmers);
@@ -335,6 +349,11 @@ public class GameDatabase {
         if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
 
             if (!h.isMoved()) {
                 return EndMoveResponses.MUST_MOVE_TO_END_MOVE;
@@ -366,6 +385,12 @@ public class GameDatabase {
                     h.setWillPower(h.getWillPower()+3);
                 }
                 regionDatabase.getRegion(h.getCurrentSpace()).setFountainStatus(false);
+
+                MasterDatabase masterDatabase = MasterDatabase.getInstance();
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return EmptyWellResponses.SUCCESS;
             } else {
                 return EmptyWellResponses.WELL_ALREADY_EMPTY;
@@ -398,6 +423,12 @@ public class GameDatabase {
             } else { // event
                 // return the EventCard here
             }
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
             return Arrays.asList(f, ActivateFogResponses.SUCCESS);
         } else {
             return Arrays.asList(null, ActivateFogResponses.FOG_DNE);
@@ -407,6 +438,7 @@ public class GameDatabase {
     public List<Object> endDay(String gameName, String username) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
         if (!getGame(gameName).getCurrentHero().equals(getGame(gameName).getSinglePlayer(username).getHero())) {
             return Arrays.asList(null, EndDayResponses.NOT_CURRENT_TURN);
@@ -422,6 +454,10 @@ public class GameDatabase {
                 getGame(gameName).setCurrentHero(getGame(gameName).getFirstHeroInNextDay());
                 getGame(gameName).setFirstHeroInNextDay(null);
 
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    getGame(gameName).getPlayers()[i].getHero().setHasEndedDay(false);
+                }
+
                 ArrayList<Region> regionsWithCreatures = regionDatabase.getAllRegionsWithCreatures();
                 for (Region r : regionsWithCreatures) { // advance every creature once
                     Creature creature = r.getCurrentCreature();
@@ -429,7 +465,7 @@ public class GameDatabase {
                     int newCreatureSpace;
 
                     do {
-                        if (r.isBridge()) {
+                        if (r.isBridge() && r.getBridgeNextRegion() > 0) {
                             newCreatureSpace = r.getBridgeNextRegion();
                         } else {
                             newCreatureSpace = r.getNextRegion();
@@ -454,7 +490,7 @@ public class GameDatabase {
                     int newCreatureSpace;
 
                     do {
-                        if (r.isBridge()) {
+                        if (r.isBridge() && r.getBridgeNextRegion() > 0) {
                             newCreatureSpace = r.getBridgeNextRegion();
                         } else {
                             newCreatureSpace = r.getNextRegion();
@@ -488,20 +524,54 @@ public class GameDatabase {
                         r.setFountainStatus(true);
                     }
                 }
-
                 // advance creatures
                 // refresh wells
                 // narrator advances one step
-                if (getGame(gameName).getGoldenShields() < 0) {
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
+                if (getGame(gameName).getGoldenShields() < 0) { // game over
+                    games.remove(getGame(gameName));
+                    masterDatabase.deleteMessageDatabase(gameName);
+
                     return Arrays.asList(null, EndDayResponses.GAME_OVER);
                 } else {
+
                     return Arrays.asList(new LegendCard(), EndDayResponses.NEW_DAY);
                 }
             } else {
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return Arrays.asList(null, EndDayResponses.SUCCESS);
             }
         } else {
             return Arrays.asList(null, EndDayResponses.DAY_ALREADY_ENDED);
+        }
+    }
+
+    public PassResponses pass (String gameName, String username) {
+        Hero h = getGame(username).getSinglePlayer(username).getHero();
+
+        if (h.isHasEndedDay()) {
+            return PassResponses.DAY_ENDED;
+        } else if (!getGame(gameName).getCurrentHero().equals(h)) {
+            return PassResponses.NOT_CURRENT_TURN;
+        } else if (h.getCurrentHour() == 10 || (h.getWillPower() <= 2 && h.getCurrentHour() >= 7)) {
+            return PassResponses.MUST_END_DAY;
+        } else { // can pass turn
+            getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
+            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+            return PassResponses.PASS_SUCCESSFUL;
         }
     }
 }
