@@ -341,7 +341,7 @@ public class GameDatabase {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
 
-        if (regionDatabase.getRegion(targetRegion).getCurrentCreatures().get(0) != null) {
+        if (regionDatabase.getRegion(targetRegion).getCurrentCreatures().size() > 0) {
             if (h.getFarmers().size() > 0) {
                 h.getFarmers().clear();
                 return Arrays.asList(null, MoveResponses.FARMERS_DIED);
@@ -371,7 +371,7 @@ public class GameDatabase {
                 regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().remove(i);
             }
 
-            if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().get(0) != null) {
+            if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().size() > 0) {
                 h.getFarmers().clear();
                 return PickUpFarmersResponses.FARMERS_DIED;
             }
@@ -539,7 +539,7 @@ public class GameDatabase {
                         } else {
                             newCreatureSpace = r.getNextRegion();
                         }
-                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreatures().get(0) != null || newCreatureSpace != 0);
+                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreatures().size() > 0 || newCreatureSpace != 0);
 
                     if (newCreatureSpace == 0) {
                         if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
@@ -624,5 +624,51 @@ public class GameDatabase {
         }
     }
 
+    public List<Object> fight(String gameName, String username) {
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
+        if (!getGame(gameName).getCurrentHero().equals(h)) {
+            return Arrays.asList(null, FightResponses.NOT_CURRENT_TURN);
+        } else if (h.isHasEndedDay()) {
+            return Arrays.asList(null, FightResponses.DAY_ENDED);
+        } else if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().size() == 0) {
+            return Arrays.asList(null, FightResponses.NO_CREATURE_FOUND);
+        } else {
+            Fight fight = new Fight(h, regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().get(0));
+
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                Player p = getGame(gameName).getPlayers()[i];
+
+                if (!p.getUsername().equals(username)) {
+                    if (p.getHero().getHeroClass() != HeroClass.ARCHER) {
+                        if (p.getHero().getCurrentSpace() == h.getCurrentSpace()) {
+                            fight.getPendingInvitedHeroes().add(p.getHero());
+                        }
+                    } else { // is an archer
+                        Region region = regionDatabase.getRegion(p.getHero().getCurrentSpace());
+                        ArrayList<Integer> archerAdjacentRegions = region.getAdjacentRegions();
+
+                        if (region.isBridge()) {
+                            archerAdjacentRegions.add(region.getBridgeAdjacentRegion());
+                        }
+
+                        if (archerAdjacentRegions.contains(h.getCurrentSpace())) {
+                            fight.getPendingInvitedHeroes().add(p.getHero());
+                        }
+                    }
+                }
+            }
+
+            getGame(gameName).setCurrentFight(fight);
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+            return Arrays.asList(fight, FightResponses.JOINED_FIGHT);
+        }
+    }
+
+    
 }

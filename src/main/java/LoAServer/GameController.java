@@ -72,9 +72,9 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().pass(gameName, username);
     }
 
-//    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/fight")
-//    public List<Object> fight(@PathVariable String gameName, @PathVariable String username) {
-//        return MasterDatabase.getInstance().getMasterGameDatabase().fight(gameName, username);
-//    }
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/fight")
+    public List<Object> fight(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().fight(gameName, username);
+    }
 
 }

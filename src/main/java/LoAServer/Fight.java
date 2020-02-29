@@ -11,8 +11,9 @@ public class Fight {
 
     public Fight() {}
 
-    public Fight(Creature creature) {
+    public Fight(Hero hero, Creature creature) {
         heroes = new ArrayList<>();
+        heroes.add(hero);
         pendingInvitedHeroes = new ArrayList<>();
         this.creature = creature;
     }
