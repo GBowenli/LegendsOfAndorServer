@@ -63,7 +63,11 @@ enum EndDayResponses {
 }
 
 enum PassResponses {
-    PASS_SUCCESSFUL, MUST_END_DAY, NOT_CURRENT_TURN, DAY_ENDED
+    PASS_SUCCESSFUL, MUST_END_DAY, ONLY_PLAYER_LEFT, NOT_CURRENT_TURN, DAY_ENDED
+}
+
+enum FightResponses {
+    NO_CREATURE_FOUND, NOT_CURRENT_TURN, DAY_ENDED, JOINED_FIGHT
 }
 
 public class GameDatabase {
@@ -297,7 +301,7 @@ public class GameDatabase {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
 
-        if (regionDatabase.getRegion(targetRegion).getCurrentCreature() != null) {
+        if (regionDatabase.getRegion(targetRegion).getCurrentCreatures().get(0) != null) {
             if (h.getFarmers().size() > 0) {
                 h.getFarmers().clear();
                 return Arrays.asList(null, MoveResponses.FARMERS_DIED);
@@ -327,7 +331,7 @@ public class GameDatabase {
                 regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().remove(i);
             }
 
-            if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreature() != null) {
+            if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().get(0) != null) {
                 h.getFarmers().clear();
                 return PickUpFarmersResponses.FARMERS_DIED;
             }
@@ -407,7 +411,7 @@ public class GameDatabase {
 
         if (f != FogKind.NONE) {
             if (f == FogKind.MONSTER) {
-                regionDatabase.getRegion(h.getCurrentSpace()).setCurrentCreature(new Gor());
+                regionDatabase.getRegion(h.getCurrentSpace()).setCurrentCreatures(new ArrayList<Creature>(Arrays.asList(new Gor())));
             } else if (f == FogKind.WINESKIN) {
                 h.getItems().add(new Wineskin());
             } else if (f == FogKind.TWO_WP) {
@@ -460,8 +464,8 @@ public class GameDatabase {
 
                 ArrayList<Region> regionsWithCreatures = regionDatabase.getAllRegionsWithCreatures();
                 for (Region r : regionsWithCreatures) { // advance every creature once
-                    Creature creature = r.getCurrentCreature();
-                    r.setCurrentCreature(null);
+                    Creature creature = r.getCurrentCreatures().get(0);
+                    r.setCurrentCreatures(null);
                     int newCreatureSpace;
 
                     do {
@@ -470,7 +474,7 @@ public class GameDatabase {
                         } else {
                             newCreatureSpace = r.getNextRegion();
                         }
-                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreature() != null || newCreatureSpace != 0);
+                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreatures() != null || newCreatureSpace != 0);
 
                     if (newCreatureSpace == 0) {
                         if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
@@ -479,14 +483,14 @@ public class GameDatabase {
                             getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
                         }
                     } else {
-                        regionDatabase.getRegion(newCreatureSpace).setCurrentCreature(creature);
+                        regionDatabase.getRegion(newCreatureSpace).setCurrentCreatures(new ArrayList<Creature>(Arrays.asList(creature)));
                     }
                 }
 
                 ArrayList<Region> regionsWithWardraks = regionDatabase.getAllRegionsWithWardraks();
                 for (Region r : regionsWithWardraks) { // advance every wardrak once again
-                    Creature creature = r.getCurrentCreature();
-                    r.setCurrentCreature(null);
+                    Creature creature = r.getCurrentCreatures().get(0);
+                    r.getCurrentCreatures().clear();
                     int newCreatureSpace;
 
                     do {
@@ -495,7 +499,7 @@ public class GameDatabase {
                         } else {
                             newCreatureSpace = r.getNextRegion();
                         }
-                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreature() != null || newCreatureSpace != 0);
+                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreatures().get(0) != null || newCreatureSpace != 0);
 
                     if (newCreatureSpace == 0) {
                         if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
@@ -504,7 +508,7 @@ public class GameDatabase {
                             getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
                         }
                     } else {
-                        regionDatabase.getRegion(newCreatureSpace).setCurrentCreature(creature);
+                        regionDatabase.getRegion(newCreatureSpace).setCurrentCreatures(new ArrayList<Creature>(Arrays.asList(creature)));
                     }
                 }
 
@@ -564,6 +568,11 @@ public class GameDatabase {
             return PassResponses.MUST_END_DAY;
         } else { // can pass turn
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
+
+            if (getGame(gameName).getCurrentHero() == null) {
+                return PassResponses.ONLY_PLAYER_LEFT;
+            }
+
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
             MasterDatabase masterDatabase = MasterDatabase.getInstance();
@@ -574,4 +583,6 @@ public class GameDatabase {
             return PassResponses.PASS_SUCCESSFUL;
         }
     }
+
+
 }
