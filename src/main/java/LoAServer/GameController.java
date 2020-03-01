@@ -77,4 +77,13 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().fight(gameName, username);
     }
 
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/joinFight")
+    public void joinFight(@PathVariable String gameName, @PathVariable String username) {
+        MasterDatabase.getInstance().getMasterGameDatabase().joinFight(gameName, username);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/leaveFight")
+    public LeaveFightResponses leaveFight(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().leaveFight(gameName, username);
+    }
 }

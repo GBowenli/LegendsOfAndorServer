@@ -74,6 +74,11 @@ enum FightResponses {
     NO_CREATURE_FOUND, NOT_CURRENT_TURN, DAY_ENDED, JOINED_FIGHT
 }
 
+enum LeaveFightResponses {
+    CANNOT_LEAVE_AFTER_ROLLING, CANNOT_LEAVE_WITHOUT_FIGHTING, SUCCESS
+}
+
+
 public class GameDatabase {
     private ArrayList<Game> games;
 
@@ -636,6 +641,7 @@ public class GameDatabase {
             return Arrays.asList(null, FightResponses.NO_CREATURE_FOUND);
         } else {
             Fight fight = new Fight(h, regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().get(0));
+            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.FIGHT);
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 Player p = getGame(gameName).getPlayers()[i];
@@ -670,5 +676,45 @@ public class GameDatabase {
         }
     }
 
-    
+    public void joinFight(String gameName, String username) {
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        getGame(gameName).getCurrentFight().getHeroes().add(h);
+        getGame(gameName).getCurrentFight().getHeroesBattleScores().add(0);
+        getGame(gameName).getCurrentFight().getPendingInvitedHeroes().remove(h);
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+    }
+
+    public LeaveFightResponses leaveFight(String gameName, String username) {
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        if (getGame(gameName).getCurrentFight().getHeroesBattleScores().get(getGame(gameName).getCurrentFight().getHeroes().indexOf(h)) > 0) {
+            return LeaveFightResponses.CANNOT_LEAVE_AFTER_ROLLING;
+        } else if (h.isFought()) {
+            return LeaveFightResponses.CANNOT_LEAVE_WITHOUT_FIGHTING;
+        } else {
+            getGame(gameName).getCurrentFight().getHeroes().remove(h);
+            h.setFought(false);
+
+            if (getGame(gameName).getCurrentFight().getHeroes().size() == 0) {
+                getGame(gameName).setCurrentFight(null);
+                getGame(gameName).setCurrentHero(h);
+                getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
+            } else {
+                getGame(gameName).getCurrentFight().getHeroes().remove(h);
+            }
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+            return LeaveFightResponses.SUCCESS;
+        }
+    }
+
 }

@@ -19,6 +19,7 @@ public class Hero {
     private ArrayList<Item> items;
     private ArrayList<Farmer> farmers;
     private boolean moved;
+    private boolean fought;
 
     public Hero() {}
 
@@ -120,5 +121,14 @@ public class Hero {
 
     public void setMoved(boolean moved) {
         this.moved = moved;
+    }
+
+
+    public boolean isFought() {
+        return fought;
+    }
+
+    public void setFought(boolean fought) {
+        this.fought = fought;
     }
 }
