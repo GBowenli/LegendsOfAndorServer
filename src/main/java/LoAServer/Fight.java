@@ -10,6 +10,7 @@ public class Fight {
     private ArrayList<Hero> pendingInvitedHeroes;
     private Creature creature;
     private boolean battleRoundEnded;
+    private boolean wizardAbilityUsed;
 
     public Fight() {}
 
@@ -68,5 +69,13 @@ public class Fight {
 
     public void setBattleRoundEnded(boolean battleRoundEnded) {
         this.battleRoundEnded = battleRoundEnded;
+    }
+
+    public boolean isWizardAbilityUsed() {
+        return wizardAbilityUsed;
+    }
+
+    public void setWizardAbilityUsed(boolean wizardAbilityUsed) {
+        this.wizardAbilityUsed = wizardAbilityUsed;
     }
 }

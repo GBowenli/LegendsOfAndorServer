@@ -1,5 +1,6 @@
 package LoAServer;
 
+import LoAServer.Die.Die;
 import eu.kartoffelquadrat.asyncrestlib.ResponseGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -85,5 +86,10 @@ public class GameController {
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/leaveFight")
     public LeaveFightResponses leaveFight(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().leaveFight(gameName, username);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/getDice")
+    public ArrayList<Die> getDice(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().getDice(gameName, username);
     }
 }

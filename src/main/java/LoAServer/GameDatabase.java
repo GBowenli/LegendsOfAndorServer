@@ -3,6 +3,8 @@ package LoAServer;
 
 import LoAServer.Creature.Creature;
 import LoAServer.Creature.Gor;
+import LoAServer.Die.Die;
+import LoAServer.Die.RegularDie;
 import LoAServer.Item.Wineskin;
 
 import java.lang.reflect.Array;
@@ -717,4 +719,35 @@ public class GameDatabase {
         }
     }
 
+    public ArrayList<Die> getDice(String gameName, String username) { // DID NOT CHECK FOR BLACK DIE HERE ADD IN FUTURE!!!
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        if (h.getHeroClass() == HeroClass.WIZARD) {
+            return new ArrayList<>(Arrays.asList(new RegularDie()));
+        } else if (h.getHeroClass() == HeroClass.WARRIOR) {
+            if (h.getWillPower() < 7) {
+                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie()));
+            } else if (h.getWillPower() < 14) {
+                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie()));
+            } else {
+                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie(), new RegularDie()));
+            }
+        } else if (h.getHeroClass() == HeroClass.DWARF) {
+            if (h.getWillPower() < 7) {
+                return new ArrayList<>(Arrays.asList(new RegularDie()));
+            } else if (h.getWillPower() < 14) {
+                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie()));
+            } else {
+                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie()));
+            }
+        } else { // ARCHER
+            if (h.getWillPower() < 7) {
+                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie()));
+            } else if (h.getWillPower() < 14) {
+                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie(), new RegularDie()));
+            } else {
+                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie(), new RegularDie(), new RegularDie()));
+            }
+        }
+    }
 }
