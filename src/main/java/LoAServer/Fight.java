@@ -11,6 +11,7 @@ public class Fight {
     private Creature creature;
     private boolean battleRoundEnded;
     private boolean wizardAbilityUsed;
+    private int creatureBattleScore;
 
     public Fight() {}
 
@@ -23,7 +24,7 @@ public class Fight {
         this.creature = creature;
     }
 
-    public boolean canStartFight() {
+    public boolean noPendingInvitations() {
         if (pendingInvitedHeroes.size() == 0) {
             return true;
         } else {
@@ -77,5 +78,13 @@ public class Fight {
 
     public void setWizardAbilityUsed(boolean wizardAbilityUsed) {
         this.wizardAbilityUsed = wizardAbilityUsed;
+    }
+
+    public int getCreatureBattleScore() {
+        return creatureBattleScore;
+    }
+
+    public void setCreatureBattleScore(int creatureBattleScore) {
+        this.creatureBattleScore = creatureBattleScore;
     }
 }

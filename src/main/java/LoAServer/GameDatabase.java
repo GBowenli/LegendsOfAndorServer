@@ -3,14 +3,13 @@ package LoAServer;
 
 import LoAServer.Creature.Creature;
 import LoAServer.Creature.Gor;
+import LoAServer.Creature.Skral;
+import LoAServer.Die.BlackDie;
 import LoAServer.Die.Die;
 import LoAServer.Die.RegularDie;
 import LoAServer.Item.Wineskin;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 enum HostGameResponses {
     HOST_GAME_SUCCESS, ERROR_GAME_ALREADY_EXISTS
@@ -749,5 +748,74 @@ public class GameDatabase {
                 return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie(), new RegularDie(), new RegularDie()));
             }
         }
+    }
+
+    public Integer calculateBattleValue(String gameName, String username, ArrayList<Integer> diceRolls) { // control the way this method can be called error check on client (did not account for doubles)
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        int max = 0;
+        for (int i : diceRolls) {
+            if (i > max) {
+                max = i;
+            }
+        }
+
+        getGame(gameName).getCurrentFight().getHeroesBattleScores().set(getGame(gameName).getCurrentFight().getHeroes().indexOf(h), max + h.getStrength());
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+        return max + h.getStrength();
+    }
+
+    public ArrayList<Die> getCreatureDice(String gameName, String username) {
+        Creature creature = getGame(gameName).getCurrentFight().getCreature();
+
+        if (creature instanceof Skral) {
+            if (creature.getWillpower() < 7) {
+                return new ArrayList<>(Arrays.asList(new BlackDie()));
+            } else {
+                return new ArrayList<>(Arrays.asList(new BlackDie(), new BlackDie()));
+            }
+        } else {
+            if (creature.getWillpower() < 7) {
+                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie()));
+            } else {
+                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie()));
+            }
+        }
+    }
+
+    public Integer calculateCreatureBattleValue(String gameName, String username, ArrayList<Integer> diceRolls) {
+        Creature creature = getGame(gameName).getCurrentFight().getCreature();
+
+        Collections.sort(diceRolls);
+        int prevValue = diceRolls.get(0);
+        int duplicateCurrent = diceRolls.get(0);
+        int duplicateMax = 0;
+        for (int i : diceRolls) {
+            if (i == prevValue) {
+                duplicateCurrent += prevValue;
+            } else {
+                if (i > duplicateCurrent) {
+                    duplicateCurrent = i;
+                }
+
+                if (duplicateCurrent > duplicateMax) {
+                    duplicateMax = duplicateCurrent;
+                }
+                duplicateCurrent = i;
+            }
+            prevValue = i;
+        }
+
+        getGame(gameName).getCurrentFight().setCreatureBattleScore(duplicateMax + creature.getStrength());
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+        return duplicateMax + creature.getStrength();
     }
 }

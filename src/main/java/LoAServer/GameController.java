@@ -88,8 +88,23 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().leaveFight(gameName, username);
     }
 
-    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/getDice")
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getDice")
     public ArrayList<Die> getDice(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().getDice(gameName, username);
+    }
+
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/calculateBattleValue")
+    public Integer calculateBattleValue(@PathVariable String gameName, @PathVariable String username, @RequestBody ArrayList<Integer> diceRolls) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().calculateBattleValue(gameName, username, diceRolls);
+    }
+
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getCreatureDice")
+    public ArrayList<Die> getCreatureDice(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().getCreatureDice(gameName, username);
+    }
+
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/calculateCreatureBattleValue")
+    public Integer calculateCreatureBattleValue(@PathVariable String gameName, @PathVariable String username, @RequestBody ArrayList<Integer> diceRolls) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().calculateCreatureBattleValue(gameName, username, diceRolls);
     }
 }
