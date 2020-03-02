@@ -1,6 +1,5 @@
 package LoAServer;
 
-import LoAServer.Die.Die;
 import eu.kartoffelquadrat.asyncrestlib.ResponseGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

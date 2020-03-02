@@ -1,7 +1,5 @@
 package LoAServer;
 
-import LoAServer.Creature.Creature;
-
 import java.util.ArrayList;
 
 public class Fight {

@@ -1,7 +1,5 @@
 package LoAServer;
 
-import LoAServer.Item.Item;
-
 import java.util.ArrayList;
 
 enum HeroClass {

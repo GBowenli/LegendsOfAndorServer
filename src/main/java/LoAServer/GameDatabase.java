@@ -1,13 +1,7 @@
 //added changes
 package LoAServer;
 
-import LoAServer.Creature.Creature;
-import LoAServer.Creature.Gor;
-import LoAServer.Creature.Skral;
-import LoAServer.Die.BlackDie;
-import LoAServer.Die.Die;
-import LoAServer.Die.RegularDie;
-import LoAServer.Item.Wineskin;
+import com.google.gson.Gson;
 
 import java.util.*;
 
@@ -97,6 +91,9 @@ public class GameDatabase {
     }
 
     public HostGameResponses hostGame(Game g) {
+        System.out.println(new Gson().toJson(g));
+        System.out.println(g.getRegionDatabase().getAllRegionsWithCreatures().size());
+
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
         if (getGame(g.getGameName()) == null) {
@@ -371,7 +368,6 @@ public class GameDatabase {
         if (farmers.size() == 0) {
             return PickUpFarmersResponses.NO_FARMERS;
         } else {
-            int newFarmersCount = regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().size() - farmers.size();
             regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().clear();
             for (int i = regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().size()-1; i >= farmers.size(); i--) {
                 regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().remove(i);
@@ -457,9 +453,9 @@ public class GameDatabase {
 
         if (f != FogKind.NONE) {
             if (f == FogKind.MONSTER) {
-                regionDatabase.getRegion(h.getCurrentSpace()).setCurrentCreatures(new ArrayList<Creature>(Arrays.asList(new Gor())));
+                regionDatabase.getRegion(h.getCurrentSpace()).setCurrentCreatures(new ArrayList<Creature>(Arrays.asList(new Creature(CreatureType.GOR))));
             } else if (f == FogKind.WINESKIN) {
-                h.getItems().add(new Wineskin());
+                h.getItems().add(new Item(ItemType.WINESKIN));
             } else if (f == FogKind.TWO_WP) {
                 h.setWillPower(h.getWillPower()+2);
             } else if (f == FogKind.THREE_WP) {
@@ -516,7 +512,8 @@ public class GameDatabase {
                     int newCreatureSpace;
 
                     do {
-                        if (r.isBridge() && r.getBridgeNextRegion() > 0) {
+                        System.out.println(r.getNumber());
+                        if (r.getBridgeNextRegion() != null) {
                             newCreatureSpace = r.getBridgeNextRegion();
                         } else {
                             newCreatureSpace = r.getNextRegion();
@@ -528,6 +525,7 @@ public class GameDatabase {
                         if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
                             regionDatabase.getRegion(0).getFarmers().remove(regionDatabase.getRegion(0).getFarmers().size()-1);
                         } else {
+                            System.out.println("Monster entered castle!");
                             getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
                         }
                     } else {
@@ -542,7 +540,7 @@ public class GameDatabase {
                     int newCreatureSpace;
 
                     do {
-                        if (r.isBridge() && r.getBridgeNextRegion() > 0) {
+                        if (r.getBridgeNextRegion() != null) {
                             newCreatureSpace = r.getBridgeNextRegion();
                         } else {
                             newCreatureSpace = r.getNextRegion();
@@ -554,8 +552,6 @@ public class GameDatabase {
                         if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
                             regionDatabase.getRegion(0).getFarmers().remove(regionDatabase.getRegion(0).getFarmers().size()-1);
                         } else {
-                            System.out.println("Monster entered castle!");
-
                             getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
                         }
                     } else {
@@ -582,6 +578,13 @@ public class GameDatabase {
                 // advance creatures
                 // refresh wells
                 // narrator advances one step
+
+                System.out.println(regionDatabase.getAllRegionsWithCreatures());
+
+                for (Region r : regionDatabase.getAllRegionsWithCreatures()) {
+                    System.out.println("!!!" + r.getCurrentCreatures().get(0).toString() + "!!!   " + r.getNumber());
+                }
+
 
                 if (getGame(gameName).getGoldenShields() < 0) { // game over
                     games.remove(getGame(gameName));
@@ -616,6 +619,7 @@ public class GameDatabase {
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
 
             if (getGame(gameName).getCurrentHero() == null) {
+                getGame(gameName).setCurrentHero(h);
                 return PassResponses.ONLY_PLAYER_LEFT;
             }
 
@@ -728,30 +732,30 @@ public class GameDatabase {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
         if (h.getHeroClass() == HeroClass.WIZARD) {
-            return new ArrayList<>(Arrays.asList(new RegularDie()));
+            return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE)));
         } else if (h.getHeroClass() == HeroClass.WARRIOR) {
             if (h.getWillPower() < 7) {
-                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else if (h.getWillPower() < 14) {
-                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
-                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie(), new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         } else if (h.getHeroClass() == HeroClass.DWARF) {
             if (h.getWillPower() < 7) {
-                return new ArrayList<>(Arrays.asList(new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE)));
             } else if (h.getWillPower() < 14) {
-                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
-                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         } else { // ARCHER
             if (h.getWillPower() < 7) {
-                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else if (h.getWillPower() < 14) {
-                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie(), new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
-                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie(), new RegularDie(), new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         }
     }
@@ -778,17 +782,17 @@ public class GameDatabase {
     public ArrayList<Die> getCreatureDice(String gameName, String username) {
         Creature creature = getGame(gameName).getCurrentFight().getCreature();
 
-        if (creature instanceof Skral) {
+        if (creature.getCreatureType() == CreatureType.WARDRAKS) {
             if (creature.getWillpower() < 7) {
-                return new ArrayList<>(Arrays.asList(new BlackDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
             } else {
-                return new ArrayList<>(Arrays.asList(new BlackDie(), new BlackDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE), new Die(DieType.BLACK_DIE)));
             }
         } else {
             if (creature.getWillpower() < 7) {
-                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
-                return new ArrayList<>(Arrays.asList(new RegularDie(), new RegularDie(), new RegularDie()));
+                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         }
     }

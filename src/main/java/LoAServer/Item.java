@@ -1,12 +1,18 @@
-package LoAServer.Item;
+package LoAServer;
+
+enum ItemType {
+    WINESKIN
+}
 
 public class Item {
     int uses;
 
     public Item(){this.uses = 0;}
 
-    public Item (int numUses){
-        this.uses = numUses;
+    public Item (ItemType itemType){
+        if (itemType == ItemType.WINESKIN) {
+            uses = 2;
+        }
     }
     public int getNumUses() {
         return uses;

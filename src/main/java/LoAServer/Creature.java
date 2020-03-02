@@ -1,12 +1,43 @@
-package LoAServer.Creature;
+package LoAServer;
+
+enum CreatureType {
+    GOR, SKRAL, TROLL, WARDRAKS
+}
+
 
 public class Creature {
     private int strength;
     private int willpower;
     private int goldReward;
     private int willpowerReward;
+    private CreatureType creatureType;
 
     public Creature() {}
+
+    public Creature(CreatureType creatureType) {
+        this.creatureType = creatureType;
+        if (creatureType == CreatureType.GOR) {
+            strength = 2;
+            willpower = 4;
+            goldReward = 2;
+            willpowerReward = 2;
+        } else if (creatureType == CreatureType.SKRAL) {
+            strength = 6;
+            willpower = 6;
+            goldReward = 4;
+            willpowerReward = 4;
+        } else if (creatureType == CreatureType.TROLL) {
+            strength = 14;
+            willpower = 12;
+            goldReward = 6;
+            willpowerReward = 6;
+        } else { // wardraks
+            strength = 10;
+            willpower = 7;
+            goldReward = 6;
+            willpowerReward = 6;
+        }
+    }
 
     public Creature(int strength, int willpower, int goldReward, int willpowerReward) {
         this.strength = strength;
@@ -45,5 +76,13 @@ public class Creature {
 
     public void setWillpowerReward(int willpowerReward) {
         this.willpowerReward = willpowerReward;
+    }
+
+    public CreatureType getCreatureType() {
+        return creatureType;
+    }
+
+    public void setCreatureType(CreatureType creatureType) {
+        this.creatureType = creatureType;
     }
 }

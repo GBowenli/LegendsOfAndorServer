@@ -1,17 +1,24 @@
-package LoAServer.Die;
-
-import LoAServer.LoAServer;
+package LoAServer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
+
+enum DieType {
+    REGULAR_DIE, BLACK_DIE
+}
 
 public class Die {
     ArrayList<Integer> dieFaces;
 
     public Die() {}
 
-    public Die(ArrayList<Integer> dieFaces) {
-        this.dieFaces = dieFaces;
+    public Die(DieType dieType) {
+        if (dieType == DieType.REGULAR_DIE) {
+            dieFaces = new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5, 6));
+        } else { // black die
+            dieFaces = new ArrayList<Integer>(Arrays.asList(8, 9, 9, 10, 10, 12));
+        }
     }
 
     public Integer rollDie() {
@@ -39,9 +46,5 @@ public class Die {
 
     public ArrayList<Integer> getDieFaces() {
         return dieFaces;
-    }
-
-    public void setDieFaces(ArrayList<Integer> dieFaces) {
-        this.dieFaces = dieFaces;
     }
 }

@@ -164,7 +164,6 @@ public class Game implements BroadcastContent {
             if (currentHeroIndex+i == currentNumPlayers) {
                 currentHeroIndex = i * -1;
             }
-            System.out.println(currentHeroIndex+i);
             if (!players[currentHeroIndex+i].getHero().isHasEndedDay()) {
                 return players[currentHeroIndex+i].getHero();
             }

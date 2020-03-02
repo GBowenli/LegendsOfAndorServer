@@ -1,8 +1,5 @@
 package LoAServer;
 
-import LoAServer.Creature.Creature;
-import LoAServer.Item.Item;
-
 import java.util.ArrayList;
 
 enum FogKind {
