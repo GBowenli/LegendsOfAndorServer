@@ -1,5 +1,6 @@
 package LoAServer;
 
+import LoAServer.Creature.Creature;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 

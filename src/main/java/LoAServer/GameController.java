@@ -64,7 +64,7 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/endDay")
-    public List<Object> endDay(@PathVariable String gameName, @PathVariable String username) {
+    public EndDayResponses endDay(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().endDay(gameName, username);
     }
 
@@ -74,7 +74,7 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/fight")
-    public List<Object> fight(@PathVariable String gameName, @PathVariable String username) {
+    public FightResponses fight(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().fight(gameName, username);
     }
 

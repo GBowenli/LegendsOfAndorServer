@@ -68,7 +68,7 @@ enum EndDayResponses {
 }
 
 enum PassResponses {
-    PASS_SUCCESSFUL, MUST_END_DAY, ONLY_PLAYER_LEFT, NOT_CURRENT_TURN, DAY_ENDED
+    PASS_SUCCESSFUL, MUST_END_DAY, ONLY_PLAYER_LEFT, NOT_CURRENT_TURN, DAY_ENDED, PASS_SUCCESSFUL_WP_DEDUCTED
 }
 
 enum FightResponses {
@@ -485,13 +485,13 @@ public class GameDatabase {
         }
     }
 
-    public List<Object> endDay(String gameName, String username) {
+    public EndDayResponses endDay(String gameName, String username) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
         if (!getGame(gameName).getCurrentHero().equals(getGame(gameName).getSinglePlayer(username).getHero())) {
-            return Arrays.asList(null, EndDayResponses.NOT_CURRENT_TURN);
+            return EndDayResponses.NOT_CURRENT_TURN;
         }
 
         if (!h.isHasEndedDay()) {
@@ -499,6 +499,7 @@ public class GameDatabase {
             if (getGame(gameName).getFirstHeroInNextDay() == null) {
                 getGame(gameName).setFirstHeroInNextDay(h);
             }
+            getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
 
             if (getGame(gameName).getCurrentHero() == null) { // new day
                 getGame(gameName).setCurrentHero(getGame(gameName).getFirstHeroInNextDay());
@@ -511,7 +512,7 @@ public class GameDatabase {
                 ArrayList<Region> regionsWithCreatures = regionDatabase.getAllRegionsWithCreatures();
                 for (Region r : regionsWithCreatures) { // advance every creature once
                     Creature creature = r.getCurrentCreatures().get(0);
-                    r.setCurrentCreatures(null);
+                    r.getCurrentCreatures().clear();
                     int newCreatureSpace;
 
                     do {
@@ -520,7 +521,8 @@ public class GameDatabase {
                         } else {
                             newCreatureSpace = r.getNextRegion();
                         }
-                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreatures() != null || newCreatureSpace != 0);
+                        r = regionDatabase.getRegion(newCreatureSpace);
+                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreatures().size() > 0);
 
                     if (newCreatureSpace == 0) {
                         if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
@@ -529,7 +531,7 @@ public class GameDatabase {
                             getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
                         }
                     } else {
-                        regionDatabase.getRegion(newCreatureSpace).setCurrentCreatures(new ArrayList<Creature>(Arrays.asList(creature)));
+                        regionDatabase.getRegion(newCreatureSpace).setCurrentCreatures(new ArrayList<>(Arrays.asList(creature)));
                     }
                 }
 
@@ -545,12 +547,15 @@ public class GameDatabase {
                         } else {
                             newCreatureSpace = r.getNextRegion();
                         }
-                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreatures().size() > 0 || newCreatureSpace != 0);
+                        r = regionDatabase.getRegion(newCreatureSpace);
+                    } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreatures().size() > 0);
 
                     if (newCreatureSpace == 0) {
                         if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
                             regionDatabase.getRegion(0).getFarmers().remove(regionDatabase.getRegion(0).getFarmers().size()-1);
                         } else {
+                            System.out.println("Monster entered castle!");
+
                             getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
                         }
                     } else {
@@ -578,33 +583,28 @@ public class GameDatabase {
                 // refresh wells
                 // narrator advances one step
 
-                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                }
-
                 if (getGame(gameName).getGoldenShields() < 0) { // game over
                     games.remove(getGame(gameName));
                     masterDatabase.deleteMessageDatabase(gameName);
 
-                    return Arrays.asList(null, EndDayResponses.GAME_OVER);
+                    return EndDayResponses.GAME_OVER;
                 } else {
-
-                    return Arrays.asList(new LegendCard(), EndDayResponses.NEW_DAY);
+                    return EndDayResponses.NEW_DAY; // Legend Card here
                 }
             } else {
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                     masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
                 }
 
-                return Arrays.asList(null, EndDayResponses.SUCCESS);
+                return EndDayResponses.SUCCESS;
             }
         } else {
-            return Arrays.asList(null, EndDayResponses.DAY_ALREADY_ENDED);
+            return EndDayResponses.DAY_ALREADY_ENDED;
         }
     }
 
     public PassResponses pass (String gameName, String username) {
-        Hero h = getGame(username).getSinglePlayer(username).getHero();
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
         if (h.isHasEndedDay()) {
             return PassResponses.DAY_ENDED;
@@ -619,6 +619,12 @@ public class GameDatabase {
                 return PassResponses.ONLY_PLAYER_LEFT;
             }
 
+            h.setCurrentHour(h.getCurrentHour()+1);
+            if (h.getCurrentHour() >= 6) {
+                h.setWillPower(h.getWillPower()-2);
+                return PassResponses.PASS_SUCCESSFUL_WP_DEDUCTED;
+            }
+
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
             MasterDatabase masterDatabase = MasterDatabase.getInstance();
@@ -630,16 +636,16 @@ public class GameDatabase {
         }
     }
 
-    public List<Object> fight(String gameName, String username) {
+    public FightResponses fight(String gameName, String username) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
         if (!getGame(gameName).getCurrentHero().equals(h)) {
-            return Arrays.asList(null, FightResponses.NOT_CURRENT_TURN);
+            return FightResponses.NOT_CURRENT_TURN;
         } else if (h.isHasEndedDay()) {
-            return Arrays.asList(null, FightResponses.DAY_ENDED);
+            return FightResponses.DAY_ENDED;
         } else if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().size() == 0) {
-            return Arrays.asList(null, FightResponses.NO_CREATURE_FOUND);
+            return FightResponses.NO_CREATURE_FOUND;
         } else {
             Fight fight = new Fight(h, regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().get(0));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.FIGHT);
@@ -673,7 +679,7 @@ public class GameDatabase {
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
-            return Arrays.asList(fight, FightResponses.JOINED_FIGHT);
+            return FightResponses.JOINED_FIGHT;
         }
     }
 
