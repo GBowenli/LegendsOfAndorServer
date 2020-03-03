@@ -201,7 +201,7 @@ public class GameDatabase {
         if (getGame(gameName).allReady()) {
             MasterDatabase masterDatabase = MasterDatabase.getInstance();
             getGame(gameName).setActive(true);
-            getGame(gameName).setCurrentHero(getGame(gameName).getSinglePlayer(username).getHero());
+            determineWhoStarts(gameName);
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
             if (getGame(gameName).getCurrentNumPlayers() == 2) {
@@ -256,6 +256,21 @@ public class GameDatabase {
 
         getGame(gameName).setItemsDistributed(true);
         return DistributeItemsResponses.DISTRIBUTE_ITEMS_SUCCESS;
+    }
+
+    public void determineWhoStarts(String gameName){
+        Game currentGame = getGame(gameName);
+        Hero startingHero = currentGame.getPlayers()[0].getHero();
+        for(int i = 0; i < currentGame.getCurrentNumPlayers(); i++){
+            System.out.println(currentGame.getPlayers()[i].getHero().getHeroClass() + " AND " + startingHero.getHeroClass());
+            System.out.println(currentGame.getPlayers()[i].getHero().getHeroClass() + "RANK: " + currentGame.getPlayers()[i].getHero().getRank());
+            System.out.println(startingHero.getHeroClass() + "RANK: " + startingHero.getRank());
+            if(currentGame.getPlayers()[i].getHero().getRank() < startingHero.getRank()){
+                startingHero = currentGame.getPlayers()[i].getHero();
+            }
+        }
+        currentGame.setCurrentHero(startingHero);
+        System.out.println("CURRENT HERO IS: " + currentGame.getCurrentHero().getHeroClass());
     }
 
     public GameStartedResponses isGameStarted(String username){
