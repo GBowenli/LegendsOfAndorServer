@@ -172,6 +172,35 @@ public class Game implements BroadcastContent {
         return null;
     }
 
+    public Hero getNextHero(HeroClass heroClass) {
+        int currentHeroIndex=0;
+        for (int i = 0; i < currentNumPlayers; i++) {
+            if (players[i].getHero().getHeroClass() == heroClass) {
+                currentHeroIndex = i;
+            }
+        }
+
+        for (int i = 1; i < currentNumPlayers; i++) {
+            if (currentHeroIndex+i == currentNumPlayers) {
+                currentHeroIndex = i * -1;
+            }
+            if (!players[currentHeroIndex+i].getHero().isHasEndedDay()) {
+                return players[currentHeroIndex+i].getHero();
+            }
+
+        }
+        return null;
+    }
+
+    public Hero getHeroByHC(HeroClass heroClass) { // not sure if necessary
+        for (int i = 0; i < currentNumPlayers; i++) {
+            if (players[i].getHero().getHeroClass() == heroClass) {
+                return players[i].getHero();
+            }
+        }
+        return null;
+    }
+
     public RegionDatabase getRegionDatabase() {
         return regionDatabase;
     }

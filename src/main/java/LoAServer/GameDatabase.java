@@ -1,11 +1,9 @@
 //added changes
 package LoAServer;
 
-import LoAServer.PublicEnums.ActivateFogResponses;
-import LoAServer.PublicEnums.FogKind;
-import LoAServer.PublicEnums.GetAvailableRegionsReponses;
-import LoAServer.PublicEnums.MoveResponses;
+import LoAServer.PublicEnums.*;
 import LoAServer.ReturnClasses.ActivateFogRC;
+import LoAServer.ReturnClasses.EndBattleRoundRC;
 import LoAServer.ReturnClasses.GetAvailableRegionsRC;
 import LoAServer.ReturnClasses.MoveRC;
 import com.google.gson.Gson;
@@ -570,6 +568,10 @@ public class GameDatabase {
                 // refresh wells
                 // narrator advances one step
 
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 if (getGame(gameName).getGoldenShields() < 0) { // game over
                     games.remove(getGame(gameName));
                     masterDatabase.deleteMessageDatabase(gameName);
@@ -697,7 +699,7 @@ public class GameDatabase {
 
             if (getGame(gameName).getCurrentFight().getHeroes().size() == 0) {
                 getGame(gameName).setCurrentFight(null);
-                getGame(gameName).setCurrentHero(h);
+                getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
                 getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
             } else {
                 getGame(gameName).getCurrentFight().getHeroes().remove(h);
@@ -746,6 +748,8 @@ public class GameDatabase {
 
     public Integer calculateBattleValue(String gameName, String username, ArrayList<Integer> diceRolls) { // control the way this method can be called error check on client (did not account for doubles)
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        h.setFought(false);
 
         int max = 0;
         for (int i : diceRolls) {
@@ -811,5 +815,75 @@ public class GameDatabase {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
         return duplicateMax + creature.getStrength();
+    }
+
+    public EndBattleRoundRC endBattleRound (String gameName, String username) {
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        Fight fight = getGame(gameName).getCurrentFight();
+
+        if (fight.getPendingInvitedHeroes().size() > 0) {
+            return new EndBattleRoundRC(fight, EndBattleRoundResponses.WAITING_FOR_PLAYERS_TO_JOIN);
+        }
+
+        if (fight.getCreatureBattleScore() == 0) {
+            return new EndBattleRoundRC(fight, EndBattleRoundResponses.CREATURE_NO_BATTLE_VALUE);
+        }
+
+        for (Integer bv : fight.getHeroesBattleScores()) {
+            if (bv == 0) {
+                return new EndBattleRoundRC(fight, EndBattleRoundResponses.PLAYERS_NO_BATTLE_VALUE);
+            }
+        }
+
+        for (Hero h : fight.getHeroes()) { // if doesn't work use getHeroByHC
+            h.setCurrentHour(h.getCurrentHour()+1);
+        }
+        int totalHeroesBV = 0;
+        for (Integer bv : fight.getHeroesBattleScores()) {
+            totalHeroesBV += bv;
+        }
+
+        int difference = totalHeroesBV - fight.getCreatureBattleScore();
+
+        for (Integer bv : fight.getHeroesBattleScores()) { // reset battle values
+            bv = 0;
+        }
+        fight.setCreatureBattleScore(0);
+
+        if (difference > 0) {
+            for (Hero h : fight.getHeroes()) { // if doesn't work use getHeroByHC
+                h.setWillPower(h.getWillPower()-difference);
+
+                if (h.getWillPower() <= 0) {
+                    h.setStrength(h.getStrength()-1);
+                    h.setWillPower(3);
+                    int index = fight.getHeroes().indexOf(h);
+                    fight.getHeroes().remove(index);
+                    fight.getHeroesBattleScores().remove(index);
+                }
+            }
+
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+            if (fight.getHeroes().size() == 0) { // force client to press leave fight!!!!!
+                return new EndBattleRoundRC(fight, EndBattleRoundResponses.BATTLE_LOST);
+            } else {
+                return new EndBattleRoundRC(fight, EndBattleRoundResponses.LOST_ROUND);
+            }
+        } else {
+            fight.getCreature().setWillpower(fight.getCreature().getWillpower()-difference);
+
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+            if (fight.getCreature().getWillpower() <= 0) { // force player to press leave fight!!!!
+                return new EndBattleRoundRC(fight, EndBattleRoundResponses.CREATURE_DEFEATED);
+            } else {
+                return new EndBattleRoundRC(fight, EndBattleRoundResponses.WON_ROUND);
+            }
+        }
     }
 }

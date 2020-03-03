@@ -1,6 +1,7 @@
 package LoAServer;
 
 import LoAServer.ReturnClasses.ActivateFogRC;
+import LoAServer.ReturnClasses.EndBattleRoundRC;
 import LoAServer.ReturnClasses.GetAvailableRegionsRC;
 import LoAServer.ReturnClasses.MoveRC;
 import eu.kartoffelquadrat.asyncrestlib.ResponseGenerator;
@@ -108,5 +109,10 @@ public class GameController {
     @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/calculateCreatureBattleValue")
     public Integer calculateCreatureBattleValue(@PathVariable String gameName, @PathVariable String username, @RequestBody ArrayList<Integer> diceRolls) {
         return MasterDatabase.getInstance().getMasterGameDatabase().calculateCreatureBattleValue(gameName, username, diceRolls);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/endBattleRound")
+    public EndBattleRoundRC calculateCreatureBattleValue(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().endBattleRound(gameName, username);
     }
 }
