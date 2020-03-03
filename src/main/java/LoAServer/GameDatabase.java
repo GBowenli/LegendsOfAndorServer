@@ -661,7 +661,15 @@ public class GameDatabase {
                 if (!p.getUsername().equals(username)) {
                     if (p.getHero().getHeroClass() != HeroClass.ARCHER) {
                         if (p.getHero().getCurrentSpace() == h.getCurrentSpace()) {
-                            fight.getPendingInvitedHeroes().add(p.getHero());
+                            if (h.getCurrentHour() >= 7 && h.getCurrentHour() != 10) {
+                                if (h.getWillPower() >= 3) {
+                                    fight.getPendingInvitedHeroes().add(p.getHero());
+                                }
+                            } else {
+                                if (h.getWillPower() >= 1) {
+                                    fight.getPendingInvitedHeroes().add(p.getHero());
+                                }
+                            }
                         }
                     } else { // is an archer
                         Region region = regionDatabase.getRegion(p.getHero().getCurrentSpace());
@@ -672,7 +680,15 @@ public class GameDatabase {
                         }
 
                         if (archerAdjacentRegions.contains(h.getCurrentSpace())) {
-                            fight.getPendingInvitedHeroes().add(p.getHero());
+                            if (h.getCurrentHour() >= 7 && h.getCurrentHour() != 10) {
+                                if (h.getWillPower() >= 3) {
+                                    fight.getPendingInvitedHeroes().add(p.getHero());
+                                }
+                            } else {
+                                if (h.getWillPower() >= 1) {
+                                    fight.getPendingInvitedHeroes().add(p.getHero());
+                                }
+                            }
                         }
                     }
                 }
@@ -851,6 +867,9 @@ public class GameDatabase {
         }
 
         for (Hero h : fight.getHeroes()) { // if doesn't work use getHeroByHC
+            if (h.getCurrentHour() >= 7) {
+                h.setWillPower(h.getWillPower()-2);
+            }
             h.setCurrentHour(h.getCurrentHour()+1);
         }
         int totalHeroesBV = 0;
@@ -869,7 +888,7 @@ public class GameDatabase {
             for (Hero h : fight.getHeroes()) { // if doesn't work use getHeroByHC
                 h.setWillPower(h.getWillPower()-difference);
 
-                if (h.getWillPower() <= 0) {
+                if (h.getWillPower() <= 0 || h.getCurrentHour() == 10) {
                     h.setStrength(h.getStrength()-1);
                     h.setWillPower(3);
                     int index = fight.getHeroes().indexOf(h);
@@ -895,6 +914,8 @@ public class GameDatabase {
             }
 
             if (fight.getCreature().getWillpower() <= 0) { // force player to press leave fight!!!!
+                getGame(gameName).getRegionDatabase().getRegion(80).getCurrentCreatures().add(fight.getCreature());
+
                 return new EndBattleRoundRC(fight, EndBattleRoundResponses.CREATURE_DEFEATED);
             } else {
                 return new EndBattleRoundRC(fight, EndBattleRoundResponses.WON_ROUND);
