@@ -3,6 +3,9 @@ package LoAServer;
 import java.util.ArrayList;
 import java.util.List;
 
+enum PLAYER_STATUS{
+    PLAYER_TURN, PLAYER_WAIT
+}
 public class Player {
     private String username;
     private String password;
@@ -10,6 +13,7 @@ public class Player {
     private boolean isLoggedIn;
     private Hero hero;
     private boolean isReady;
+    private PLAYER_STATUS player_status;
 
     public Player() {
     }
@@ -56,4 +60,7 @@ public class Player {
     public void setReady(boolean ready) {
         isReady = ready;
     }
+
+    public PLAYER_STATUS getPlayer_status() { return player_status;}
+    public void setPlayer_status(PLAYER_STATUS player_status) { this.player_status = player_status; }
 }

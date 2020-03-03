@@ -26,6 +26,7 @@ public class Game implements BroadcastContent {
     private Fight currentFight;
 
 
+
     public Game() {}
 
     public Game(Player p, int maxNumPlayers, String gameName, Boolean difficult) {
