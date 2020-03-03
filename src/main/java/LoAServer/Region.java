@@ -1,10 +1,8 @@
 package LoAServer;
 
-import java.util.ArrayList;
+import LoAServer.PublicEnums.FogKind;
 
-enum FogKind {
-    NONE, MONSTER, WINESKIN, TWO_WP, THREE_WP, SP, GOLD, WITCHBREW, EVENT
-}
+import java.util.ArrayList;
 
 public class Region {
     private int number;

@@ -1,5 +1,8 @@
 package LoAServer;
 
+import LoAServer.ReturnClasses.ActivateFogRC;
+import LoAServer.ReturnClasses.GetAvailableRegionsRC;
+import LoAServer.ReturnClasses.MoveRC;
 import eu.kartoffelquadrat.asyncrestlib.ResponseGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +31,12 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getAvailableRegions") // this is the one to call when you click the button "Move"
-    public List<Object> getAvailableRegions (@PathVariable String gameName, @PathVariable String username) {
+    public GetAvailableRegionsRC getAvailableRegions (@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().getAvailableRegions(gameName, username);
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/move")
-    public List<Object> move(@PathVariable String gameName, @PathVariable String username, @RequestBody Integer targetRegion) { // this is the one to call after they click a region after clicking "Move"
+    public MoveRC move(@PathVariable String gameName, @PathVariable String username, @RequestBody Integer targetRegion) { // this is the one to call after they click a region after clicking "Move"
         return MasterDatabase.getInstance().getMasterGameDatabase().move(gameName, username, targetRegion);
     }
 
@@ -58,7 +61,7 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateFog")
-    public List<Object> activateFog(@PathVariable String gameName, @PathVariable String username) {
+    public ActivateFogRC activateFog(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().activateFog(gameName, username);
     }
 

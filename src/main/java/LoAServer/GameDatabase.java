@@ -1,6 +1,13 @@
 //added changes
 package LoAServer;
 
+import LoAServer.PublicEnums.ActivateFogResponses;
+import LoAServer.PublicEnums.FogKind;
+import LoAServer.PublicEnums.GetAvailableRegionsReponses;
+import LoAServer.PublicEnums.MoveResponses;
+import LoAServer.ReturnClasses.ActivateFogRC;
+import LoAServer.ReturnClasses.GetAvailableRegionsRC;
+import LoAServer.ReturnClasses.MoveRC;
 import com.google.gson.Gson;
 
 import java.util.*;
@@ -33,14 +40,6 @@ enum DistributeItemsResponses{
     DISTRIBUTE_ITEMS_SUCCESS, DISTRIBUTE_ITEMS_FAILURE
 }
 
-enum GetAvailableRegionsReponses {
-    NOT_CURRENT_TURN, DEDUCT_WILLPOWER, NOT_ENOUGH_WILLPOWER, CURRENT_HOUR_MAXED, CANNOT_MOVE_AFTER_FIGHT, SUCCESS
-}
-
-enum MoveResponses {
-    PICK_UP_FARMER, FARMERS_DIED, NO_OTHER_ACTIONS
-}
-
 enum PickUpFarmersResponses {
     FARMERS_DIED, NO_FARMERS, FARMERS_PICKED_UP
 }
@@ -51,10 +50,6 @@ enum EndMoveResponses {
 
 enum EmptyWellResponses {
     SUCCESS, WELL_ALREADY_EMPTY, WELL_DNE
-}
-
-enum ActivateFogResponses {
-    SUCCESS, FOG_DNE
 }
 
 enum EndDayResponses {
@@ -91,9 +86,6 @@ public class GameDatabase {
     }
 
     public HostGameResponses hostGame(Game g) {
-        System.out.println(new Gson().toJson(g));
-        System.out.println(g.getRegionDatabase().getAllRegionsWithCreatures().size());
-
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
         if (getGame(g.getGameName()) == null) {
@@ -291,21 +283,21 @@ public class GameDatabase {
     }
 
 
-    public List<Object> getAvailableRegions (String gameName, String username) {
+    public GetAvailableRegionsRC getAvailableRegions (String gameName, String username) {
         Player p = getGame(gameName).getSinglePlayer(username);
 
         if (getGame(gameName).getCurrentHero().equals(p.getHero())) {
             if (p.getHero().getCurrentHour() == 10) {
-                return Arrays.asList(null, GetAvailableRegionsReponses.CURRENT_HOUR_MAXED);
+                return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.CURRENT_HOUR_MAXED);
             } else {
                 if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.FIGHT) {
-                    return Arrays.asList(null, GetAvailableRegionsReponses.CANNOT_MOVE_AFTER_FIGHT);
+                    return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.CANNOT_MOVE_AFTER_FIGHT);
                 } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.NONE) {
                     getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.MOVE);
                 }
 
                 if (p.getHero().getCurrentHour() >= 7 && p.getHero().getWillPower() <= 2) {
-                    return Arrays.asList(null, GetAvailableRegionsReponses.NOT_ENOUGH_WILLPOWER);
+                    return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.NOT_ENOUGH_WILLPOWER);
                 }
 
                 ArrayList<Integer> adjacentRegions = new ArrayList<>();
@@ -318,17 +310,17 @@ public class GameDatabase {
                 }
 
                 if (p.getHero().getCurrentHour() >= 7) {
-                    return Arrays.asList(adjacentRegions, GetAvailableRegionsReponses.DEDUCT_WILLPOWER);
+                    return new GetAvailableRegionsRC(adjacentRegions, GetAvailableRegionsReponses.DEDUCT_WILLPOWER);
                 } else {
-                    return Arrays.asList(adjacentRegions, GetAvailableRegionsReponses.SUCCESS);
+                    return new GetAvailableRegionsRC(adjacentRegions, GetAvailableRegionsReponses.SUCCESS);
                 }
             }
         } else {
-            return Arrays.asList(null, GetAvailableRegionsReponses.NOT_CURRENT_TURN);
+            return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.NOT_CURRENT_TURN);
         }
     }
 
-    public List<Object> move(String gameName, String username, Integer targetRegion) { // do the verification on android (checking if is feasible adjacent)
+    public MoveRC move(String gameName, String username, Integer targetRegion) { // do the verification on android (checking if is feasible adjacent)
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
 
@@ -347,13 +339,13 @@ public class GameDatabase {
         if (regionDatabase.getRegion(targetRegion).getCurrentCreatures().size() > 0) {
             if (h.getFarmers().size() > 0) {
                 h.getFarmers().clear();
-                return Arrays.asList(null, MoveResponses.FARMERS_DIED);
+                return new MoveRC(new ArrayList<>(), MoveResponses.FARMERS_DIED);
             }
         }
         if (regionDatabase.getRegion(targetRegion).getFarmers().size() > 0) {
-            return Arrays.asList(regionDatabase.getRegion(targetRegion).getFarmers(), MoveResponses.PICK_UP_FARMER);
+            return new MoveRC(regionDatabase.getRegion(targetRegion).getFarmers(), MoveResponses.PICK_UP_FARMER);
         } else {
-            return Arrays.asList(null, MoveResponses.NO_OTHER_ACTIONS);
+            return new MoveRC(new ArrayList<>(), MoveResponses.NO_OTHER_ACTIONS);
         }
     }
 
@@ -446,7 +438,7 @@ public class GameDatabase {
         }
     }
 
-    public List<Object> activateFog(String gameName, String username) {
+    public ActivateFogRC activateFog(String gameName, String username) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         FogKind f = regionDatabase.getRegion(h.getCurrentSpace()).getFog();
@@ -475,9 +467,9 @@ public class GameDatabase {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
 
-            return Arrays.asList(f, ActivateFogResponses.SUCCESS);
+            return new ActivateFogRC(f, ActivateFogResponses.SUCCESS);
         } else {
-            return Arrays.asList(null, ActivateFogResponses.FOG_DNE);
+            return new ActivateFogRC(FogKind.NONE, ActivateFogResponses.FOG_DNE);
         }
     }
 
@@ -512,7 +504,6 @@ public class GameDatabase {
                     int newCreatureSpace;
 
                     do {
-                        System.out.println(r.getNumber());
                         if (r.getBridgeNextRegion() != null) {
                             newCreatureSpace = r.getBridgeNextRegion();
                         } else {
@@ -578,13 +569,6 @@ public class GameDatabase {
                 // advance creatures
                 // refresh wells
                 // narrator advances one step
-
-                System.out.println(regionDatabase.getAllRegionsWithCreatures());
-
-                for (Region r : regionDatabase.getAllRegionsWithCreatures()) {
-                    System.out.println("!!!" + r.getCurrentCreatures().get(0).toString() + "!!!   " + r.getNumber());
-                }
-
 
                 if (getGame(gameName).getGoldenShields() < 0) { // game over
                     games.remove(getGame(gameName));
