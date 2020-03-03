@@ -2,11 +2,7 @@
 package LoAServer;
 
 import LoAServer.PublicEnums.*;
-import LoAServer.ReturnClasses.ActivateFogRC;
-import LoAServer.ReturnClasses.EndBattleRoundRC;
-import LoAServer.ReturnClasses.GetAvailableRegionsRC;
-import LoAServer.ReturnClasses.MoveRC;
-import com.google.gson.Gson;
+import LoAServer.ReturnClasses.*;
 
 import java.util.*;
 
@@ -56,10 +52,6 @@ enum EndDayResponses {
 
 enum PassResponses {
     PASS_SUCCESSFUL, MUST_END_DAY, ONLY_PLAYER_LEFT, NOT_CURRENT_TURN, DAY_ENDED, PASS_SUCCESSFUL_WP_DEDUCTED
-}
-
-enum FightResponses {
-    NO_CREATURE_FOUND, NOT_CURRENT_TURN, DAY_ENDED, JOINED_FIGHT
 }
 
 enum LeaveFightResponses {
@@ -641,16 +633,16 @@ public class GameDatabase {
         }
     }
 
-    public FightResponses fight(String gameName, String username) {
+    public FightRC fight(String gameName, String username) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
         if (!getGame(gameName).getCurrentHero().equals(h)) {
-            return FightResponses.NOT_CURRENT_TURN;
+            return new FightRC(new Fight(), FightResponses.NOT_CURRENT_TURN);
         } else if (h.isHasEndedDay()) {
-            return FightResponses.DAY_ENDED;
+            return new FightRC(new Fight(), FightResponses.DAY_ENDED);
         } else if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().size() == 0) {
-            return FightResponses.NO_CREATURE_FOUND;
+            return new FightRC(new Fight(), FightResponses.NO_CREATURE_FOUND);
         } else {
             Fight fight = new Fight(h, regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().get(0));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.FIGHT);
@@ -700,7 +692,7 @@ public class GameDatabase {
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
-            return FightResponses.JOINED_FIGHT;
+            return new FightRC(fight, FightResponses.JOINED_FIGHT);
         }
     }
 

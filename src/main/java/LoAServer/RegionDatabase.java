@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-enum Difficulty {
+enum    Difficulty {
     EASY, HARD
 }
 
@@ -226,6 +226,51 @@ public class RegionDatabase {
         if (difficulty == Difficulty.EASY) {
             regionDatabase.get(36).getFarmers().add(new Farmer(false));
         }
+
+        //setCoordinates
+        regionDatabase.get(9).setCoordinatesa(new float[] {244,41});
+        regionDatabase.get(7).setCoordinatesa(new float[] {166,105});
+        regionDatabase.get(8).setCoordinatesa(new float[] {325,137});
+        regionDatabase.get(15).setCoordinatesa(new float[] {103,31});
+
+        regionDatabase.get(41).setCoordinatesa(new float[] {621,768});
+        regionDatabase.get(42).setCoordinatesa(new float[] {1152,640});
+        regionDatabase.get(43).setCoordinatesa(new float[] {325,137});
+        regionDatabase.get(44).setCoordinatesa(new float[] {1121,518});
+        regionDatabase.get(45).setCoordinatesa(new float[] {1251,556});
+        regionDatabase.get(46).setCoordinatesa(new float[] {1147,445});
+        regionDatabase.get(47).setCoordinatesa(new float[] {1123,301});
+        regionDatabase.get(48).setCoordinatesa(new float[] {867,262});
+        regionDatabase.get(49).setCoordinatesa(new float[] {765,222});
+        regionDatabase.get(50).setCoordinatesa(new float[] {824,150});
+        regionDatabase.get(51).setCoordinatesa(new float[] {977,193});
+        regionDatabase.get(52).setCoordinatesa(new float[] {902,96});
+        regionDatabase.get(53).setCoordinatesa(new float[] {1056,247});
+        regionDatabase.get(54).setCoordinatesa(new float[] {1171,204});
+        regionDatabase.get(55).setCoordinatesa(new float[] {1136,83});
+        regionDatabase.get(56).setCoordinatesa(new float[] {1266,278});
+        regionDatabase.get(57).setCoordinatesa(new float[] {1268,146});
+        regionDatabase.get(58).setCoordinatesa(new float[] {1525,219});
+        regionDatabase.get(59).setCoordinatesa(new float[] {1460,110});
+        regionDatabase.get(60).setCoordinatesa(new float[] {1590,141});
+        regionDatabase.get(61).setCoordinatesa(new float[] {1605,381});
+        regionDatabase.get(62).setCoordinatesa(new float[] {1647,198});
+        regionDatabase.get(63).setCoordinatesa(new float[] {1480,295});
+        regionDatabase.get(64).setCoordinatesa(new float[] {1367,427});
+        regionDatabase.get(65).setCoordinatesa(new float[] {1393,521});
+        regionDatabase.get(66).setCoordinatesa(new float[] {1504,645});
+        regionDatabase.get(67).setCoordinatesa(new float[] {1505,715});
+        regionDatabase.get(68).setCoordinatesa(new float[] {1459,759});
+        regionDatabase.get(69).setCoordinatesa(new float[] {1372,813});
+        regionDatabase.get(70).setCoordinatesa(new float[] {1364,878});
+        regionDatabase.get(71).setCoordinatesa(new float[] {1266,686});
+        //missing 72!!!!
+        // 73 - 79 no regions on map
+        regionDatabase.get(80).setCoordinatesa(new float[] {1529,936});
+        regionDatabase.get(81).setCoordinatesa(new float[] {1352,926});
+        regionDatabase.get(82).setCoordinatesa(new float[] {1249,965});
+        regionDatabase.get(83).setCoordinatesa(new float[] {1621,502});
+        regionDatabase.get(84).setCoordinatesa(new float[] {1180,862});
     }
 
     public void setRandomizedFogs() {

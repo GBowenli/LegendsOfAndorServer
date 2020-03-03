@@ -20,6 +20,7 @@ public class Region {
     private ArrayList<Item> items;
     private ArrayList<Creature> currentCreatures;
     private ArrayList<Farmer> farmers;
+    private float[] coordinates;
 
     public Region() {}
 
@@ -155,4 +156,8 @@ public class Region {
     public void setFarmers(ArrayList<Farmer> farmers) {
         this.farmers = farmers;
     }
+
+    public void setCoordinatesa(float[] coor) {this.coordinates = coor;}
+
+    public float[] getCoordinates() {return this.coordinates;}
 }

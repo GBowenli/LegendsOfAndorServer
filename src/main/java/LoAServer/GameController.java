@@ -1,16 +1,13 @@
 package LoAServer;
 
-import LoAServer.ReturnClasses.ActivateFogRC;
-import LoAServer.ReturnClasses.EndBattleRoundRC;
-import LoAServer.ReturnClasses.GetAvailableRegionsRC;
-import LoAServer.ReturnClasses.MoveRC;
+import LoAServer.PublicEnums.FightResponses;
+import LoAServer.ReturnClasses.*;
 import eu.kartoffelquadrat.asyncrestlib.ResponseGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 public class GameController {
@@ -77,7 +74,7 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/fight")
-    public FightResponses fight(@PathVariable String gameName, @PathVariable String username) {
+    public FightRC fight(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().fight(gameName, username);
     }
 
