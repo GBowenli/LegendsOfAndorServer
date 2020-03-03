@@ -6,6 +6,10 @@ public class Fight {
     private ArrayList<Hero> heroes;
     private ArrayList<Integer> heroesBattleScores;
     private ArrayList<Hero> pendingInvitedHeroes;
+    private ArrayList<Integer> warriorDice;
+    private ArrayList<Integer> dwarfDice;
+    private ArrayList<Integer> archerDice;
+    private ArrayList<Integer> wizardDice;
     private Creature creature;
     private boolean battleRoundEnded;
     private boolean wizardAbilityUsed;
@@ -20,6 +24,11 @@ public class Fight {
         heroesBattleScores.add(0);
         pendingInvitedHeroes = new ArrayList<>();
         this.creature = creature;
+
+        warriorDice = new ArrayList<>();
+        dwarfDice = new ArrayList<>();
+        archerDice = new ArrayList<>();
+        wizardDice = new ArrayList<>();
     }
 
     public boolean noPendingInvitations() {
@@ -76,6 +85,38 @@ public class Fight {
 
     public void setWizardAbilityUsed(boolean wizardAbilityUsed) {
         this.wizardAbilityUsed = wizardAbilityUsed;
+    }
+
+    public ArrayList<Integer> getWarriorDice() {
+        return warriorDice;
+    }
+
+    public void setWarriorDice(ArrayList<Integer> warriorDice) {
+        this.warriorDice = warriorDice;
+    }
+
+    public ArrayList<Integer> getDwarfDice() {
+        return dwarfDice;
+    }
+
+    public void setDwarfDice(ArrayList<Integer> dwarfDice) {
+        this.dwarfDice = dwarfDice;
+    }
+
+    public ArrayList<Integer> getArcherDice() {
+        return archerDice;
+    }
+
+    public void setArcherDice(ArrayList<Integer> archerDice) {
+        this.archerDice = archerDice;
+    }
+
+    public ArrayList<Integer> getWizardDice() {
+        return wizardDice;
+    }
+
+    public void setWizardDice(ArrayList<Integer> wizardDice) {
+        this.wizardDice = wizardDice;
     }
 
     public int getCreatureBattleScore() {

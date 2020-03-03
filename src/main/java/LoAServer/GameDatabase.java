@@ -771,8 +771,19 @@ public class GameDatabase {
 
     public Integer calculateBattleValue(String gameName, String username, ArrayList<Integer> diceRolls) { // control the way this method can be called error check on client (did not account for doubles)
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        Fight fight = getGame(gameName).getCurrentFight();
 
         h.setFought(false);
+
+        if (h.getHeroClass().equals(HeroClass.WARRIOR)) {
+            fight.setWarriorDice(diceRolls);
+        } else if (h.getHeroClass().equals(HeroClass.ARCHER)) {
+            fight.setArcherDice(diceRolls);
+        } else if (h.getHeroClass().equals(HeroClass.DWARF)) {
+            fight.setDwarfDice(diceRolls);
+        } else { // wizard
+            fight.setWizardDice(diceRolls);
+        }
 
         int max = 0;
         for (int i : diceRolls) {
@@ -787,6 +798,12 @@ public class GameDatabase {
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
+
+        for (Integer i : diceRolls) {
+            System.out.println(i);
+        }
+        System.out.println(max+h.getStrength());
+
         return max + h.getStrength();
     }
 
@@ -875,6 +892,10 @@ public class GameDatabase {
             bv = 0;
         }
         fight.setCreatureBattleScore(0);
+        fight.setWizardDice(new ArrayList<>());
+        fight.setDwarfDice(new ArrayList<>());
+        fight.setArcherDice(new ArrayList<>());
+        fight.setWizardDice(new ArrayList<>());
 
         if (difference > 0) {
             for (Hero h : fight.getHeroes()) { // if doesn't work use getHeroByHC
