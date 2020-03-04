@@ -109,7 +109,7 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/endBattleRound")
-    public EndBattleRoundRC calculateCreatureBattleValue(@PathVariable String gameName, @PathVariable String username) {
+    public EndBattleRoundResponses calculateCreatureBattleValue(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().endBattleRound(gameName, username);
     }
 }

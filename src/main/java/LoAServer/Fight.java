@@ -15,6 +15,8 @@ public class Fight {
     private boolean wizardAbilityUsed;
     private int creatureBattleScore;
 
+    private ArrayList<Integer> creatureDice;
+
     public Fight() {}
 
     public Fight(Hero hero, Creature creature) {
@@ -29,6 +31,7 @@ public class Fight {
         dwarfDice = new ArrayList<>();
         archerDice = new ArrayList<>();
         wizardDice = new ArrayList<>();
+        creatureDice = new ArrayList<>();
     }
 
     public boolean noPendingInvitations() {
@@ -125,5 +128,13 @@ public class Fight {
 
     public void setCreatureBattleScore(int creatureBattleScore) {
         this.creatureBattleScore = creatureBattleScore;
+    }
+
+    public ArrayList<Integer> getCreatureDice() {
+        return creatureDice;
+    }
+
+    public void setCreatureDice(ArrayList<Integer> creatureDice) {
+        this.creatureDice = creatureDice;
     }
 }

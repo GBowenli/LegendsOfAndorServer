@@ -58,6 +58,10 @@ enum LeaveFightResponses {
     CANNOT_LEAVE_AFTER_ROLLING, CANNOT_LEAVE_WITHOUT_FIGHTING, SUCCESS
 }
 
+enum EndBattleRoundResponses {
+    WON_ROUND, LOST_ROUND, CREATURE_DEFEATED, BATTLE_LOST, PLAYERS_NO_BATTLE_VALUE, CREATURE_NO_BATTLE_VALUE, WAITING_FOR_PLAYERS_TO_JOIN
+}
+
 
 public class GameDatabase {
     private ArrayList<Game> games;
@@ -581,6 +585,7 @@ public class GameDatabase {
 
                 if (getGame(gameName).getGoldenShields() < 0) { // game over
                     games.remove(getGame(gameName));
+                    masterDatabase.removeGameBCM(gameName);
                     masterDatabase.deleteMessageDatabase(gameName);
 
                     return EndDayResponses.GAME_OVER;
@@ -739,31 +744,42 @@ public class GameDatabase {
 
     public ArrayList<Die> getDice(String gameName, String username) { // DID NOT CHECK FOR BLACK DIE HERE ADD IN FUTURE!!!
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        Fight fight = getGame(gameName).getCurrentFight();
 
         if (h.getHeroClass() == HeroClass.WIZARD) {
+            fight.setWizardDice(new ArrayList<>(Arrays.asList(0)));
             return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE)));
         } else if (h.getHeroClass() == HeroClass.WARRIOR) {
             if (h.getWillPower() < 7) {
+                fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else if (h.getWillPower() < 14) {
+                fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
+                fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         } else if (h.getHeroClass() == HeroClass.DWARF) {
             if (h.getWillPower() < 7) {
+                fight.setDwarfDice(new ArrayList<>(Arrays.asList(0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE)));
             } else if (h.getWillPower() < 14) {
+                fight.setDwarfDice(new ArrayList<>(Arrays.asList(0, 0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
+                fight.setDwarfDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         } else { // ARCHER
             if (h.getWillPower() < 7) {
+                fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else if (h.getWillPower() < 14) {
+                fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
+                fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         }
@@ -809,17 +825,22 @@ public class GameDatabase {
 
     public ArrayList<Die> getCreatureDice(String gameName, String username) {
         Creature creature = getGame(gameName).getCurrentFight().getCreature();
+        Fight fight = getGame(gameName).getCurrentFight();
 
         if (creature.getCreatureType() == CreatureType.WARDRAKS) {
             if (creature.getWillpower() < 7) {
+                fight.setCreatureDice(new ArrayList<>(Arrays.asList(-1))); // -1 MEANS BLACK DIE!!!!!!!!!!!!!!!!!!!!
                 return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
             } else {
+                fight.setCreatureDice(new ArrayList<>(Arrays.asList(-1, -1)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE), new Die(DieType.BLACK_DIE)));
             }
         } else {
             if (creature.getWillpower() < 7) {
+                fight.setCreatureDice(new ArrayList<>(Arrays.asList(0, 0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
+                fight.setCreatureDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         }
@@ -857,21 +878,21 @@ public class GameDatabase {
         return duplicateMax + creature.getStrength();
     }
 
-    public EndBattleRoundRC endBattleRound (String gameName, String username) {
+    public EndBattleRoundResponses endBattleRound (String gameName, String username) {
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
         Fight fight = getGame(gameName).getCurrentFight();
 
         if (fight.getPendingInvitedHeroes().size() > 0) {
-            return new EndBattleRoundRC(fight, EndBattleRoundResponses.WAITING_FOR_PLAYERS_TO_JOIN);
+            return EndBattleRoundResponses.WAITING_FOR_PLAYERS_TO_JOIN;
         }
 
         if (fight.getCreatureBattleScore() == 0) {
-            return new EndBattleRoundRC(fight, EndBattleRoundResponses.CREATURE_NO_BATTLE_VALUE);
+            return EndBattleRoundResponses.CREATURE_NO_BATTLE_VALUE;
         }
 
         for (Integer bv : fight.getHeroesBattleScores()) {
             if (bv == 0) {
-                return new EndBattleRoundRC(fight, EndBattleRoundResponses.PLAYERS_NO_BATTLE_VALUE);
+                return EndBattleRoundResponses.PLAYERS_NO_BATTLE_VALUE;
             }
         }
 
@@ -915,9 +936,9 @@ public class GameDatabase {
             }
 
             if (fight.getHeroes().size() == 0) { // force client to press leave fight!!!!!
-                return new EndBattleRoundRC(fight, EndBattleRoundResponses.BATTLE_LOST);
+                return EndBattleRoundResponses.BATTLE_LOST;
             } else {
-                return new EndBattleRoundRC(fight, EndBattleRoundResponses.LOST_ROUND);
+                return EndBattleRoundResponses.LOST_ROUND;
             }
         } else {
             fight.getCreature().setWillpower(fight.getCreature().getWillpower()-difference);
@@ -929,9 +950,9 @@ public class GameDatabase {
             if (fight.getCreature().getWillpower() <= 0) { // force player to press leave fight!!!!
                 getGame(gameName).getRegionDatabase().getRegion(80).getCurrentCreatures().add(fight.getCreature());
 
-                return new EndBattleRoundRC(fight, EndBattleRoundResponses.CREATURE_DEFEATED);
+                return EndBattleRoundResponses.CREATURE_DEFEATED;
             } else {
-                return new EndBattleRoundRC(fight, EndBattleRoundResponses.WON_ROUND);
+                return EndBattleRoundResponses.WON_ROUND;
             }
         }
     }
