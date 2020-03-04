@@ -584,13 +584,13 @@ public class GameDatabase {
                 }
 
                 if (getGame(gameName).getGoldenShields() < 0) { // game over
+                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) { // reset heroes
+                        masterDatabase.getMasterPlayerDatabase().getPlayer(getGame(gameName).getPlayers()[i].getUsername()).setHero(null);
+                    }
+
                     games.remove(getGame(gameName));
                     masterDatabase.removeGameBCM(gameName);
                     masterDatabase.deleteMessageDatabase(gameName);
-
-                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                        masterDatabase.getMasterPlayerDatabase().getPlayer(username).setHero(null);
-                    }
 
                     return EndDayResponses.GAME_OVER;
                 } else {
