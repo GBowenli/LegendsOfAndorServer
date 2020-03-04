@@ -588,6 +588,10 @@ public class GameDatabase {
                     masterDatabase.removeGameBCM(gameName);
                     masterDatabase.deleteMessageDatabase(gameName);
 
+                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                        masterDatabase.getMasterPlayerDatabase().getPlayer(username).setHero(null);
+                    }
+
                     return EndDayResponses.GAME_OVER;
                 } else {
                     return EndDayResponses.NEW_DAY; // Legend Card here
