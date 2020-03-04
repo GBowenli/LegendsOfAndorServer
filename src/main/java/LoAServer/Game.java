@@ -7,6 +7,9 @@ import java.util.ArrayList;
 enum TurnOptions{
     MOVE, FIGHT, NONE
 }
+enum GameStatus{
+    GAME_WON, GAME_LOST, GAME_ERROR, IN_PROGRESS
+}
 
 public class Game implements BroadcastContent {
     private int maxNumPlayers;
@@ -24,6 +27,7 @@ public class Game implements BroadcastContent {
     private ArrayList<Farmer> farmers;
     private Boolean difficultMode;
     private Fight currentFight;
+    private GameStatus gameStatus;
 
 
 
@@ -43,6 +47,7 @@ public class Game implements BroadcastContent {
         farmers = new ArrayList<Farmer>();
         this.difficultMode = difficult;
         itemsDistributedMessage = "";
+        this.gameStatus = GameStatus.IN_PROGRESS;
     }
 
     public int getMaxNumPlayers() {

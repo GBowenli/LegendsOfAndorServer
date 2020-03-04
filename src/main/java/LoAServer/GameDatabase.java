@@ -935,4 +935,10 @@ public class GameDatabase {
             }
         }
     }
+
+    public void gameOver(String gameName){
+        if(getGame(gameName) != null){
+            games.remove(getGame(gameName));
+        }
+    }
 }

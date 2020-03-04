@@ -112,4 +112,9 @@ public class GameController {
     public EndBattleRoundRC calculateCreatureBattleValue(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().endBattleRound(gameName, username);
     }
+
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{gameName}/gameOver")
+    public void gameOver (@PathVariable String gameName){
+        MasterDatabase.getInstance().getMasterGameDatabase().gameOver(gameName);
+    }
 }
