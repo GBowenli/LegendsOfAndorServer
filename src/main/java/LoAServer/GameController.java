@@ -112,4 +112,10 @@ public class GameController {
     public EndBattleRoundResponses calculateCreatureBattleValue(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().endBattleRound(gameName, username);
     }
+
+   //remove the game
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{gameName}/gameOver")
+    public void gameOver (@PathVariable String gameName){
+        MasterDatabase.getInstance().getMasterGameDatabase().gameOver(gameName);
+    }
 }
