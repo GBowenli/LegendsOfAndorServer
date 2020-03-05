@@ -749,41 +749,93 @@ public class GameDatabase {
     public ArrayList<Die> getDice(String gameName, String username) { // DID NOT CHECK FOR BLACK DIE HERE ADD IN FUTURE!!!
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         Fight fight = getGame(gameName).getCurrentFight();
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+
 
         if (h.getHeroClass() == HeroClass.WIZARD) {
             fight.setWizardDice(new ArrayList<>(Arrays.asList(0)));
+
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
             return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE)));
         } else if (h.getHeroClass() == HeroClass.WARRIOR) {
             if (h.getWillPower() < 7) {
                 fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else if (h.getWillPower() < 14) {
                 fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
                 fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         } else if (h.getHeroClass() == HeroClass.DWARF) {
             if (h.getWillPower() < 7) {
                 fight.setDwarfDice(new ArrayList<>(Arrays.asList(0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE)));
             } else if (h.getWillPower() < 14) {
                 fight.setDwarfDice(new ArrayList<>(Arrays.asList(0, 0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
                 fight.setDwarfDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         } else { // ARCHER
             if (h.getWillPower() < 7) {
                 fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else if (h.getWillPower() < 14) {
                 fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
                 fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         }
@@ -828,23 +880,44 @@ public class GameDatabase {
     }
 
     public ArrayList<Die> getCreatureDice(String gameName, String username) {
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
         Creature creature = getGame(gameName).getCurrentFight().getCreature();
         Fight fight = getGame(gameName).getCurrentFight();
 
         if (creature.getCreatureType() == CreatureType.WARDRAKS) {
             if (creature.getWillpower() < 7) {
                 fight.setCreatureDice(new ArrayList<>(Arrays.asList(-1))); // -1 MEANS BLACK DIE!!!!!!!!!!!!!!!!!!!!
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
             } else {
                 fight.setCreatureDice(new ArrayList<>(Arrays.asList(-1, -1)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE), new Die(DieType.BLACK_DIE)));
             }
         } else {
             if (creature.getWillpower() < 7) {
                 fight.setCreatureDice(new ArrayList<>(Arrays.asList(0, 0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             } else {
                 fight.setCreatureDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
             }
         }
@@ -853,9 +926,11 @@ public class GameDatabase {
     public Integer calculateCreatureBattleValue(String gameName, String username, ArrayList<Integer> diceRolls) {
         Creature creature = getGame(gameName).getCurrentFight().getCreature();
 
+        getGame(gameName).getCurrentFight().setCreatureDice(diceRolls);
+
         Collections.sort(diceRolls);
         int prevValue = diceRolls.get(0);
-        int duplicateCurrent = diceRolls.get(0);
+        int duplicateCurrent = 0;
         int duplicateMax = 0;
         for (int i : diceRolls) {
             if (i == prevValue) {
@@ -871,6 +946,10 @@ public class GameDatabase {
                 duplicateCurrent = i;
             }
             prevValue = i;
+        }
+
+        if (duplicateMax < duplicateCurrent) {
+            duplicateMax = duplicateCurrent;
         }
 
         getGame(gameName).getCurrentFight().setCreatureBattleScore(duplicateMax + creature.getStrength());

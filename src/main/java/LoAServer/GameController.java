@@ -103,7 +103,7 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().getCreatureDice(gameName, username);
     }
 
-    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/calculateCreatureBattleValue")
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/calculateCreatureBattleValue")
     public Integer calculateCreatureBattleValue(@PathVariable String gameName, @PathVariable String username, @RequestBody ArrayList<Integer> diceRolls) {
         return MasterDatabase.getInstance().getMasterGameDatabase().calculateCreatureBattleValue(gameName, username, diceRolls);
     }
