@@ -1029,6 +1029,16 @@ public class GameDatabase {
             }
 
             if (fight.getHeroes().size() == 0) { // force client to press leave fight!!!!!
+                if (fight.getCreature().getCreatureType() == CreatureType.GOR) { // TEST THIS OUT NOT SURE IF WILL CHANGE CREATURE
+                    fight.setCreature(new Creature(CreatureType.GOR));
+                } else if (fight.getCreature().getCreatureType() == CreatureType.SKRAL) {
+                    fight.setCreature(new Creature(CreatureType.SKRAL));
+                } else if (fight.getCreature().getCreatureType() == CreatureType.TROLL) {
+                    fight.setCreature(new Creature(CreatureType.TROLL));
+                } else { // wardraks
+                    fight.setCreature(new Creature(CreatureType.WARDRAKS));
+                }
+
                 return EndBattleRoundResponses.BATTLE_LOST;
             } else {
                 return EndBattleRoundResponses.LOST_ROUND;
