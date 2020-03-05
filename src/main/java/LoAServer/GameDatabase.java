@@ -59,7 +59,7 @@ enum LeaveFightResponses {
 }
 
 enum EndBattleRoundResponses {
-    WON_ROUND, LOST_ROUND, CREATURE_DEFEATED, BATTLE_LOST, PLAYERS_NO_BATTLE_VALUE, CREATURE_NO_BATTLE_VALUE, WAITING_FOR_PLAYERS_TO_JOIN
+    WON_ROUND, LOST_ROUND, TIE_ROUND, CREATURE_DEFEATED, BATTLE_LOST, PLAYERS_NO_BATTLE_VALUE, CREATURE_NO_BATTLE_VALUE, WAITING_FOR_PLAYERS_TO_JOIN
 }
 
 
@@ -992,21 +992,53 @@ public class GameDatabase {
 
         int difference = totalHeroesBV - fight.getCreatureBattleScore();
 
-        for (Integer bv : fight.getHeroesBattleScores()) { // reset battle values
-            bv = 0;
+        fight.getHeroesBattleScores().clear();
+        for (int i = 0; i < fight.getHeroes().size(); i++) { // reset battle values test!!!!!!!!!!!
+            fight.getHeroesBattleScores().add(0);
         }
         fight.setCreatureBattleScore(0);
-        fight.setWizardDice(new ArrayList<>());
-        fight.setDwarfDice(new ArrayList<>());
-        fight.setArcherDice(new ArrayList<>());
-        fight.setWizardDice(new ArrayList<>());
+        fight.getCreatureDice().clear();
+        fight.getWarriorDice().clear();
+        fight.getArcherDice().clear();
+        fight.getDwarfDice().clear();
+        fight.getWizardDice().clear();
 
-        if (difference > 0) {
+        if (difference < 0) {
+            for (Iterator<Hero> it = fight.getHeroes().iterator(); it.hasNext();) {
+                Hero h = it.next();
+
+                h.setWillPower(h.getWillPower() + difference);
+
+                if (h.getWillPower() <= 0) {
+                    if (h.getStrength() > 1) {
+                        h.setStrength(h.getStrength() - 1);
+                    }
+                    h.setWillPower(3);
+                    int index = fight.getHeroes().indexOf(h);
+                    it.remove();
+                    fight.getHeroesBattleScores().remove(index);
+                } else if (h.getCurrentHour() == 10) {
+                    int index = fight.getHeroes().indexOf(h);
+                    it.remove();
+                    fight.getHeroesBattleScores().remove(index);
+                }
+            }
+
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+            if (fight.getHeroes().size() == 0) { // force client to press leave fight!!!!!
+                return EndBattleRoundResponses.BATTLE_LOST;
+            } else {
+                return EndBattleRoundResponses.LOST_ROUND;
+            }
+        } else if (difference == 0) {
             for (Hero h : fight.getHeroes()) { // if doesn't work use getHeroByHC
-                h.setWillPower(h.getWillPower()-difference);
-
                 if (h.getWillPower() <= 0 || h.getCurrentHour() == 10) {
-                    h.setStrength(h.getStrength()-1);
+                    if (h.getStrength() > 1) {
+                        h.setStrength(h.getStrength() - 1);
+                    }
                     h.setWillPower(3);
                     int index = fight.getHeroes().indexOf(h);
                     fight.getHeroes().remove(index);
@@ -1021,20 +1053,24 @@ public class GameDatabase {
             if (fight.getHeroes().size() == 0) { // force client to press leave fight!!!!!
                 return EndBattleRoundResponses.BATTLE_LOST;
             } else {
-                return EndBattleRoundResponses.LOST_ROUND;
+                return EndBattleRoundResponses.TIE_ROUND;
             }
         } else {
             fight.getCreature().setWillpower(fight.getCreature().getWillpower()-difference);
 
-            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-            }
-
             if (fight.getCreature().getWillpower() <= 0) { // force player to press leave fight!!!!
                 getGame(gameName).getRegionDatabase().getRegion(80).getCurrentCreatures().add(fight.getCreature());
 
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return EndBattleRoundResponses.CREATURE_DEFEATED;
             } else {
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
                 return EndBattleRoundResponses.WON_ROUND;
             }
         }
