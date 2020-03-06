@@ -1137,6 +1137,29 @@ public class GameDatabase {
         }
     }
 
+    public void dropGold(String gameName, String username, Integer gold) {
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+
+        h.setGold(h.getGold() - gold);
+        regionDatabase.getRegion(h.getCurrentSpace()).setGold(regionDatabase.getRegion(h.getCurrentSpace()).getGold() + gold);
+    }
+
+    public Integer getGold(String gameName, String username) {
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+
+        return regionDatabase.getRegion(h.getCurrentSpace()).getGold();
+    }
+
+    public void pickUpGold(String gameName, String username, Integer gold) {
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+
+        h.setGold(h.getGold() + gold);
+        regionDatabase.getRegion(h.getCurrentSpace()).setGold(regionDatabase.getRegion(h.getCurrentSpace()).getGold() - gold);
+    }
+
 
     public void gameOver(String gameName){
         if(getGame(gameName) != null){
