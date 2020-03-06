@@ -118,12 +118,12 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().buyFromMerchant(gameName, username, merchantPurchase);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{gameName}/{username}/dropGold")
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/dropGold")
     public void dropGold (@PathVariable String gameName, @PathVariable String username, @RequestBody Integer gold) {
         MasterDatabase.getInstance().getMasterGameDatabase().dropGold(gameName, username, gold);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/getGold")
+    @RequestMapping(method = RequestMethod.GET, value = "/{gameName}/{username}/getGold")
     public Integer getGold (@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().getGold(gameName, username);
     }
