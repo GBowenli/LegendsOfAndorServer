@@ -680,6 +680,7 @@ public class GameDatabase {
                     } else { // is an archer
                         Region region = regionDatabase.getRegion(p.getHero().getCurrentSpace());
                         ArrayList<Integer> archerAdjacentRegions = region.getAdjacentRegions();
+                        archerAdjacentRegions.add(p.getHero().getCurrentSpace());
 
                         if (region.isBridge()) {
                             archerAdjacentRegions.add(region.getBridgeAdjacentRegion());
@@ -727,6 +728,10 @@ public class GameDatabase {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         Fight fight = getGame(gameName).getCurrentFight();
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
+
+        if (fight == null) {
+            return LeaveFightResponses.SUCCESS;
+        }
 
         if (fight.getHeroes().size() == 0) {
             getGame(gameName).setCurrentFight(null);
