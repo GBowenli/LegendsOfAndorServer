@@ -26,16 +26,19 @@ public class Hero {
         this.heroClass = heroClass;
 
         if (heroClass == HeroClass.ARCHER) {
-            currentSpace = 53;
+            //currentSpace = 53;
+            currentSpace = 25; //for testing!!
             rank = 25;
         } else if (heroClass == HeroClass.DWARF) {
-            currentSpace = 43;
+           // currentSpace = 43;
+            currentSpace = 25; //for testing!!
             rank = 7;
         } else if (heroClass == HeroClass.WARRIOR) {
             currentSpace = 25;
             rank = 14;
         } else { // wizard
-            currentSpace = 9;
+          //  currentSpace = 9;
+            currentSpace = 25; //for testing!!
             rank = 34;
         }
         willPower = 7;
