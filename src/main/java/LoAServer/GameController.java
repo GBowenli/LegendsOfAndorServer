@@ -113,6 +113,11 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().endBattleRound(gameName, username);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/buyFromMerchant")
+    public BuyFromMerchantResponses buyFromMerchant (@PathVariable String gameName, @PathVariable String username, @RequestBody MerchantPurchase merchantPurchase) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().buyFromMerchant(gameName, username, merchantPurchase);
+    }
+
    //remove the game
     @RequestMapping(method = RequestMethod.DELETE, value = "/{gameName}/gameOver")
     public void gameOver (@PathVariable String gameName){

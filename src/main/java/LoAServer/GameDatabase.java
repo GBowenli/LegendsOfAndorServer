@@ -63,6 +63,10 @@ enum EndBattleRoundResponses {
     WON_ROUND, LOST_ROUND, TIE_ROUND, CREATURE_DEFEATED, BATTLE_LOST, PLAYERS_NO_BATTLE_VALUE, CREATURE_NO_BATTLE_VALUE, WAITING_FOR_PLAYERS_TO_JOIN
 }
 
+enum BuyFromMerchantResponses {
+    SUCCESS, NOT_ENOUGH_GOLD
+}
+
 
 public class GameDatabase {
     private ArrayList<Game> games;
@@ -1100,6 +1104,34 @@ public class GameDatabase {
             }
         }
     }
+
+    public BuyFromMerchantResponses buyFromMerchant (String gameName, String username, MerchantPurchase merchantPurchase) {
+        int totalGold = 0;
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+
+        if (h.getHeroClass() == HeroClass.DWARF) {
+            totalGold += merchantPurchase.getStrength();
+        } else {
+            totalGold += merchantPurchase.getStrength() * 2;
+        }
+        totalGold += merchantPurchase.getItems().size() * 2;
+
+        if (h.getGold() >= totalGold) {
+            h.setGold(h.getGold() - totalGold);
+            h.setStrength(h.getStrength() + merchantPurchase.getStrength());
+            h.getItems().addAll(merchantPurchase.getItems());
+
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+            return BuyFromMerchantResponses.SUCCESS;
+        } else {
+            return BuyFromMerchantResponses.NOT_ENOUGH_GOLD;
+        }
+    }
+
 
     public void gameOver(String gameName){
         if(getGame(gameName) != null){
