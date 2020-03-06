@@ -3,6 +3,7 @@ package LoAServer;
 
 import LoAServer.PublicEnums.*;
 import LoAServer.ReturnClasses.*;
+import com.google.gson.Gson;
 
 import java.util.*;
 
@@ -653,7 +654,7 @@ public class GameDatabase {
         } else if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().size() == 0) {
             return new FightRC(new Fight(), FightResponses.NO_CREATURE_FOUND);
         } else {
-            Fight fight = new Fight(h, regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().get(0));
+            Fight fight = new Fight(h.getCurrentSpace(), h, regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().get(0));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.FIGHT);
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
@@ -720,30 +721,40 @@ public class GameDatabase {
 
     public LeaveFightResponses leaveFight(String gameName, String username) {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        Fight fight = getGame(gameName).getCurrentFight();
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
-        if (getGame(gameName).getCurrentFight().getHeroesBattleScores().get(getGame(gameName).getCurrentFight().getHeroes().indexOf(h)) > 0) {
-            return LeaveFightResponses.CANNOT_LEAVE_AFTER_ROLLING;
-        } else if (h.isFought()) {
-            return LeaveFightResponses.CANNOT_LEAVE_WITHOUT_FIGHTING;
-        } else {
-            getGame(gameName).getCurrentFight().getHeroes().remove(h);
-            h.setFought(false);
+        if (fight.getHeroes().size() == 0) {
+            getGame(gameName).setCurrentFight(null);
+            getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
+            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
-            if (getGame(gameName).getCurrentFight().getHeroes().size() == 0) {
-                getGame(gameName).setCurrentFight(null);
-                getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
-                getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
-            } else {
-                getGame(gameName).getCurrentFight().getHeroes().remove(h);
-            }
-
-            MasterDatabase masterDatabase = MasterDatabase.getInstance();
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
 
             return LeaveFightResponses.SUCCESS;
         }
+
+        if (h.isFought()) {
+            return LeaveFightResponses.CANNOT_LEAVE_WITHOUT_FIGHTING;
+        }
+
+        int index = fight.getHeroes().indexOf(h);
+        if (index != -1) {
+            if (fight.getHeroesBattleScores().get(index) > 0) {
+                return LeaveFightResponses.CANNOT_LEAVE_AFTER_ROLLING;
+            }
+        }
+
+        fight.getHeroes().remove(index);
+        fight.getHeroesBattleScores().remove(index);
+        h.setFought(false);
+
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+        return LeaveFightResponses.SUCCESS;
     }
 
     public ArrayList<Die> getDice(String gameName, String username) { // DID NOT CHECK FOR BLACK DIE HERE ADD IN FUTURE!!!
@@ -964,6 +975,7 @@ public class GameDatabase {
     public EndBattleRoundResponses endBattleRound (String gameName, String username) {
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
         Fight fight = getGame(gameName).getCurrentFight();
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
 
         if (fight.getPendingInvitedHeroes().size() > 0) {
             return EndBattleRoundResponses.WAITING_FOR_PLAYERS_TO_JOIN;
@@ -1024,19 +1036,22 @@ public class GameDatabase {
                 }
             }
 
+            System.out.println(fight.getHeroes().size());
+            System.out.println(fight.getHeroesBattleScores().size());
+
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
 
             if (fight.getHeroes().size() == 0) { // force client to press leave fight!!!!!
                 if (fight.getCreature().getCreatureType() == CreatureType.GOR) { // TEST THIS OUT NOT SURE IF WILL CHANGE CREATURE
-                    fight.setCreature(new Creature(CreatureType.GOR));
+                    regionDatabase.getRegion(fight.getRegionNumber()).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
                 } else if (fight.getCreature().getCreatureType() == CreatureType.SKRAL) {
-                    fight.setCreature(new Creature(CreatureType.SKRAL));
+                    regionDatabase.getRegion(fight.getRegionNumber()).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
                 } else if (fight.getCreature().getCreatureType() == CreatureType.TROLL) {
-                    fight.setCreature(new Creature(CreatureType.TROLL));
+                    regionDatabase.getRegion(fight.getRegionNumber()).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.TROLL))));
                 } else { // wardraks
-                    fight.setCreature(new Creature(CreatureType.WARDRAKS));
+                    regionDatabase.getRegion(fight.getRegionNumber()).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.WARDRAKS))));
                 }
 
                 return EndBattleRoundResponses.BATTLE_LOST;

@@ -3,6 +3,7 @@ package LoAServer;
 import java.util.ArrayList;
 
 public class Fight {
+    private int regionNumber;
     private ArrayList<Hero> heroes;
     private ArrayList<Integer> heroesBattleScores;
     private ArrayList<Hero> pendingInvitedHeroes;
@@ -19,7 +20,8 @@ public class Fight {
 
     public Fight() {}
 
-    public Fight(Hero hero, Creature creature) {
+    public Fight(int regionNumber, Hero hero, Creature creature) {
+        this.regionNumber = regionNumber;
         heroes = new ArrayList<>();
         heroes.add(hero);
         heroesBattleScores = new ArrayList<>();
@@ -34,12 +36,12 @@ public class Fight {
         creatureDice = new ArrayList<>();
     }
 
-    public boolean noPendingInvitations() {
-        if (pendingInvitedHeroes.size() == 0) {
-            return true;
-        } else {
-            return false;
-        }
+    public int getRegionNumber() {
+        return regionNumber;
+    }
+
+    public void setRegionNumber(int regionNumber) {
+        this.regionNumber = regionNumber;
     }
 
     public ArrayList<Hero> getHeroes() {
