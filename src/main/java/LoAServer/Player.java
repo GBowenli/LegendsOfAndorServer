@@ -6,6 +6,7 @@ import java.util.List;
 enum PLAYER_STATUS{
     PLAYER_TURN, PLAYER_WAIT
 }
+
 public class Player {
     private String username;
     private String password;
