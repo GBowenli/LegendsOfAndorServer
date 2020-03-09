@@ -14,4 +14,20 @@ public class GetAvailableRegionsRC {
         this.adjacentRegions = adjacentRegions;
         this.getAvailableRegionsResponses = getAvailableRegionsResponses;
     }
+
+    public ArrayList<Integer> getAdjacentRegions() {
+        return adjacentRegions;
+    }
+
+    public void setAdjacentRegions(ArrayList<Integer> adjacentRegions) {
+        this.adjacentRegions = adjacentRegions;
+    }
+
+    public GetAvailableRegionsReponses getGetAvailableRegionsResponses() {
+        return getAvailableRegionsResponses;
+    }
+
+    public void setGetAvailableRegionsResponses(GetAvailableRegionsReponses getAvailableRegionsResponses) {
+        this.getAvailableRegionsResponses = getAvailableRegionsResponses;
+    }
 }
