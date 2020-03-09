@@ -64,7 +64,7 @@ enum EndBattleRoundResponses {
 }
 
 enum BuyFromMerchantResponses {
-    SUCCESS, NOT_ENOUGH_GOLD
+    SUCCESS, NOT_ENOUGH_GOLD, MERCHANT_DNE
 }
 
 
@@ -1111,29 +1111,37 @@ public class GameDatabase {
     }
 
     public BuyFromMerchantResponses buyFromMerchant (String gameName, String username, MerchantPurchase merchantPurchase) {
-        int totalGold = 0;
-        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
-        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        Hero hero = getGame(gameName).getSinglePlayer(username).getHero();
 
-        if (h.getHeroClass() == HeroClass.DWARF) {
-            totalGold += merchantPurchase.getStrength();
-        } else {
-            totalGold += merchantPurchase.getStrength() * 2;
-        }
-        totalGold += merchantPurchase.getItems().size() * 2;
+        if (regionDatabase.getRegion(hero.getCurrentSpace()).isMerchant()) {
+            int totalGold = 0;
+            Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
-        if (h.getGold() >= totalGold) {
-            h.setGold(h.getGold() - totalGold);
-            h.setStrength(h.getStrength() + merchantPurchase.getStrength());
-            h.getItems().addAll(merchantPurchase.getItems());
-
-            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            if (h.getHeroClass() == HeroClass.DWARF) {
+                totalGold += merchantPurchase.getStrength();
+            } else {
+                totalGold += merchantPurchase.getStrength() * 2;
             }
+            totalGold += merchantPurchase.getItems().size() * 2;
 
-            return BuyFromMerchantResponses.SUCCESS;
-        } else {
-            return BuyFromMerchantResponses.NOT_ENOUGH_GOLD;
+            if (h.getGold() >= totalGold) {
+                h.setGold(h.getGold() - totalGold);
+                h.setStrength(h.getStrength() + merchantPurchase.getStrength());
+                h.getItems().addAll(merchantPurchase.getItems());
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
+                return BuyFromMerchantResponses.SUCCESS;
+            } else {
+                return BuyFromMerchantResponses.NOT_ENOUGH_GOLD;
+            }
+        }
+        else{
+            return BuyFromMerchantResponses.MERCHANT_DNE;
         }
     }
 
