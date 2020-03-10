@@ -760,6 +760,11 @@ public class GameDatabase {
         fight.getHeroesBattleScores().remove(index);
         h.setFought(false);
 
+        if (fight.getHeroes().size() == 0) {
+            getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
+            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
+        }
+
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
@@ -1166,6 +1171,38 @@ public class GameDatabase {
 
         h.setGold(h.getGold() + gold);
         regionDatabase.getRegion(h.getCurrentSpace()).setGold(regionDatabase.getRegion(h.getCurrentSpace()).getGold() - gold);
+    }
+
+    public void dropFarmers(String gameName, String username, ArrayList<Farmer> farmers) {
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+
+        regionDatabase.getRegion(h.getCurrentSpace()).getFarmers().addAll(farmers);
+    }
+
+    public void distributeAfterFight(String gameName, String username, FightDistribution fightDistribution) {
+        Game g = getGame(gameName);
+
+        for (int i = 0; i < g.getCurrentNumPlayers(); i++) {
+            if (g.getPlayers()[i].getHero().getHeroClass() == HeroClass.DWARF) {
+                g.getPlayers()[i].getHero().setGold(g.getPlayers()[i].getHero().getGold() + fightDistribution.getDwarfGold());
+                g.getPlayers()[i].getHero().setWillPower(g.getPlayers()[i].getHero().getWillPower() + fightDistribution.getDwarfWillpower());
+            } else if (g.getPlayers()[i].getHero().getHeroClass() == HeroClass.WARRIOR) {
+                g.getPlayers()[i].getHero().setGold(g.getPlayers()[i].getHero().getGold() + fightDistribution.getWarriorGold());
+                g.getPlayers()[i].getHero().setWillPower(g.getPlayers()[i].getHero().getWillPower() + fightDistribution.getWarriorWillpower());
+            } else if (g.getPlayers()[i].getHero().getHeroClass() == HeroClass.ARCHER) {
+                g.getPlayers()[i].getHero().setGold(g.getPlayers()[i].getHero().getGold() + fightDistribution.getArcherGold());
+                g.getPlayers()[i].getHero().setWillPower(g.getPlayers()[i].getHero().getWillPower() + fightDistribution.getArcherWillpower());
+            } else { // WIZARD
+                g.getPlayers()[i].getHero().setGold(g.getPlayers()[i].getHero().getGold() + fightDistribution.getWizardGold());
+                g.getPlayers()[i].getHero().setWillPower(g.getPlayers()[i].getHero().getWillPower() + fightDistribution.getWizardWillpower());
+            }
+        }
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < g.getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
     }
 
 

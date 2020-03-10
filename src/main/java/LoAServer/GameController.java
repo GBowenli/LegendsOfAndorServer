@@ -113,24 +113,34 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().endBattleRound(gameName, username);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/buyFromMerchant")
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/buyFromMerchant")
     public BuyFromMerchantResponses buyFromMerchant (@PathVariable String gameName, @PathVariable String username, @RequestBody MerchantPurchase merchantPurchase) {
         return MasterDatabase.getInstance().getMasterGameDatabase().buyFromMerchant(gameName, username, merchantPurchase);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/dropGold")
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/dropGold")
     public void dropGold (@PathVariable String gameName, @PathVariable String username, @RequestBody Integer gold) {
         MasterDatabase.getInstance().getMasterGameDatabase().dropGold(gameName, username, gold);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{gameName}/{username}/getGold")
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getGold")
     public Integer getGold (@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().getGold(gameName, username);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/pickUpGold")
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/pickUpGold")
     public void pickUpGold (@PathVariable String gameName, @PathVariable String username, @RequestBody Integer gold) {
         MasterDatabase.getInstance().getMasterGameDatabase().pickUpGold(gameName, username, gold);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/dropFarmers")
+    public void dropFarmers (@PathVariable String gameName, @PathVariable String username, @RequestBody ArrayList<Farmer> farmers) {
+        MasterDatabase.getInstance().getMasterGameDatabase().dropFarmers(gameName, username, farmers);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/distributeAfterFight")
+    public void distributeAfterFight (@PathVariable String gameName, @PathVariable String username, @RequestBody FightDistribution fightDistribution) {
+        MasterDatabase.getInstance().getMasterGameDatabase().distributeAfterFight(gameName, username, fightDistribution);
     }
 
    //remove the game
@@ -138,4 +148,6 @@ public class GameController {
     public void gameOver (@PathVariable String gameName){
         MasterDatabase.getInstance().getMasterGameDatabase().gameOver(gameName);
     }
+
+    // DROP FARMER ADD!!!!
 }
