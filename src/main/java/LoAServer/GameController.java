@@ -39,7 +39,7 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getFarmers")
-    public ArrayList<Farmer> getFarmers(@PathVariable String gameName, String username) {
+    public ArrayList<Farmer> getFarmers(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().getFarmers(gameName, username);
     }
 

@@ -509,6 +509,7 @@ public class GameDatabase {
 
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                     getGame(gameName).getPlayers()[i].getHero().setHasEndedDay(false);
+                    getGame(gameName).getPlayers()[i].getHero().setCurrentHour(0);
                 }
 
                 ArrayList<Region> regionsWithCreatures = regionDatabase.getAllRegionsWithCreatures();
