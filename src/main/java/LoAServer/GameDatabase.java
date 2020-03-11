@@ -1096,9 +1096,11 @@ public class GameDatabase {
             }
         } else {
             fight.getCreature().setWillpower(fight.getCreature().getWillpower()-difference);
+            Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
             if (fight.getCreature().getWillpower() <= 0) { // force player to press leave fight!!!!
-                getGame(gameName).getRegionDatabase().getRegion(80).getCurrentCreatures().add(fight.getCreature());
+                regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().clear();
+                regionDatabase.getRegion(80).getCurrentCreatures().add(fight.getCreature());
 
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                     masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
