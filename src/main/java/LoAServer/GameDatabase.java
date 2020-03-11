@@ -1207,6 +1207,10 @@ public class GameDatabase {
         }
     }
 
+    public ArrayList<Farmer> getMyFarmers(String gameName, String username) {
+        return getGame(gameName).getSinglePlayer(username).getHero().getFarmers();
+    }
+
 
     public void gameOver(String gameName){
         if(getGame(gameName) != null){

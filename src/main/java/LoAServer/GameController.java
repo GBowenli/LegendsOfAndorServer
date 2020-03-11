@@ -138,6 +138,11 @@ public class GameController {
         MasterDatabase.getInstance().getMasterGameDatabase().dropFarmers(gameName, username, farmers);
     }
 
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getMyFarmers")
+    public ArrayList<Farmer> getMyFarmers (@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().getMyFarmers(gameName, username);
+    }
+
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/distributeAfterFight")
     public void distributeAfterFight (@PathVariable String gameName, @PathVariable String username, @RequestBody FightDistribution fightDistribution) {
         MasterDatabase.getInstance().getMasterGameDatabase().distributeAfterFight(gameName, username, fightDistribution);
