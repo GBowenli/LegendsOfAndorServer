@@ -335,6 +335,8 @@ public class GameDatabase {
     }
 
     public MoveRC move(String gameName, String username, Integer targetRegion) { // do the verification on android (checking if is feasible adjacent)
+        System.out.println("moved!");
+
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
 
