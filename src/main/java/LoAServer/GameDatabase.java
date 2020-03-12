@@ -735,7 +735,7 @@ public class GameDatabase {
         }
 
         if (fight.getHeroes().size() == 0) {
-            getGame(gameName).setCurrentFight(null);
+            //getGame(gameName).setCurrentFight(null);
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
@@ -1102,6 +1102,9 @@ public class GameDatabase {
             if (fight.getCreature().getWillpower() <= 0) { // force player to press leave fight!!!!
                 regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().clear();
                 regionDatabase.getRegion(80).getCurrentCreatures().add(fight.getCreature());
+
+                System.out.println(fight.getCreature().getCreatureType());
+
 
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                     masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
