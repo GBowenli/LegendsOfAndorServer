@@ -13,7 +13,7 @@ public class MasterDatabase {
 
     private PlayerDatabase masterPlayerDatabase = new PlayerDatabase();
     private GameDatabase masterGameDatabase = new GameDatabase();
-    private ArrayList<Game> savedGameDatabase = new ArrayList<>();
+    private HashMap<String, Game> savedGameDatabase = new HashMap<>();
 
     private ArrayList<MessageDatabase> masterMessageDatabase = new ArrayList<>();
     private HashMap<String, BroadcastContentManager<MessageDatabase>> masterMessageDatabaseBCM = new HashMap<>(); // one message database BCM per Player
@@ -34,7 +34,8 @@ public class MasterDatabase {
 
             String serializedGame = reader.readLine();
             while (serializedGame != null) {
-                savedGameDatabase.add(new Gson().fromJson(serializedGame, Game.class));
+                Game g = new Gson().fromJson(serializedGame, Game.class);
+                savedGameDatabase.put(g.getGameName(), g);
                 serializedGame = reader.readLine();
             }
             reader.close();
@@ -43,7 +44,7 @@ public class MasterDatabase {
         }
     }
 
-    public ArrayList<Game> getSavedGameDatabase() {
+    public HashMap<String, Game> getSavedGameDatabase() {
         return savedGameDatabase;
     }
 
