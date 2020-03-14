@@ -1,7 +1,10 @@
 package LoAServer;
 
+import com.google.gson.Gson;
 import eu.kartoffelquadrat.asyncrestlib.BroadcastContentManager;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -10,6 +13,7 @@ public class MasterDatabase {
 
     private PlayerDatabase masterPlayerDatabase = new PlayerDatabase();
     private GameDatabase masterGameDatabase = new GameDatabase();
+    private ArrayList<Game> savedGameDatabase = new ArrayList<>();
 
     private ArrayList<MessageDatabase> masterMessageDatabase = new ArrayList<>();
     private HashMap<String, BroadcastContentManager<MessageDatabase>> masterMessageDatabaseBCM = new HashMap<>(); // one message database BCM per Player
@@ -22,6 +26,25 @@ public class MasterDatabase {
             singletonMasterDatabase = new MasterDatabase();
         }
         return singletonMasterDatabase;
+    }
+
+    public void loadGames() {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("savedGames"));
+
+            String serializedGame = reader.readLine();
+            while (serializedGame != null) {
+                savedGameDatabase.add(new Gson().fromJson(serializedGame, Game.class));
+                serializedGame = reader.readLine();
+            }
+            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<Game> getSavedGameDatabase() {
+        return savedGameDatabase;
     }
 
     public void addMessageDatabase(String gameName) {

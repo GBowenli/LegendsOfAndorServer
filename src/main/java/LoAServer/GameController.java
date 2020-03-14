@@ -154,5 +154,8 @@ public class GameController {
         MasterDatabase.getInstance().getMasterGameDatabase().gameOver(gameName);
     }
 
-    // DROP FARMER ADD!!!!
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/saveGame")
+    public void distributeAfterFight (@PathVariable String gameName) {
+        MasterDatabase.getInstance().getMasterGameDatabase().saveGame(gameName);
+    }
 }

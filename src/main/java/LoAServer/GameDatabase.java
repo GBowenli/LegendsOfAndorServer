@@ -5,6 +5,9 @@ import LoAServer.PublicEnums.*;
 import LoAServer.ReturnClasses.*;
 import com.google.gson.Gson;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 enum HostGameResponses {
@@ -764,6 +767,7 @@ public class GameDatabase {
         h.setFought(false);
 
         if (fight.getHeroes().size() == 0) {
+            //getGame(gameName).setCurrentFight(null);
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
         }
@@ -1221,6 +1225,17 @@ public class GameDatabase {
     public void gameOver(String gameName){
         if(getGame(gameName) != null){
             games.remove(getGame(gameName));
+        }
+    }
+
+    public void saveGame(String gameName) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter("savedGames", true));
+            writer.write(new Gson().toJson(getGame(gameName)));
+            writer.newLine();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
