@@ -512,6 +512,9 @@ public class GameDatabase {
                 getGame(gameName).setCurrentHero(getGame(gameName).getFirstHeroInNextDay());
                 getGame(gameName).setFirstHeroInNextDay(null);
 
+                getGame(gameName).getNarrator().incrementNarrator();
+                getGame(gameName).activateLegendCard();
+
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                     getGame(gameName).getPlayers()[i].getHero().setHasEndedDay(false);
                     getGame(gameName).getPlayers()[i].getHero().setCurrentHour(0);
@@ -1104,8 +1107,8 @@ public class GameDatabase {
                 regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().clear();
                 regionDatabase.getRegion(80).getCurrentCreatures().add(fight.getCreature());
 
-                System.out.println(fight.getCreature().getCreatureType());
-
+                getGame(gameName).getNarrator().incrementNarrator();
+                getGame(gameName).activateLegendCard();
 
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                     masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();

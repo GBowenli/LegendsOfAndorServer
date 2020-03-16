@@ -1,7 +1,7 @@
 package LoAServer;
 
 enum CreatureType {
-    GOR, SKRAL, TROLL, WARDRAKS
+    GOR, SKRAL, TROLL, WARDRAKS, SKRAL_BOSS
 }
 
 
@@ -39,11 +39,28 @@ public class Creature {
         }
     }
 
-    public Creature(int strength, int willpower, int goldReward, int willpowerReward) {
-        this.strength = strength;
-        this.willpower = willpower;
-        this.goldReward = goldReward;
-        this.willpowerReward = willpowerReward;
+    public Creature(Difficulty difficulty, int totalPlayers) {
+        creatureType = CreatureType.SKRAL_BOSS;
+        if (difficulty == Difficulty.HARD) {
+            if (totalPlayers == 2) {
+                strength = 20;
+            } else if (totalPlayers == 3) {
+                strength = 30;
+            } else { // == 4
+                strength = 40;
+            }
+        } else {
+            if (totalPlayers == 2) {
+                strength = 10;
+            } else if (totalPlayers == 3) {
+                strength = 20;
+            } else { // == 4
+                strength = 30;
+            }
+        }
+        willpower = 6;
+        goldReward = 0;
+        willpowerReward = 0;
     }
 
     public int getStrength() {

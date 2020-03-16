@@ -51,9 +51,9 @@ public class Game implements BroadcastContent {
     }
 
     public void activateLegendCard() {
-        if (narrator.getSlot() == NarratorSpace.A) {
-
-        }
+        if (narrator.getSlot() == NarratorSpace.C) {
+            
+        } 
     }
 
     public int getMaxNumPlayers() {

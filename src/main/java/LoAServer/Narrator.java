@@ -69,12 +69,6 @@ public class Narrator {
         else if (this.slot ==NarratorSpace.M){
             this.slot =NarratorSpace.N;
         }
-        else if (this.slot ==NarratorSpace.A){
-            this.slot =NarratorSpace.B;
-        }
-        else if (this.slot ==NarratorSpace.A){
-            this.slot =NarratorSpace.B;
-        }
     }
 
     public HashMap<NarratorSpace,Integer[]> getMap(){
