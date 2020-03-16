@@ -158,4 +158,9 @@ public class GameController {
     public void distributeAfterFight (@PathVariable String gameName) {
         MasterDatabase.getInstance().getMasterGameDatabase().saveGame(gameName);
     }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateLegendCardC")
+    public void activateLegendCardC (@PathVariable String gameName, @PathVariable String username, @RequestBody Integer dieRoll) {
+        MasterDatabase.getInstance().getMasterGameDatabase().activateLegendCardC(gameName, username, dieRoll);
+    }
 }

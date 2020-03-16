@@ -513,7 +513,6 @@ public class GameDatabase {
                 getGame(gameName).setFirstHeroInNextDay(null);
 
                 getGame(gameName).getNarrator().incrementNarrator();
-                getGame(gameName).activateLegendCard();
 
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                     getGame(gameName).getPlayers()[i].getHero().setHasEndedDay(false);
@@ -1108,7 +1107,6 @@ public class GameDatabase {
                 regionDatabase.getRegion(80).getCurrentCreatures().add(fight.getCreature());
 
                 getGame(gameName).getNarrator().incrementNarrator();
-                getGame(gameName).activateLegendCard();
 
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                     masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
@@ -1235,5 +1233,13 @@ public class GameDatabase {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void activateLegendCardC(String gameName, String username, Integer dieRoll) {
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        int skralStronghold = dieRoll + 50;
+
+        regionDatabase.getRegion(skralStronghold).getCurrentCreatures().clear();
+        regionDatabase.getRegion(skralStronghold).getCurrentCreatures().add(new Creature(getGame(gameName).getDifficultMode(), getGame(gameName).getCurrentNumPlayers()));
     }
 }

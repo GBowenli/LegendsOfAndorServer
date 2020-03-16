@@ -39,9 +39,9 @@ public class Creature {
         }
     }
 
-    public Creature(Difficulty difficulty, int totalPlayers) {
+    public Creature(boolean difficult, int totalPlayers) {
         creatureType = CreatureType.SKRAL_BOSS;
-        if (difficulty == Difficulty.HARD) {
+        if (difficult) {
             if (totalPlayers == 2) {
                 strength = 20;
             } else if (totalPlayers == 3) {

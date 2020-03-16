@@ -50,12 +50,6 @@ public class Game implements BroadcastContent {
         this.narrator = new Narrator();
     }
 
-    public void activateLegendCard() {
-        if (narrator.getSlot() == NarratorSpace.C) {
-            
-        } 
-    }
-
     public int getMaxNumPlayers() {
         return maxNumPlayers;
     }
