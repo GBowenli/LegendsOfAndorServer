@@ -29,6 +29,7 @@ public class Game implements BroadcastContent {
     private Fight currentFight;
     private GameStatus gameStatus;
     private Narrator narrator;
+    private PrinceThorald princeThorald;
 
     public Game() {}
 
@@ -273,6 +274,14 @@ public class Game implements BroadcastContent {
 
     public void setNarrator(Narrator narrator) {
         this.narrator = narrator;
+    }
+
+    public PrinceThorald getPrinceThorald() {
+        return princeThorald;
+    }
+
+    public void setPrinceThorald(PrinceThorald princeThorald) {
+        this.princeThorald = princeThorald;
     }
 
     @Override

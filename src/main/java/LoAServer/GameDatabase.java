@@ -1241,5 +1241,9 @@ public class GameDatabase {
 
         regionDatabase.getRegion(skralStronghold).getCurrentCreatures().clear();
         regionDatabase.getRegion(skralStronghold).getCurrentCreatures().add(new Creature(getGame(gameName).getDifficultMode(), getGame(gameName).getCurrentNumPlayers()));
+
+        regionDatabase.getRegion(27).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
+        regionDatabase.getRegion(31).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
+        regionDatabase.getRegion(29).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
     }
 }
