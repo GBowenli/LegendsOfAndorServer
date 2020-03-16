@@ -59,8 +59,8 @@ public class Creature {
             }
         }
         willpower = 6;
-        goldReward = 0;
-        willpowerReward = 0;
+        goldReward = 6;
+        willpowerReward = 6;
     }
 
     public int getStrength() {
