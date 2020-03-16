@@ -28,8 +28,7 @@ public class Game implements BroadcastContent {
     private Boolean difficultMode;
     private Fight currentFight;
     private GameStatus gameStatus;
-
-
+    private Narrator narrator;
 
     public Game() {}
 
@@ -48,6 +47,13 @@ public class Game implements BroadcastContent {
         this.difficultMode = difficult;
         itemsDistributedMessage = "";
         this.gameStatus = GameStatus.IN_PROGRESS;
+        this.narrator = new Narrator();
+    }
+
+    public void activateLegendCard() {
+        if (narrator.getSlot() == NarratorSpace.A) {
+
+        }
     }
 
     public int getMaxNumPlayers() {
@@ -265,6 +271,14 @@ public class Game implements BroadcastContent {
 
     public void setCurrentFight(Fight currentFight) {
         this.currentFight = currentFight;
+    }
+
+    public Narrator getNarrator() {
+        return narrator;
+    }
+
+    public void setNarrator(Narrator narrator) {
+        this.narrator = narrator;
     }
 
     @Override

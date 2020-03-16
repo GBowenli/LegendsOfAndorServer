@@ -903,11 +903,6 @@ public class GameDatabase {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
 
-        for (Integer i : diceRolls) {
-            System.out.println(i);
-        }
-        System.out.println(max+h.getStrength());
-
         return max + h.getStrength();
     }
 
