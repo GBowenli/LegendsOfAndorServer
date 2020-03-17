@@ -5,13 +5,15 @@ enum ItemType {
 }
 
 public class Item {
-    int uses;
+    private ItemType itemType;
+    private int uses;
 
     public Item() {
         this.uses = 0;
     }
 
     public Item(ItemType itemType) {
+        this.itemType = itemType;
         if (itemType == ItemType.WINESKIN) {
             uses = 2;
             //falcon can only be used once per day
@@ -20,6 +22,14 @@ public class Item {
         } else if (itemType == ItemType.SHIELD){
             uses = 2;
         }
+    }
+
+    public ItemType getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(ItemType itemType) {
+        this.itemType = itemType;
     }
 
     public int getNumUses() {
