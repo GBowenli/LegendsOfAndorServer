@@ -1,18 +1,16 @@
 package LoAServer;
 
 enum Colour {
-    GREEN, BLUE, RED
+    GREEN, BLUE, YELLOW
 }
 
 public class RuneStone {
     private Colour colour;
-    private int value;
 
     public RuneStone() {}
 
-    public RuneStone(Colour colour, int value) {
+    public RuneStone(Colour colour) {
         this.colour = colour;
-        this.value = value;
     }
 
     public Colour getColour() {
@@ -21,13 +19,5 @@ public class RuneStone {
 
     public void setColour(Colour colour) {
         this.colour = colour;
-    }
-
-    public int getValue() {
-        return value;
-    }
-
-    public void setValue(int value) {
-        this.value = value;
     }
 }

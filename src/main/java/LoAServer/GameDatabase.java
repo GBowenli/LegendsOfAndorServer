@@ -1484,11 +1484,37 @@ public class GameDatabase {
             regionDatabase.getRegion(39).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
 
             if (getGame(gameName).getWitch() != null) {
-
+                for (int i = 0; i < runeStonePositions.size(); i++) {
+                    if (i == 0) {
+                        regionDatabase.getRegion(runeStonePositions.get(i)).getRuneStones().add(new RuneStone(Colour.BLUE));
+                    } else if (i == 1) {
+                        regionDatabase.getRegion(runeStonePositions.get(i)).getRuneStones().add(new RuneStone(Colour.BLUE));
+                    } else if (i == 2) {
+                        regionDatabase.getRegion(runeStonePositions.get(i)).getRuneStones().add(new RuneStone(Colour.YELLOW));
+                    } else if (i == 3) {
+                        regionDatabase.getRegion(runeStonePositions.get(i)).getRuneStones().add(new RuneStone(Colour.YELLOW));
+                    } else { // i == 4
+                        regionDatabase.getRegion(runeStonePositions.get(i)).getRuneStones().add(new RuneStone(Colour.GREEN));
+                    }
+                }
             }
         } else {
             regionDatabase.getRegion(43).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
             regionDatabase.getRegion(39).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
+
+            for (int i = 0; i < runeStonePositions.size(); i++) {
+                if (i == 0) {
+                    regionDatabase.getRegion(runeStonePositions.get(i)).getRuneStones().add(new RuneStone(Colour.BLUE));
+                } else if (i == 1) {
+                    regionDatabase.getRegion(runeStonePositions.get(i)).getRuneStones().add(new RuneStone(Colour.BLUE));
+                } else if (i == 2) {
+                    regionDatabase.getRegion(runeStonePositions.get(i)).getRuneStones().add(new RuneStone(Colour.YELLOW));
+                } else if (i == 3) {
+                    regionDatabase.getRegion(runeStonePositions.get(i)).getRuneStones().add(new RuneStone(Colour.YELLOW));
+                } else { // i == 4
+                    regionDatabase.getRegion(runeStonePositions.get(i)).getRuneStones().add(new RuneStone(Colour.GREEN));
+                }
+            }
         }
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
