@@ -163,4 +163,12 @@ public class GameController {
     public void activateLegendCardC (@PathVariable String gameName, @PathVariable String username, @RequestBody Integer dieRoll) {
         MasterDatabase.getInstance().getMasterGameDatabase().activateLegendCardC(gameName, username, dieRoll);
     }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateLegendCardG")
+    public void activateLegendCardC (@PathVariable String gameName, @PathVariable String username) {
+        MasterDatabase.getInstance().getMasterGameDatabase().activateLegendCardG(gameName, username);
+    }
+
+    // to do.. move prince
+    // wardraks reward is gold + willpwoer = 6
 }

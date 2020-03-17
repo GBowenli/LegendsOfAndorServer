@@ -1020,7 +1020,13 @@ public class GameDatabase {
             totalHeroesBV += bv;
         }
 
-        int difference = totalHeroesBV - fight.getCreatureBattleScore();
+        int difference;
+
+        if (getGame(gameName).getPrinceThorald() != null) {
+            difference = 4 + totalHeroesBV - fight.getCreatureBattleScore();
+        } else {
+            difference = totalHeroesBV - fight.getCreatureBattleScore();
+        }
 
         fight.getHeroesBattleScores().clear();
         for (int i = 0; i < fight.getHeroes().size(); i++) { // reset battle values test!!!!!!!!!!!
@@ -1245,5 +1251,72 @@ public class GameDatabase {
         regionDatabase.getRegion(27).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
         regionDatabase.getRegion(31).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
         regionDatabase.getRegion(29).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
+        getGame(gameName).setPrinceThorald(new PrinceThorald(72));
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+    }
+
+    public void activateLegendCardG(String gameName, String username) {
+        Game g = getGame(gameName);
+        RegionDatabase regionDatabase = g.getRegionDatabase();
+        Region r = regionDatabase.getRegion(26);
+
+        if (regionDatabase.getRegion(26).getCurrentCreatures().size() > 0) {
+            Creature creature = r.getCurrentCreatures().get(0);
+            r.getCurrentCreatures().clear();
+            int newCreatureSpace;
+
+            do {
+                if (r.getBridgeNextRegion() != null) {
+                    newCreatureSpace = r.getBridgeNextRegion();
+                } else {
+                    newCreatureSpace = r.getNextRegion();
+                }
+                r = regionDatabase.getRegion(newCreatureSpace);
+            } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreatures().size() > 0);
+
+            if (newCreatureSpace == 0) {
+                if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
+                    regionDatabase.getRegion(0).getFarmers().remove(regionDatabase.getRegion(0).getFarmers().size()-1);
+                } else {
+                    getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
+                }
+            } else {
+                regionDatabase.getRegion(newCreatureSpace).setCurrentCreatures(new ArrayList<>(Arrays.asList(creature)));
+            }
+        } else {
+            regionDatabase.getRegion(26).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.WARDRAKS))));
+        }
+
+        r = regionDatabase.getRegion(27);
+        if (regionDatabase.getRegion(27).getCurrentCreatures().size() > 0) {
+            Creature creature = r.getCurrentCreatures().get(0);
+            r.getCurrentCreatures().clear();
+            int newCreatureSpace;
+
+            do {
+                if (r.getBridgeNextRegion() != null) {
+                    newCreatureSpace = r.getBridgeNextRegion();
+                } else {
+                    newCreatureSpace = r.getNextRegion();
+                }
+                r = regionDatabase.getRegion(newCreatureSpace);
+            } while (regionDatabase.getRegion(newCreatureSpace).getCurrentCreatures().size() > 0);
+
+            if (newCreatureSpace == 0) {
+                if (regionDatabase.getRegion(0).getFarmers().size() > 0) {
+                    regionDatabase.getRegion(0).getFarmers().remove(regionDatabase.getRegion(0).getFarmers().size()-1);
+                } else {
+                    getGame(gameName).setGoldenShields(getGame(gameName).getGoldenShields()-1);
+                }
+            } else {
+                regionDatabase.getRegion(newCreatureSpace).setCurrentCreatures(new ArrayList<>(Arrays.asList(creature)));
+            }
+        } else {
+            regionDatabase.getRegion(27).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.WARDRAKS))));
+        }
     }
 }
