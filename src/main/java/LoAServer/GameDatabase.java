@@ -9,7 +9,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 enum HostGameResponses {
     HOST_GAME_SUCCESS, ERROR_GAME_ALREADY_EXISTS
@@ -69,6 +68,10 @@ enum EndBattleRoundResponses {
 
 enum BuyFromMerchantResponses {
     SUCCESS, NOT_ENOUGH_GOLD, MERCHANT_DNE
+}
+
+enum EndMovePrinceThoraldResponses {
+    MUST_MOVE_PRINCE_TO_END_MOVE, MOVE_PRINCE_ALREADY_ENDED, SUCCESS
 }
 
 
@@ -406,6 +409,10 @@ public class GameDatabase {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
+        if (!h.isMoved()) {
+            return EndMoveResponses.MUST_MOVE_TO_END_MOVE;
+        }
+
         if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
@@ -413,10 +420,6 @@ public class GameDatabase {
             MasterDatabase masterDatabase = MasterDatabase.getInstance();
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-            }
-
-            if (!h.isMoved()) {
-                return EndMoveResponses.MUST_MOVE_TO_END_MOVE;
             }
 
             if (regionDatabase.getRegion(h.getCurrentSpace()).isMerchant()) {
@@ -1432,6 +1435,27 @@ public class GameDatabase {
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
+    }
 
+    public EndMovePrinceThoraldResponses endMovePrinceThorald(String gameName, String username) {
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        if (!h.isMoved()) {
+            return EndMovePrinceThoraldResponses.MUST_MOVE_PRINCE_TO_END_MOVE;
+        }
+
+        if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE_PRINCE) {
+            getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
+            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+            return EndMovePrinceThoraldResponses.SUCCESS;
+        } else {
+            return EndMovePrinceThoraldResponses.MOVE_PRINCE_ALREADY_ENDED;
+        }
     }
 }

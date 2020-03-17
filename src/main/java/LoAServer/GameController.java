@@ -179,6 +179,11 @@ public class GameController {
         MasterDatabase.getInstance().getMasterGameDatabase().movePrinceThorald(gameName, username, targetRegion);
     }
 
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/endMovePrinceThorald")
+    public EndMovePrinceThoraldResponses endMovePrinceThorald (@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().endMovePrinceThorald(gameName, username);
+    }
+
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6
     // add turnoptions movePrinceThorald to android and
