@@ -1479,12 +1479,14 @@ public class GameDatabase {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
 
         if (getGame(gameName).getDifficultMode()) {
+            regionDatabase.getRegion(32).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
             regionDatabase.getRegion(43).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
             regionDatabase.getRegion(39).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
 
+            if (getGame(gameName).getWitch() != null) {
 
+            }
         } else {
-            regionDatabase.getRegion(32).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
             regionDatabase.getRegion(43).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
             regionDatabase.getRegion(39).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
         }
