@@ -30,6 +30,7 @@ public class Game implements BroadcastContent {
     private GameStatus gameStatus;
     private Narrator narrator;
     private PrinceThorald princeThorald;
+    private NarratorSpace runeStoneLegendCard;
 
     public Game() {}
 
@@ -282,6 +283,14 @@ public class Game implements BroadcastContent {
 
     public void setPrinceThorald(PrinceThorald princeThorald) {
         this.princeThorald = princeThorald;
+    }
+
+    public NarratorSpace getRuneStoneLegendCard() {
+        return runeStoneLegendCard;
+    }
+
+    public void setRuneStoneLegendCard(NarratorSpace runeStoneLegendCard) {
+        this.runeStoneLegendCard = runeStoneLegendCard;
     }
 
     @Override

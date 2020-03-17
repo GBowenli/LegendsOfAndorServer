@@ -613,7 +613,7 @@ public class GameDatabase {
 
                     return EndDayResponses.GAME_OVER;
                 } else {
-                    return EndDayResponses.NEW_DAY; // Legend Card here
+                    return EndDayResponses.NEW_DAY;
                 }
             } else {
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
@@ -1457,5 +1457,9 @@ public class GameDatabase {
         } else {
             return EndMovePrinceThoraldResponses.MOVE_PRINCE_ALREADY_ENDED;
         }
+    }
+
+    public void setRuneStoneLegendCard(String gameName, String username, Integer dieRoll) {
+
     }
 }
