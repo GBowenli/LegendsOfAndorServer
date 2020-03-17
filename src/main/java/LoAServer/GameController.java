@@ -170,7 +170,7 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getPrinceThoraldMoves")
-    public ArrayList<Integer> getPrinceThoraldMoves (@PathVariable String gameName, @PathVariable String username) {
+    public GetPrinceThoraldMovesRC getPrinceThoraldMoves (@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().getPrinceThoraldMoves(gameName, username);
     }
 

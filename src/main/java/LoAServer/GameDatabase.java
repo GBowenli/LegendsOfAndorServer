@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 enum HostGameResponses {
     HOST_GAME_SUCCESS, ERROR_GAME_ALREADY_EXISTS
@@ -1342,7 +1343,71 @@ public class GameDatabase {
         }
     }
 
-    public ArrayList<Integer> getPrinceThoraldMoves(String gameName, String username) {
-        return new ArrayList<>();
+    public GetPrinceThoraldMovesRC getPrinceThoraldMoves(String gameName, String username) {
+        Player p = getGame(gameName).getSinglePlayer(username);
+
+        if (getGame(gameName).getCurrentHero().equals(p.getHero())) {
+            if (p.getHero().getCurrentHour() == 10) {
+                return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.CURRENT_HOUR_MAXED);
+            } else {
+                if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.FIGHT) {
+                    return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.CANNOT_MOVE_PRINCE_AFTER_FIGHT);
+                } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
+                    return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.CANNOT_MOVE_PRINCE_AFTER_MOVE);
+                } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.NONE) {
+                    getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.MOVE_PRINCE);
+                }
+
+                if (p.getHero().getCurrentHour() >= 7 && p.getHero().getWillPower() <= 2) {
+                    return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.NOT_ENOUGH_WILLPOWER);
+                }
+
+                ArrayList<Integer> moves = new ArrayList<>();
+                Game g = getGame(gameName);
+                RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+
+                // add all regions adjacent by 1 space
+                moves.addAll(regionDatabase.getRegion(g.getPrinceThorald().getCurrentPosition()).getAdjacentRegions());
+                if (regionDatabase.getRegion(g.getPrinceThorald().getCurrentPosition()).isBridge()) {
+                    moves.add(regionDatabase.getRegion(g.getPrinceThorald().getCurrentPosition()).getBridgeAdjacentRegion());
+                }
+
+                // add all regions adjacent by 2 spaces
+                for (Integer move : moves) {
+                    moves.addAll(regionDatabase.getRegion(move).getAdjacentRegions());
+                    if (regionDatabase.getRegion(move).isBridge()) {
+                        moves.add(regionDatabase.getRegion(move).getBridgeAdjacentRegion());
+                    }
+                }
+
+                // add all regions adjacent by 3 spaces
+                for (Integer move : moves) {
+                    moves.addAll(regionDatabase.getRegion(move).getAdjacentRegions());
+                    if (regionDatabase.getRegion(move).isBridge()) {
+                        moves.add(regionDatabase.getRegion(move).getBridgeAdjacentRegion());
+                    }
+                }
+
+                // add all regions adjacent by 4 spaces
+                for (Integer move : moves) {
+                    moves.addAll(regionDatabase.getRegion(move).getAdjacentRegions());
+                    if (regionDatabase.getRegion(move).isBridge()) {
+                        moves.add(regionDatabase.getRegion(move).getBridgeAdjacentRegion());
+                    }
+                }
+
+                // remove duplicates
+                LinkedHashSet<Integer> hashSet = new LinkedHashSet<>(moves);
+                ArrayList<Integer> movesWithoutDuplicates = new ArrayList<>(hashSet);
+
+                if (p.getHero().getCurrentHour() >= 7) {
+                    return new GetPrinceThoraldMovesRC(movesWithoutDuplicates, GetPrinceThoraldMovesResponses.DEDUCT_WILLPOWER);
+                } else {
+                    return new GetPrinceThoraldMovesRC(movesWithoutDuplicates, GetPrinceThoraldMovesResponses.SUCCESS);
+                }
+            }
+        } else {
+            return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.NOT_CURRENT_TURN);
+        }
     }
 }
