@@ -169,6 +169,12 @@ public class GameController {
         MasterDatabase.getInstance().getMasterGameDatabase().activateLegendCardG(gameName, username);
     }
 
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getPrinceThoraldMoves")
+    public ArrayList<Integer> getPrinceThoraldMoves (@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().getPrinceThoraldMoves(gameName, username);
+    }
+
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6
+    // add turnoptions movePrinceThorald to android and
 }

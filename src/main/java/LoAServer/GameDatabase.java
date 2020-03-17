@@ -309,6 +309,8 @@ public class GameDatabase {
             } else {
                 if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.FIGHT) {
                     return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.CANNOT_MOVE_AFTER_FIGHT);
+                } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE_PRINCE) {
+                    return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.CANNOT_MOVE_AFTER_MOVE_PRINCE);
                 } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.NONE) {
                     getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.MOVE);
                 }
@@ -665,6 +667,10 @@ public class GameDatabase {
             return new FightRC(new Fight(), FightResponses.DAY_ENDED);
         } else if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().size() == 0) {
             return new FightRC(new Fight(), FightResponses.NO_CREATURE_FOUND);
+        } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
+            return new FightRC(new Fight(), FightResponses.CANNOT_FIGHT_AFTER_MOVE);
+        } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE_PRINCE) {
+            return new FightRC(new Fight(), FightResponses.CANNOT_FIGHT_AFTER_MOVE_PRINCE);
         } else {
             Fight fight = new Fight(h.getCurrentSpace(), h, regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().get(0));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.FIGHT);
@@ -956,6 +962,17 @@ public class GameDatabase {
         Creature creature = getGame(gameName).getCurrentFight().getCreature();
 
         getGame(gameName).getCurrentFight().setCreatureDice(diceRolls);
+
+        if (creature.getCreatureType() == CreatureType.TROLL) {
+            int maxRoll = Collections.max(diceRolls);
+            getGame(gameName).getCurrentFight().setCreatureBattleScore(maxRoll + creature.getStrength());
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+            return maxRoll + creature.getStrength();
+        }
 
         Collections.sort(diceRolls);
         int prevValue = diceRolls.get(0);
@@ -1318,5 +1335,14 @@ public class GameDatabase {
         } else {
             regionDatabase.getRegion(27).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.WARDRAKS))));
         }
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+    }
+
+    public ArrayList<Integer> getPrinceThoraldMoves(String gameName, String username) {
+        return new ArrayList<>();
     }
 }
