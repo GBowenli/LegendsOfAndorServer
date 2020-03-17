@@ -165,13 +165,18 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateLegendCardG")
-    public void activateLegendCardC (@PathVariable String gameName, @PathVariable String username) {
+    public void activateLegendCardG (@PathVariable String gameName, @PathVariable String username) {
         MasterDatabase.getInstance().getMasterGameDatabase().activateLegendCardG(gameName, username);
     }
 
     @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getPrinceThoraldMoves")
     public GetPrinceThoraldMovesRC getPrinceThoraldMoves (@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().getPrinceThoraldMoves(gameName, username);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/movePrinceThorald")
+    public void movePrinceThorald (@PathVariable String gameName, @PathVariable String username, @RequestBody Integer targetRegion) {
+        MasterDatabase.getInstance().getMasterGameDatabase().movePrinceThorald(gameName, username, targetRegion);
     }
 
     // to do.. move prince

@@ -19,6 +19,7 @@ public class Hero {
     private boolean moved;
     private boolean fought;
     private int rank;
+    private boolean movedPrince;
 
     public Hero() {}
 
@@ -138,4 +139,12 @@ public class Hero {
     public int getRank() { return rank; }
 
     public void setRank(int rank) { this.rank = rank; }
+
+    public boolean isMovedPrince() {
+        return movedPrince;
+    }
+
+    public void setMovedPrince(boolean movedPrince) {
+        this.movedPrince = movedPrince;
+    }
 }

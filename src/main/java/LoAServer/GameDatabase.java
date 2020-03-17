@@ -1346,6 +1346,10 @@ public class GameDatabase {
     public GetPrinceThoraldMovesRC getPrinceThoraldMoves(String gameName, String username) {
         Player p = getGame(gameName).getSinglePlayer(username);
 
+        if (getGame(gameName).getPrinceThorald() == null) {
+            return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.PRINCE_DNE);
+        }
+
         if (getGame(gameName).getCurrentHero().equals(p.getHero())) {
             if (p.getHero().getCurrentHour() == 10) {
                 return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.CURRENT_HOUR_MAXED);
@@ -1409,5 +1413,25 @@ public class GameDatabase {
         } else {
             return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.NOT_CURRENT_TURN);
         }
+    }
+
+    public void movePrinceThorald (String gameName, String username, Integer targetRegion) {
+        Game g = getGame(gameName);
+        Hero h = g.getSinglePlayer(username).getHero();
+
+        h.setMovedPrince(true);
+
+        if (h.getCurrentHour() >= 7) {
+            h.setWillPower(h.getWillPower()-2);
+        }
+        h.setCurrentHour(h.getCurrentHour()+1);
+
+        g.getPrinceThorald().setCurrentPosition(targetRegion);
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+
     }
 }
