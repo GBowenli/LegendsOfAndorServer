@@ -189,6 +189,11 @@ public class GameController {
         MasterDatabase.getInstance().getMasterGameDatabase().setRuneStoneLegendCard(gameName, username, dieRoll);
     }
 
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateLegendCardRuneStone")
+    public void activateLegendCardRuneStone (@PathVariable String gameName, @PathVariable String username, @RequestBody ArrayList<Integer> runeStonePositions) {
+        MasterDatabase.getInstance().getMasterGameDatabase().activateLegendCardRuneStone(gameName, username, runeStonePositions);
+    }
+
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6
     // add turnoptions movePrinceThorald to android and

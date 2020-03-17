@@ -1159,7 +1159,7 @@ public class GameDatabase {
             Hero h = getGame(gameName).getSinglePlayer(username).getHero();
             MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
-            if (h.getHeroClass() == HeroClass.DWARF) {
+            if (h.getHeroClass() == HeroClass.DWARF && hero.getCurrentSpace() == 71) {
                 totalGold += merchantPurchase.getStrength();
             } else {
                 totalGold += merchantPurchase.getStrength() * 2;
@@ -1460,6 +1460,37 @@ public class GameDatabase {
     }
 
     public void setRuneStoneLegendCard(String gameName, String username, Integer dieRoll) {
+        if (dieRoll == 1) {
+            getGame(gameName).setRuneStoneLegendCard(NarratorSpace.B);
+        } else if (dieRoll == 2) {
+            getGame(gameName).setRuneStoneLegendCard(NarratorSpace.D);
+        } else if (dieRoll == 3) {
+            getGame(gameName).setRuneStoneLegendCard(NarratorSpace.E);
+        } else if (dieRoll == 4) {
+            getGame(gameName).setRuneStoneLegendCard(NarratorSpace.F);
+        } else if (dieRoll == 5) {
+            getGame(gameName).setRuneStoneLegendCard(NarratorSpace.F);
+        } else { // 6
+            getGame(gameName).setRuneStoneLegendCard(NarratorSpace.H);
+        }
+    }
 
+    public void activateLegendCardRuneStone(String gameName, String username, ArrayList<Integer> runeStonePositions) {
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+
+        if (getGame(gameName).getDifficultMode()) {
+            regionDatabase.getRegion(43).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
+            regionDatabase.getRegion(39).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
+
+
+        } else {
+            regionDatabase.getRegion(32).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
+            regionDatabase.getRegion(43).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
+            regionDatabase.getRegion(39).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
+        }
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
     }
 }
