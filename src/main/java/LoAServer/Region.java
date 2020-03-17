@@ -21,7 +21,7 @@ public class Region {
     private ArrayList<Creature> currentCreatures;
     private ArrayList<Farmer> farmers;
     private float[] coordinates;
-    private ArrayList<GemStone> gemStones;
+    private ArrayList<RuneStone> runeStones;
 
     public Region() {}
 
@@ -37,7 +37,7 @@ public class Region {
         items = new ArrayList<>();
         farmers = new ArrayList<>();
         currentCreatures = new ArrayList<>();
-        gemStones = new ArrayList<>();
+        runeStones = new ArrayList<>();
     }
     public int getNumber() {
         return number;
@@ -163,11 +163,11 @@ public class Region {
 
     public float[] getCoordinates() {return this.coordinates;}
 
-    public ArrayList<GemStone> getGemStones() {
-        return gemStones;
+    public ArrayList<RuneStone> getRuneStones() {
+        return runeStones;
     }
 
-    public void setGemStones(ArrayList<GemStone> gemStones) {
-        this.gemStones = gemStones;
+    public void setRuneStones(ArrayList<RuneStone> runeStones) {
+        this.runeStones = runeStones;
     }
 }

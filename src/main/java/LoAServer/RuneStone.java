@@ -4,13 +4,13 @@ enum Colour {
     GREEN, BLUE, RED
 }
 
-public class GemStone {
+public class RuneStone {
     private Colour colour;
     private int value;
 
-    public GemStone() {}
+    public RuneStone() {}
 
-    public GemStone(Colour colour, int value) {
+    public RuneStone(Colour colour, int value) {
         this.colour = colour;
         this.value = value;
     }
