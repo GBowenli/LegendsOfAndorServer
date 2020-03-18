@@ -32,6 +32,7 @@ public class Game implements BroadcastContent {
     private PrinceThorald princeThorald;
     private NarratorSpace runeStoneLegendCard;
     private Witch witch;
+    private int skralStronghold;
 
     public Game() {}
 
@@ -270,6 +271,14 @@ public class Game implements BroadcastContent {
         this.currentFight = currentFight;
     }
 
+    public GameStatus getGameStatus() {
+        return gameStatus;
+    }
+
+    public void setGameStatus(GameStatus gameStatus) {
+        this.gameStatus = gameStatus;
+    }
+
     public Narrator getNarrator() {
         return narrator;
     }
@@ -300,6 +309,14 @@ public class Game implements BroadcastContent {
 
     public void setWitch(Witch witch) {
         this.witch = witch;
+    }
+
+    public int getSkralStronghold() {
+        return skralStronghold;
+    }
+
+    public void setSkralStronghold(int skralStronghold) {
+        this.skralStronghold = skralStronghold;
     }
 
     @Override

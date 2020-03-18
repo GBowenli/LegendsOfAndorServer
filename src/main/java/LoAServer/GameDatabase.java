@@ -74,6 +74,10 @@ enum EndMovePrinceThoraldResponses {
     MUST_MOVE_PRINCE_TO_END_MOVE, MOVE_PRINCE_ALREADY_ENDED, SUCCESS
 }
 
+enum ActivateLegendCardNResponses {
+    WIN, LOSE
+}
+
 
 public class GameDatabase {
     private ArrayList<Game> games;
@@ -1264,6 +1268,8 @@ public class GameDatabase {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         int skralStronghold = dieRoll + 50;
 
+        getGame(gameName).setSkralStronghold(skralStronghold);
+
         regionDatabase.getRegion(skralStronghold).getCurrentCreatures().clear();
         regionDatabase.getRegion(skralStronghold).getCurrentCreatures().add(new Creature(getGame(gameName).getDifficultMode(), getGame(gameName).getCurrentNumPlayers()));
 
@@ -1528,13 +1534,48 @@ public class GameDatabase {
         g.setWitch(new Witch(h.getCurrentSpace()));
         h.getItems().add(new Item(ItemType.WITCH_BREW));
 
+        Creature gor = new Creature(CreatureType.GOR);
+        gor.setMedicinalHerb(new Item(ItemType.MEDICINAL_HERB));
+
         if (dieRoll == 1 || dieRoll == 2) {
-
+            regionDatabase.getRegion(37).setCurrentCreatures(new ArrayList<>(Arrays.asList(gor)));
         } else if (dieRoll == 3 || dieRoll == 4) {
-
+            regionDatabase.getRegion(67).setCurrentCreatures(new ArrayList<>(Arrays.asList(gor)));
         } else { // 5 or 6
-
+            regionDatabase.getRegion(61).setCurrentCreatures(new ArrayList<>(Arrays.asList(gor)));
         }
 
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+    }
+
+    public void activateLegendCardN(String gameName, String username) {
+        Game g = getGame(gameName);
+        RegionDatabase regionDatabase = g.getRegionDatabase();
+        boolean medicinalHerbInCastle = false;
+
+        for (Item item : regionDatabase.getRegion(0).getItems()) {
+            if (item.getItemType() == ItemType.MEDICINAL_HERB) {
+                medicinalHerbInCastle = true;
+                break;
+            }
+        }
+
+        if (medicinalHerbInCastle && regionDatabase.getRegion(g.getSkralStronghold()).getCurrentCreatures().size() == 0 && g.getGoldenShields() >= 0) {
+            g.setGameStatus(GameStatus.GAME_WON);
+        } else {
+            g.setGameStatus(GameStatus.GAME_LOST);
+        }
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+
+        games.remove(getGame(gameName));
+        masterDatabase.removeGameBCM(gameName);
+        masterDatabase.deleteMessageDatabase(gameName);
     }
 }
