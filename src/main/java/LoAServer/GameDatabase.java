@@ -1519,4 +1519,22 @@ public class GameDatabase {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
     }
+
+    public void activateLegendCardTheWitch(String gameName, String username, Integer dieRoll) {
+        Game g = getGame(gameName);
+        Hero h = g.getSinglePlayer(username).getHero();
+        RegionDatabase regionDatabase = g.getRegionDatabase();
+
+        g.setWitch(new Witch(h.getCurrentSpace()));
+        h.getItems().add(new Item(ItemType.WITCH_BREW));
+
+        if (dieRoll == 1 || dieRoll == 2) {
+
+        } else if (dieRoll == 3 || dieRoll == 4) {
+
+        } else { // 5 or 6
+
+        }
+
+    }
 }

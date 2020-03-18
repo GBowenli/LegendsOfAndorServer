@@ -11,6 +11,7 @@ public class Creature {
     private int goldReward;
     private int willpowerReward;
     private CreatureType creatureType;
+    private Item medicinalHerb;
 
     public Creature() {}
 
@@ -101,5 +102,13 @@ public class Creature {
 
     public void setCreatureType(CreatureType creatureType) {
         this.creatureType = creatureType;
+    }
+
+    public Item getMedicinalHerb() {
+        return medicinalHerb;
+    }
+
+    public void setMedicinalHerb(Item medicinalHerb) {
+        this.medicinalHerb = medicinalHerb;
     }
 }
