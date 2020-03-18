@@ -1,7 +1,7 @@
 package LoAServer;
 
 enum ItemType {
-    WINESKIN,FALCON,BOW,HELM,SHIELD,TELESCOPE
+    WINESKIN,FALCON,BOW,HELM,SHIELD,TELESCOPE, WITCH_BREW, MEDICINAL_HERB
 }
 
 public class Item {
@@ -20,6 +20,8 @@ public class Item {
         } else if (itemType == ItemType.FALCON) {
             uses = 1;
         } else if (itemType == ItemType.SHIELD){
+            uses = 2;
+        } else if (itemType == ItemType.WITCH_BREW) {
             uses = 2;
         }
     }
@@ -40,6 +42,3 @@ public class Item {
         this.uses = uses;
     }
 }
-
-
-
