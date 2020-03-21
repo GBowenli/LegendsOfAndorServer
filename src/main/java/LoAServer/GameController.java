@@ -155,7 +155,7 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/saveGame")
-    public void distributeAfterFight (@PathVariable String gameName) {
+    public void saveGame (@PathVariable String gameName) {
         MasterDatabase.getInstance().getMasterGameDatabase().saveGame(gameName);
     }
 
