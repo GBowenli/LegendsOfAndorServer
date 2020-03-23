@@ -1463,7 +1463,7 @@ public class GameDatabase {
         }
     }
 
-    public void setRuneStoneLegendCard(String gameName, String username, Integer dieRoll) {
+    public void setRuneStonesLegendCard(String gameName, String username, Integer dieRoll) {
         if (dieRoll == 1) {
             getGame(gameName).setRuneStoneLegendCard(NarratorSpace.B);
         } else if (dieRoll == 2) {
@@ -1479,7 +1479,7 @@ public class GameDatabase {
         }
     }
 
-    public void activateLegendCardRuneStone(String gameName, String username, ArrayList<Integer> runeStonePositions) {
+    public void activateLegendCardRuneStones(String gameName, String username, ArrayList<Integer> runeStonePositions) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
 
         if (getGame(gameName).getDifficultMode()) {

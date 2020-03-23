@@ -184,14 +184,14 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().endMovePrinceThorald(gameName, username);
     }
 
-    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/setRuneStoneLegendCard")
-    public void setRuneStoneLegendCard (@PathVariable String gameName, @PathVariable String username, @RequestBody Integer dieRoll) {
-        MasterDatabase.getInstance().getMasterGameDatabase().setRuneStoneLegendCard(gameName, username, dieRoll);
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/setRuneStonesLegendCard")
+    public void setRuneStonesLegendCard (@PathVariable String gameName, @PathVariable String username, @RequestBody Integer dieRoll) {
+        MasterDatabase.getInstance().getMasterGameDatabase().setRuneStonesLegendCard(gameName, username, dieRoll);
     }
 
-    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateLegendCardRuneStone")
-    public void activateLegendCardRuneStone (@PathVariable String gameName, @PathVariable String username, @RequestBody ArrayList<Integer> runeStonePositions) {
-        MasterDatabase.getInstance().getMasterGameDatabase().activateLegendCardRuneStone(gameName, username, runeStonePositions);
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateLegendCardRuneStones")
+    public void activateLegendCardRuneStones (@PathVariable String gameName, @PathVariable String username, @RequestBody ArrayList<Integer> runeStonePositions) {
+        MasterDatabase.getInstance().getMasterGameDatabase().activateLegendCardRuneStones(gameName, username, runeStonePositions);
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateLegendCardTheWitch")
