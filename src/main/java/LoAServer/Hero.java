@@ -22,22 +22,23 @@ public class Hero {
     private boolean movedPrince;
     private ArrayList<RuneStone> runeStones;
 
+
     public Hero() {}
 
     public Hero(HeroClass heroClass) {
         this.heroClass = heroClass;
 
         if (heroClass == HeroClass.ARCHER) {
-            currentSpace = 53;
+            currentSpace = 25;
             rank = 25;
         } else if (heroClass == HeroClass.DWARF) {
-            currentSpace = 43;
+            currentSpace = 25;
             rank = 7;
         } else if (heroClass == HeroClass.WARRIOR) {
             currentSpace = 25;
             rank = 14;
         } else { // wizard
-            currentSpace = 9;
+            currentSpace = 25;
             rank = 34;
         }
         willPower = 7;

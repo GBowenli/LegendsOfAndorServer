@@ -78,6 +78,10 @@ enum ActivateLegendCardNResponses {
     WIN, LOSE
 }
 
+enum AddDropItemResponses{
+    ITEM_ADDED,ITEM_DROPPED,ADD_DROP_FAILURE
+}
+
 
 public class GameDatabase {
     private ArrayList<Game> games;
@@ -1578,4 +1582,139 @@ public class GameDatabase {
         masterDatabase.removeGameBCM(gameName);
         masterDatabase.deleteMessageDatabase(gameName);
     }
+
+    public AddDropItemResponses addItem(String username, String gameName, ItemType itemType){
+        Game game = getGame(gameName);
+        Region region = null;
+        Hero hero = null;
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getUsername().equals(username)){
+                region = game.getRegionDatabase().getRegion(game.getPlayers()[i].getHero().getCurrentSpace());
+                hero = game.getPlayers()[i].getHero();
+            }
+        }
+
+        if(region == null || hero == null){
+            return AddDropItemResponses.ADD_DROP_FAILURE;
+        }
+
+        for(Item item : region.getItems()){
+            if(item.getItemType() == itemType){
+                region.getItems().remove(item);
+                hero.getItems().add(item);
+                return AddDropItemResponses.ITEM_ADDED;
+            }
+        }
+        return  AddDropItemResponses.ADD_DROP_FAILURE;
+    }
+
+    public AddDropItemResponses addRunestone(String username, String gameName){
+        Game game = getGame(gameName);
+        Region region = null;
+        Hero hero = null;
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getUsername().equals(username)){
+                region = game.getRegionDatabase().getRegion(game.getPlayers()[i].getHero().getCurrentSpace());
+                hero = game.getPlayers()[i].getHero();
+            }
+        }
+
+        if(region == null || hero == null){
+            return AddDropItemResponses.ADD_DROP_FAILURE;
+        }
+
+        for(RuneStone stone : region.getRuneStones()){
+            region.getRuneStones().remove(stone);
+            hero.getRuneStones().add(stone);
+            return AddDropItemResponses.ITEM_ADDED;
+        }
+
+        return  AddDropItemResponses.ADD_DROP_FAILURE;
+    }
+
+    public AddDropItemResponses dropItem(String username, String gameName, ItemType itemType){
+        Game game = getGame(gameName);
+        Region region = null;
+        Hero hero = null;
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getUsername().equals(username)){
+                region = game.getRegionDatabase().getRegion(game.getPlayers()[i].getHero().getCurrentSpace());
+                hero = game.getPlayers()[i].getHero();
+            }
+        }
+
+        if(region == null || hero == null){
+            return AddDropItemResponses.ADD_DROP_FAILURE;
+        }
+
+        for(Item item : hero.getItems()){
+            if(item.getItemType() == itemType){
+                hero.getItems().remove(item);
+                region.getItems().add(item);
+                return AddDropItemResponses.ITEM_DROPPED;
+            }
+        }
+
+        return  AddDropItemResponses.ADD_DROP_FAILURE;
+    }
+
+    public AddDropItemResponses dropRunestone(String username, String gameName){
+        Game game = getGame(gameName);
+        Region region = null;
+        Hero hero = null;
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getUsername().equals(username)){
+                region = game.getRegionDatabase().getRegion(game.getPlayers()[i].getHero().getCurrentSpace());
+                hero = game.getPlayers()[i].getHero();
+            }
+        }
+
+        if(region == null || hero == null){
+            return AddDropItemResponses.ADD_DROP_FAILURE;
+        }
+
+        for(RuneStone stone : hero.getRuneStones()){
+            hero.getRuneStones().remove(stone);
+            region.getRuneStones().add(stone);
+            return AddDropItemResponses.ITEM_DROPPED;
+
+        }
+
+        return  AddDropItemResponses.ADD_DROP_FAILURE;
+    }
+
+    public ArrayList<Item> getItems(String gameName, String username){
+        Game game = getGame(gameName);
+        Region region = null;
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getUsername().equals(username)){
+                region = game.getRegionDatabase().getRegion(game.getPlayers()[i].getHero().getCurrentSpace());
+            }
+        }
+
+        if(region == null){
+            return new ArrayList<Item>();
+        }else{
+            return region.getItems();
+        }
+    }
+
+    public ArrayList<RuneStone> getRunestones(String gameName, String username){
+        Game game = getGame(gameName);
+        Region region = null;
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getUsername().equals(username)){
+                region = game.getRegionDatabase().getRegion(game.getPlayers()[i].getHero().getCurrentSpace());
+            }
+        }
+
+        if(region == null){
+            return new ArrayList<RuneStone>();
+        }else{
+            return region.getRuneStones();
+        }
+    }
+
+
+
 }

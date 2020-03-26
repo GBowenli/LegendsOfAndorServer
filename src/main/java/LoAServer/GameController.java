@@ -204,6 +204,37 @@ public class GameController {
         MasterDatabase.getInstance().getMasterGameDatabase().activateLegendCardN(gameName, username);
     }
 
+    @RequestMapping(method = RequestMethod.GET, value = "/{gameName}/{username}/getItems")
+    public ArrayList<Item> getItems(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().getItems(gameName,username);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/{gameName}/{username}/getRunestones")
+    public ArrayList<RuneStone> getRunestones(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().getRunestones(gameName,username);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/addItem")
+    public AddDropItemResponses addItem(@PathVariable String gameName, @PathVariable String username, @RequestBody ItemType itemType){
+        return MasterDatabase.getInstance().getMasterGameDatabase().addItem(username,gameName,itemType);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/addRunestone")
+    public AddDropItemResponses addRunestone(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().addRunestone(username,gameName);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/dropItem")
+    public AddDropItemResponses dropItem(@PathVariable String gameName, @PathVariable String username, @RequestBody ItemType itemType){
+        return MasterDatabase.getInstance().getMasterGameDatabase().dropItem(username,gameName,itemType);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/dropRunestone")
+    public AddDropItemResponses dropRunestone(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().dropRunestone(username,gameName);
+    }
+
+
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6
     // add turnoptions movePrinceThorald to android and
