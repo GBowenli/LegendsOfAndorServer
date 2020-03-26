@@ -432,7 +432,7 @@ public class GameDatabase {
                 return EndMoveResponses.BUY_FROM_MERCHANT;
             } else if (regionDatabase.getRegion(h.getCurrentSpace()).isFountain() && regionDatabase.getRegion(h.getCurrentSpace()).isFountainStatus()) {
                 return EndMoveResponses.EMPTY_WELL;
-            } else if (regionDatabase.getRegion(h.getCurrentSpace()).getFog() != FogKind.NONE) {
+            } else if ((regionDatabase.getRegion(h.getCurrentSpace()).getFog() != FogKind.NONE) && (regionDatabase.getRegion(h.getCurrentSpace()).isFogRevealed() == false)) {
                 return EndMoveResponses.ACTIVATE_FOG; // display a prompt where user must click activate fog
             } else {
                 return EndMoveResponses.NONE;
@@ -472,7 +472,8 @@ public class GameDatabase {
     public ActivateFogRC activateFog(String gameName, String username) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
-        FogKind f = regionDatabase.getRegion(h.getCurrentSpace()).getFog();
+        int region = h.getCurrentSpace();
+        FogKind f = regionDatabase.getRegion(region).getFog();
 
         if (f != FogKind.NONE) {
             if (f == FogKind.MONSTER) {
@@ -487,11 +488,12 @@ public class GameDatabase {
                 h.setStrength(h.getStrength()+1);
             } else if (f == FogKind.GOLD) {
                 h.setGold(h.getGold()+1);
-            } else if (f == FogKind.WITCHBREW) { // add Witch Brew object to do this
-
+            } else if (f == FogKind.WITCHBREW) {
+                h.getItems().add(new Item(ItemType.WITCH_BREW));
             } else { // event
                 // return the EventCard here
             }
+            regionDatabase.getRegion(region).setFogRevealed(true);
 
             MasterDatabase masterDatabase = MasterDatabase.getInstance();
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
