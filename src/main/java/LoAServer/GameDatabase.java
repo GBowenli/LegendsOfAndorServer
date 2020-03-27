@@ -808,7 +808,7 @@ public class GameDatabase {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
 
-        getGame(gameName).setCurrentFight(null);
+        //getGame(gameName).setCurrentFight(null);
 
         return LeaveFightResponses.SUCCESS;
     }
