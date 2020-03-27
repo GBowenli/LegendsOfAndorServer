@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 @RestController
@@ -230,8 +231,8 @@ public class GameController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/addRunestone")
-    public AddDropItemResponses addRunestone(@PathVariable String gameName, @PathVariable String username){
-        return MasterDatabase.getInstance().getMasterGameDatabase().addRunestone(username,gameName);
+    public AddDropItemResponses addRunestone(@PathVariable String gameName, @PathVariable String username, @RequestBody Colour colour){
+        return MasterDatabase.getInstance().getMasterGameDatabase().addRunestone(username,gameName,colour);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/dropItem")
@@ -240,8 +241,8 @@ public class GameController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/dropRunestone")
-    public AddDropItemResponses dropRunestone(@PathVariable String gameName, @PathVariable String username){
-        return MasterDatabase.getInstance().getMasterGameDatabase().dropRunestone(username,gameName);
+    public AddDropItemResponses dropRunestone(@PathVariable String gameName, @PathVariable String username, @RequestBody Colour colour){
+        return MasterDatabase.getInstance().getMasterGameDatabase().dropRunestone(username,gameName, colour);
     }
 
 

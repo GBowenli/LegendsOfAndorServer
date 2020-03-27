@@ -41,4 +41,25 @@ public class Item {
     public void setNumUses(int uses) {
         this.uses = uses;
     }
+
+    public boolean isSmallItem(){
+        if(this.itemType == ItemType.MEDICINAL_HERB || this.itemType == ItemType.WINESKIN || this.itemType == ItemType.WITCH_BREW
+                || this.itemType == ItemType.TELESCOPE){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean isLargeItem(){
+        if(this.itemType == ItemType.FALCON || this.itemType == ItemType.SHIELD || this.itemType == ItemType.BOW){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    public boolean isHelm(){
+        return this.itemType == ItemType.HELM;
+    }
 }
