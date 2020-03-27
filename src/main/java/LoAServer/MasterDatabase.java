@@ -6,6 +6,7 @@ import eu.kartoffelquadrat.asyncrestlib.BroadcastContentManager;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class MasterDatabase {
@@ -42,6 +43,11 @@ public class MasterDatabase {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<Game> getSavedGames(String gameName, String username) {
+        Collection<Game> values = savedGameDatabase.values();
+        return new ArrayList<Game>(values);
     }
 
     public HashMap<String, Game> getSavedGameDatabase() {

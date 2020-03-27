@@ -33,6 +33,7 @@ public class Game implements BroadcastContent {
     private NarratorSpace runeStoneLegendCard;
     private Witch witch;
     private int skralStronghold;
+    private boolean gameLoaded;
 
     public Game() {}
 
@@ -52,6 +53,7 @@ public class Game implements BroadcastContent {
         itemsDistributedMessage = "";
         this.gameStatus = GameStatus.IN_PROGRESS;
         this.narrator = new Narrator();
+        gameLoaded = false;
     }
 
     public int getMaxNumPlayers() {
@@ -215,6 +217,10 @@ public class Game implements BroadcastContent {
         return regionDatabase;
     }
 
+    public void setRegionDatabase(RegionDatabase regionDatabase) {
+        this.regionDatabase = regionDatabase;
+    }
+
     public Hero getCurrentHero() {
         return currentHero;
     }
@@ -245,6 +251,10 @@ public class Game implements BroadcastContent {
 
     public String getItemsDistributedMessage(){
         return itemsDistributedMessage;
+    }
+
+    public void setItemsDistributedMessage(String itemsDistributedMessage) {
+        this.itemsDistributedMessage = itemsDistributedMessage;
     }
 
     public ArrayList<Farmer> getFarmers() {
@@ -317,6 +327,14 @@ public class Game implements BroadcastContent {
 
     public void setSkralStronghold(int skralStronghold) {
         this.skralStronghold = skralStronghold;
+    }
+
+    public boolean isGameLoaded() {
+        return gameLoaded;
+    }
+
+    public void setGameLoaded(boolean gameLoaded) {
+        this.gameLoaded = gameLoaded;
     }
 
     @Override

@@ -19,7 +19,11 @@ enum GameStartedResponses{
 }
 
 enum JoinGameResponses {
-    JOIN_GAME_SUCCESS, ERROR_GAME_FULL, ERROR_GAME_DNE
+    JOIN_GAME_SUCCESS, ERROR_GAME_FULL, ERROR_GAME_DNE, ERROR_GAME_LOADED
+}
+
+enum LeavePregameResponses {
+    ERROR_GAME_LOADED, LEAVE_SUCCESS
 }
 
 enum IsReadyResponses {
@@ -74,8 +78,8 @@ enum EndMovePrinceThoraldResponses {
     MUST_MOVE_PRINCE_TO_END_MOVE, MOVE_PRINCE_ALREADY_ENDED, SUCCESS
 }
 
-enum ActivateLegendCardNResponses {
-    WIN, LOSE
+enum LoadGameResponses {
+    ERROR_NOT_ALL_PLAYERS_SELECTED_HEROES, ERROR_PLAYER_NUM_MISMATCH, ERROR_HERO_MISMATCH, ERROR_DIFFICULTY_MISMATCH, LOAD_GAME_SUCCESS
 }
 
 
@@ -117,6 +121,10 @@ public class GameDatabase {
         if (getGame(gameName) == null) {
             return JoinGameResponses.ERROR_GAME_DNE;
         } else {
+            if (getGame(gameName).isGameLoaded()) {
+                return JoinGameResponses.ERROR_GAME_LOADED;
+            }
+
             int currentNumPlayers = getGame(gameName).getCurrentNumPlayers();
             int maxNumPlayers = getGame(gameName).getMaxNumPlayers();
 
@@ -146,21 +154,26 @@ public class GameDatabase {
         return response;
     }
 
-    public void leavePregame(String gameName, String username) {
-        MasterDatabase masterDatabase = MasterDatabase.getInstance();
-
-        masterDatabase.removeGameBCM(username);
-        masterDatabase.removeMessageDatabaseBCM(username);
-
-        if (getGame(gameName).getCurrentNumPlayers() == 1) {
-            games.remove(getGame(gameName));
-            masterDatabase.deleteMessageDatabase(gameName);
+    public LeavePregameResponses leavePregame(String gameName, String username) {
+        if (getGame(gameName).isGameLoaded()) {
+            return LeavePregameResponses.ERROR_GAME_LOADED;
         } else {
-            getGame(gameName).removePlayer(username);
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
-            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            masterDatabase.removeGameBCM(username);
+            masterDatabase.removeMessageDatabaseBCM(username);
+
+            if (getGame(gameName).getCurrentNumPlayers() == 1) {
+                games.remove(getGame(gameName));
+                masterDatabase.deleteMessageDatabase(gameName);
+            } else {
+                getGame(gameName).removePlayer(username);
+
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
             }
+            return LeavePregameResponses.LEAVE_SUCCESS;
         }
     }
 
@@ -781,7 +794,6 @@ public class GameDatabase {
         h.setFought(false);
 
         if (fight.getHeroes().size() == 0) {
-            //getGame(gameName).setCurrentFight(null);
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
         }
@@ -789,6 +801,9 @@ public class GameDatabase {
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
+
+        getGame(gameName).setCurrentFight(null);
+
         return LeaveFightResponses.SUCCESS;
     }
 
@@ -1577,5 +1592,67 @@ public class GameDatabase {
         games.remove(getGame(gameName));
         masterDatabase.removeGameBCM(gameName);
         masterDatabase.deleteMessageDatabase(gameName);
+    }
+
+    public LoadGameResponses loadGame(String gameName, String username, Game g) {
+        Game game = getGame(gameName);
+        for (int i = 0; i < game.getCurrentNumPlayers(); i++) {
+            if (game.getPlayers()[i].getHero() == null) {
+                return LoadGameResponses.ERROR_NOT_ALL_PLAYERS_SELECTED_HEROES;
+            }
+        }
+
+        if (game.getDifficultMode() != g.getDifficultMode()) {
+            return LoadGameResponses.ERROR_DIFFICULTY_MISMATCH;
+        }
+
+        if (game.getCurrentNumPlayers() != g.getCurrentNumPlayers()) {
+            return LoadGameResponses.ERROR_PLAYER_NUM_MISMATCH;
+        }
+
+        boolean found;
+        for (HeroClass h : g.getAllHeroes()) {
+            found = false;
+            for (int i = 0; i < game.getCurrentNumPlayers(); i++) {
+                if (game.getPlayers()[i].getHero().getHeroClass() == h) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                return LoadGameResponses.ERROR_HERO_MISMATCH;
+            }
+        }
+
+        game.setGoldenShields(g.getGoldenShields());
+        for (int i = 0; i < game.getCurrentNumPlayers(); i++) {
+            for (int j = 0; i < g.getCurrentNumPlayers(); i++) {
+                if (game.getPlayers()[i].getHero().getHeroClass() == g.getPlayers()[j].getHero().getHeroClass()) {
+                    game.getPlayers()[i].setHero(g.getPlayers()[j].getHero());
+                }
+            }
+        }
+        game.setActive(g.isActive());
+        game.setItemsDistributed(g.isItemsDistributed());
+        game.setItemsDistributedMessage(g.getItemsDistributedMessage());
+        game.setRegionDatabase(g.getRegionDatabase());
+        game.setCurrentHero(g.getCurrentHero());
+        game.setFirstHeroInNextDay(g.getFirstHeroInNextDay());
+        game.setCurrentHeroSelectedOption(g.getCurrentHeroSelectedOption());
+        game.setFarmers(g.getFarmers());
+        game.setDifficultMode(g.getDifficultMode());
+        game.setCurrentFight(g.getCurrentFight());
+        game.setGameStatus(g.getGameStatus());
+        game.setNarrator(g.getNarrator());
+        game.setPrinceThorald(g.getPrinceThorald());
+        game.setRuneStoneLegendCard(g.getRuneStoneLegendCard());
+        game.setWitch(g.getWitch());
+        game.setSkralStronghold(g.getSkralStronghold());
+        game.setGameLoaded(true);
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+
+        return LoadGameResponses.LOAD_GAME_SUCCESS;
     }
 }
