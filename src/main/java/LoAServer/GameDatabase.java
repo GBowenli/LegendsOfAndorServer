@@ -5,6 +5,7 @@ import LoAServer.PublicEnums.*;
 import LoAServer.ReturnClasses.*;
 import com.google.gson.Gson;
 
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -83,7 +84,7 @@ enum LoadGameResponses {
 }
 
 enum AddDropItemResponses{
-    ITEM_ADDED,ITEM_DROPPED,ADD_DROP_FAILURE
+    ITEM_ADDED,ITEM_DROPPED,ADD_DROP_FAILURE, MAX_ITEMS
 }
 
 
@@ -1616,6 +1617,10 @@ public class GameDatabase {
             return AddDropItemResponses.ADD_DROP_FAILURE;
         }
 
+        if(!canAddItem(hero,itemType)){
+            return AddDropItemResponses.MAX_ITEMS;
+        }
+
         for(Item item : region.getItems()){
             if(item.getItemType() == itemType){
                 region.getItems().remove(item);
@@ -1626,7 +1631,7 @@ public class GameDatabase {
         return  AddDropItemResponses.ADD_DROP_FAILURE;
     }
 
-    public AddDropItemResponses addRunestone(String username, String gameName){
+    public AddDropItemResponses addRunestone(String username, String gameName, Colour colour){
         Game game = getGame(gameName);
         Region region = null;
         Hero hero = null;
@@ -1641,10 +1646,16 @@ public class GameDatabase {
             return AddDropItemResponses.ADD_DROP_FAILURE;
         }
 
+        if(!canAddRunestone(hero)){
+            return AddDropItemResponses.MAX_ITEMS;
+        }
+
         for(RuneStone stone : region.getRuneStones()){
-            region.getRuneStones().remove(stone);
-            hero.getRuneStones().add(stone);
-            return AddDropItemResponses.ITEM_ADDED;
+            if(stone.getColour() == colour){
+                region.getRuneStones().remove(stone);
+                hero.getRuneStones().add(stone);
+                return AddDropItemResponses.ITEM_ADDED;
+            }
         }
 
         return  AddDropItemResponses.ADD_DROP_FAILURE;
@@ -1676,7 +1687,7 @@ public class GameDatabase {
         return  AddDropItemResponses.ADD_DROP_FAILURE;
     }
 
-    public AddDropItemResponses dropRunestone(String username, String gameName){
+    public AddDropItemResponses dropRunestone(String username, String gameName, Colour colour){
         Game game = getGame(gameName);
         Region region = null;
         Hero hero = null;
@@ -1692,10 +1703,11 @@ public class GameDatabase {
         }
 
         for(RuneStone stone : hero.getRuneStones()){
-            hero.getRuneStones().remove(stone);
-            region.getRuneStones().add(stone);
-            return AddDropItemResponses.ITEM_DROPPED;
-
+            if(stone.getColour() == colour){
+                hero.getRuneStones().remove(stone);
+                region.getRuneStones().add(stone);
+                return AddDropItemResponses.ITEM_DROPPED;
+            }
         }
 
         return  AddDropItemResponses.ADD_DROP_FAILURE;
@@ -1720,6 +1732,7 @@ public class GameDatabase {
     public ArrayList<RuneStone> getRunestones(String gameName, String username){
         Game game = getGame(gameName);
         Region region = null;
+
         for(int i = 0; i < game.getCurrentNumPlayers(); i++){
             if(game.getPlayers()[i].getUsername().equals(username)){
                 region = game.getRegionDatabase().getRegion(game.getPlayers()[i].getHero().getCurrentSpace());
@@ -1730,6 +1743,63 @@ public class GameDatabase {
             return new ArrayList<RuneStone>();
         }else{
             return region.getRuneStones();
+        }
+    }
+
+
+    public boolean canAddItem(Hero hero, ItemType itemType){
+        int smallItems = 0;
+        int largeItems = 0;
+        int numHelms = 0;
+
+        for(Item item : hero.getItems()){
+            if(item.isSmallItem()){
+                smallItems++;
+                continue;
+            }
+            if(item.isLargeItem()){
+                largeItems++;
+                continue;
+            }
+            if(item.isHelm()){
+                numHelms++;
+                continue;
+            }
+        }
+
+        for(RuneStone runeStone : hero.getRuneStones()){
+            smallItems++;
+        }
+
+        if(smallItems < 3 && (itemType == ItemType.WITCH_BREW || itemType == ItemType.WINESKIN || itemType == ItemType.MEDICINAL_HERB || itemType == ItemType.TELESCOPE)){
+            return true;
+        }
+        if(largeItems < 1 && (itemType == ItemType.BOW || itemType == ItemType.SHIELD || itemType == ItemType.FALCON)){
+            return true;
+        }
+        if(numHelms < 1 && (itemType == ItemType.HELM)){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean canAddRunestone(Hero hero){
+        int smallItems = 0;
+
+        for(Item item : hero.getItems()){
+            if(item.isSmallItem()){
+                smallItems++;
+            }
+        }
+
+        for(RuneStone runeStone : hero.getRuneStones()){
+            smallItems++;
+        }
+
+        if(smallItems < 3){
+            return true;
+        }else{
+            return false;
         }
     }
 
