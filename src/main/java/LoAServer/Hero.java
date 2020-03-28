@@ -32,13 +32,13 @@ public class Hero {
             currentSpace = 25;
             rank = 25;
         } else if (heroClass == HeroClass.DWARF) {
-            currentSpace = 25;
+            currentSpace = 7;
             rank = 7;
         } else if (heroClass == HeroClass.WARRIOR) {
-            currentSpace = 25;
+            currentSpace = 14;
             rank = 14;
         } else { // wizard
-            currentSpace = 25;
+            currentSpace = 34;
             rank = 34;
         }
         willPower = 7;

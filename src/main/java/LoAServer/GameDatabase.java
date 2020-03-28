@@ -773,13 +773,14 @@ public class GameDatabase {
         }
 
         if (fight.getHeroes().size() == 0) {
-            //getGame(gameName).setCurrentFight(null);
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
+
+            getGame(gameName).setCurrentFight(null);
 
             return LeaveFightResponses.SUCCESS;
         }
@@ -808,7 +809,7 @@ public class GameDatabase {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
 
-        //getGame(gameName).setCurrentFight(null);
+        getGame(gameName).setCurrentFight(null);
 
         return LeaveFightResponses.SUCCESS;
     }
