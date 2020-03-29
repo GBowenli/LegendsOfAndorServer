@@ -811,6 +811,10 @@ public class GameDatabase {
     public void joinFight(String gameName, String username) {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
+        if (h.getCurrentSpace() != getGame(gameName).getCurrentFight().getRegionNumber() && h.getHeroClass() != HeroClass.ARCHER) {
+            h.setBowActivated(true);
+        }
+
         getGame(gameName).getCurrentFight().getHeroes().add(h);
         getGame(gameName).getCurrentFight().getHeroesBattleScores().add(0);
         getGame(gameName).getCurrentFight().getPendingInvitedHeroes().remove(h);
