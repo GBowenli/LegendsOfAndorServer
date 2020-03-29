@@ -5,7 +5,6 @@ import LoAServer.PublicEnums.*;
 import LoAServer.ReturnClasses.*;
 import com.google.gson.Gson;
 
-import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -85,6 +84,14 @@ enum LoadGameResponses {
 
 enum AddDropItemResponses{
     ITEM_ADDED,ITEM_DROPPED,ADD_DROP_FAILURE, MAX_ITEMS
+}
+
+enum ActivateHelmResponses {
+    ERROR_DOES_NOT_OWN_HELM, ERROR_ARCHER, ERROR_WIZARD, ERROR_BOW_USER, ERROR_NO_DICE_ROLLS, HELM_ACTIVATED
+}
+
+enum ActivateShieldFightResponses {
+    ERROR_DOES_NOT_OWN_SHIELD, ERROR_SHIELD_ALREADY_ACTIVATED, ERROR_INAPPROPIRATE_SHIELD_ACTIVATION, SHIELD_ACTIVATED
 }
 
 
@@ -683,72 +690,122 @@ public class GameDatabase {
         }
     }
 
-    public FightRC fight(String gameName, String username) {
+    public GetPossibleCreaturesToFightRC getPossibleCreaturesToFight(String gameName, String username) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
         if (!getGame(gameName).getCurrentHero().equals(h)) {
-            return new FightRC(new Fight(), FightResponses.NOT_CURRENT_TURN);
+            return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.NOT_CURRENT_TURN, new ArrayList<>());
         } else if (h.isHasEndedDay()) {
-            return new FightRC(new Fight(), FightResponses.DAY_ENDED);
+            return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.DAY_ENDED, new ArrayList<>());
         } else if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().size() == 0) {
-            return new FightRC(new Fight(), FightResponses.NO_CREATURE_FOUND);
+            return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.NO_CREATURE_FOUND, new ArrayList<>());
         } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
-            return new FightRC(new Fight(), FightResponses.CANNOT_FIGHT_AFTER_MOVE);
+            return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.CANNOT_FIGHT_AFTER_MOVE, new ArrayList<>());
         } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE_PRINCE) {
-            return new FightRC(new Fight(), FightResponses.CANNOT_FIGHT_AFTER_MOVE_PRINCE);
+            System.out.println("wtf");
+            return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.CANNOT_FIGHT_AFTER_MOVE_PRINCE, new ArrayList<>());
         } else {
-            Fight fight = new Fight(h.getCurrentSpace(), h, regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().get(0));
-            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.FIGHT);
+            boolean ownsBow = false;
 
-            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                Player p = getGame(gameName).getPlayers()[i];
+            for (Item item : h.getItems()) {
+                if (item.getItemType() == ItemType.BOW) {
+                    ownsBow = true;
+                }
+            }
 
-                if (!p.getUsername().equals(username)) {
-                    if (p.getHero().getHeroClass() != HeroClass.ARCHER) {
-                        if (p.getHero().getCurrentSpace() == h.getCurrentSpace()) {
-                            if (h.getCurrentHour() >= 7 && h.getCurrentHour() != 10) {
-                                if (h.getWillPower() >= 3) {
-                                    fight.getPendingInvitedHeroes().add(p.getHero());
-                                }
-                            } else {
-                                if (h.getWillPower() >= 1) {
-                                    fight.getPendingInvitedHeroes().add(p.getHero());
-                                }
+            if (h.getHeroClass() == HeroClass.ARCHER || ownsBow) {
+                ArrayList<Integer> possibleCreaturesToFight = new ArrayList<>();
+                ArrayList<Integer> adjacentRegions = new ArrayList<>();
+
+                adjacentRegions = regionDatabase.getRegion(h.getCurrentSpace()).getAdjacentRegions();
+                if (regionDatabase.getRegion(h.getCurrentSpace()).isBridge()) {
+                    adjacentRegions.add(regionDatabase.getRegion(h.getCurrentSpace()).getBridgeAdjacentRegion());
+                }
+
+                for (Integer space : adjacentRegions) {
+                    if (regionDatabase.getRegion(space).getCurrentCreatures().size() > 0) {
+                        possibleCreaturesToFight.add(space);
+                    }
+                }
+                return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.SUCCESS, possibleCreaturesToFight);
+            } else {
+                return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.SUCCESS, new ArrayList<>(Arrays.asList(h.getCurrentSpace())));
+            }
+        }
+    }
+
+    public Fight fight(String gameName, String username, Integer targetRegion) {
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        boolean ownsBow = false;
+
+        for (Item item : h.getItems()) {
+            if (item.getItemType() == ItemType.BOW) {
+                ownsBow = true;
+            }
+        }
+        if (ownsBow && h.getCurrentSpace() != targetRegion) {
+            h.setBowActivated(true);
+        }
+
+        Fight fight = new Fight(targetRegion, h, regionDatabase.getRegion(targetRegion).getCurrentCreatures().get(0));
+        getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.FIGHT);
+
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            Player p = getGame(gameName).getPlayers()[i];
+            ownsBow = false;
+
+            if (!p.getUsername().equals(username)) {
+                for (Item item : h.getItems()) {
+                    if (item.getItemType() == ItemType.BOW) {
+                        ownsBow = true;
+                    }
+                }
+
+                if (p.getHero().getHeroClass() == HeroClass.ARCHER || ownsBow) {
+                    Region region = regionDatabase.getRegion(p.getHero().getCurrentSpace());
+                    ArrayList<Integer> adjacentRegions = region.getAdjacentRegions();
+                    adjacentRegions.add(p.getHero().getCurrentSpace());
+
+                    if (region.isBridge()) {
+                        adjacentRegions.add(region.getBridgeAdjacentRegion());
+                    }
+
+                    if (adjacentRegions.contains(h.getCurrentSpace())) {
+                        if (h.getCurrentHour() >= 7 && h.getCurrentHour() != 10) {
+                            if (h.getWillPower() >= 3) {
+                                fight.getPendingInvitedHeroes().add(p.getHero());
+                            }
+                        } else {
+                            if (h.getWillPower() >= 1) {
+                                fight.getPendingInvitedHeroes().add(p.getHero());
                             }
                         }
-                    } else { // is an archer
-                        Region region = regionDatabase.getRegion(p.getHero().getCurrentSpace());
-                        ArrayList<Integer> archerAdjacentRegions = region.getAdjacentRegions();
-                        archerAdjacentRegions.add(p.getHero().getCurrentSpace());
-
-                        if (region.isBridge()) {
-                            archerAdjacentRegions.add(region.getBridgeAdjacentRegion());
-                        }
-
-                        if (archerAdjacentRegions.contains(h.getCurrentSpace())) {
-                            if (h.getCurrentHour() >= 7 && h.getCurrentHour() != 10) {
-                                if (h.getWillPower() >= 3) {
-                                    fight.getPendingInvitedHeroes().add(p.getHero());
-                                }
-                            } else {
-                                if (h.getWillPower() >= 1) {
-                                    fight.getPendingInvitedHeroes().add(p.getHero());
-                                }
+                    }
+                } else {
+                    if (p.getHero().getCurrentSpace() == h.getCurrentSpace()) {
+                        if (h.getCurrentHour() >= 7 && h.getCurrentHour() != 10) {
+                            if (h.getWillPower() >= 3) {
+                                fight.getPendingInvitedHeroes().add(p.getHero());
+                            }
+                        } else {
+                            if (h.getWillPower() >= 1) {
+                                fight.getPendingInvitedHeroes().add(p.getHero());
                             }
                         }
                     }
                 }
             }
-
-            getGame(gameName).setCurrentFight(fight);
-
-            MasterDatabase masterDatabase = MasterDatabase.getInstance();
-            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-            }
-            return new FightRC(fight, FightResponses.JOINED_FIGHT);
         }
+
+        getGame(gameName).setCurrentFight(fight);
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+        return fight;
     }
 
     public void joinFight(String gameName, String username) {
@@ -800,6 +857,7 @@ public class GameDatabase {
         fight.getHeroes().remove(index);
         fight.getHeroesBattleScores().remove(index);
         h.setFought(false);
+        h.setBowActivated(false);
 
         if (fight.getHeroes().size() == 0) {
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
@@ -1145,25 +1203,28 @@ public class GameDatabase {
             for (Iterator<Hero> it = fight.getHeroes().iterator(); it.hasNext();) {
                 Hero h = it.next();
 
-                h.setWillPower(h.getWillPower() + difference);
+                if (!h.isShieldActivatedFight()) {
+                    h.setWillPower(h.getWillPower() + difference);
 
-                if (h.getWillPower() <= 0) {
-                    if (h.getStrength() > 1) {
-                        h.setStrength(h.getStrength() - 1);
+                    if (h.getWillPower() <= 0) {
+                        if (h.getStrength() > 1) {
+                            h.setStrength(h.getStrength() - 1);
+                        }
+                        h.setWillPower(3);
+                        int index = fight.getHeroes().indexOf(h);
+                        it.remove();
+                        fight.getHeroesBattleScores().remove(index);
+                        h.setBowActivated(false);
+                    } else if (h.getCurrentHour() == 10) {
+                        int index = fight.getHeroes().indexOf(h);
+                        it.remove();
+                        fight.getHeroesBattleScores().remove(index);
+                        h.setBowActivated(false);
                     }
-                    h.setWillPower(3);
-                    int index = fight.getHeroes().indexOf(h);
-                    it.remove();
-                    fight.getHeroesBattleScores().remove(index);
-                } else if (h.getCurrentHour() == 10) {
-                    int index = fight.getHeroes().indexOf(h);
-                    it.remove();
-                    fight.getHeroesBattleScores().remove(index);
+                } else {
+                    h.setShieldActivatedFight(false);
                 }
             }
-
-            System.out.println(fight.getHeroes().size());
-            System.out.println(fight.getHeroesBattleScores().size());
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
@@ -1230,6 +1291,127 @@ public class GameDatabase {
             }
         }
     }
+
+    public ActivateHelmResponses activateHelm(String gameName, String username) {
+        Game g = getGame(gameName);
+        Fight fight = g.getCurrentFight();
+        Hero h = g.getSinglePlayer(username).getHero();
+        boolean helmFound = false;
+        boolean bowFound = false;
+
+        if (h.getHeroClass() == HeroClass.ARCHER) {
+            return ActivateHelmResponses.ERROR_ARCHER;
+        } else if (h.getHeroClass() == HeroClass.WIZARD) {
+            return ActivateHelmResponses.ERROR_WIZARD;
+        }
+
+        for (Item item : h.getItems()) {
+            if (item.getItemType() == ItemType.HELM) {
+                helmFound = true;
+            } else if (item.getItemType() == ItemType.BOW) {
+                bowFound = true;
+            }
+        }
+
+        if (!helmFound) {
+            return ActivateHelmResponses.ERROR_DOES_NOT_OWN_HELM;
+        }
+        if (bowFound && h.isBowActivated()) {
+            return ActivateHelmResponses.ERROR_BOW_USER;
+        }
+
+        ArrayList<Integer> diceRolls = new ArrayList<>();
+
+        if (h.getHeroClass() == HeroClass.WARRIOR) {
+            diceRolls = fight.getWarriorDice();
+        } else if (h.getHeroClass() == HeroClass.DWARF) {
+            diceRolls = fight.getDwarfDice();
+        }
+
+        if (diceRolls.get(0) > 0) {
+            Collections.sort(diceRolls);
+            int prevValue = diceRolls.get(0);
+            int duplicateCurrent = 0;
+            int duplicateMax = 0;
+            for (int i : diceRolls) {
+                if (i == prevValue) {
+                    duplicateCurrent += prevValue;
+                } else {
+                    if (i > duplicateCurrent) {
+                        duplicateCurrent = i;
+                    }
+
+                    if (duplicateCurrent > duplicateMax) {
+                        duplicateMax = duplicateCurrent;
+                    }
+                    duplicateCurrent = i;
+                }
+                prevValue = i;
+            }
+
+            if (duplicateMax < duplicateCurrent) {
+                duplicateMax = duplicateCurrent;
+            }
+
+            getGame(gameName).getCurrentFight().getHeroesBattleScores().set(fight.getHeroes().indexOf(h), duplicateMax + h.getStrength());
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < g.getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+            return ActivateHelmResponses.HELM_ACTIVATED;
+        } else {
+            return ActivateHelmResponses.ERROR_NO_DICE_ROLLS;
+        }
+    }
+
+    public ActivateShieldFightResponses activateShieldFight(String gameName, String username) {
+        Game g = getGame(gameName);
+        Fight fight = g.getCurrentFight();
+        Hero h = g.getSinglePlayer(username).getHero();
+
+        if (h.isShieldActivatedFight()) {
+            return ActivateShieldFightResponses.ERROR_SHIELD_ALREADY_ACTIVATED;
+        }
+
+        int totalHeroesBV = 0;
+        for (Integer bv : fight.getHeroesBattleScores()) {
+            totalHeroesBV += bv;
+            if (bv == 0) {
+                return ActivateShieldFightResponses.ERROR_INAPPROPIRATE_SHIELD_ACTIVATION;
+            }
+        }
+
+        if (fight.getCreatureBattleScore() == 0) {
+            return ActivateShieldFightResponses.ERROR_INAPPROPIRATE_SHIELD_ACTIVATION;
+        }
+
+        if (getGame(gameName).getPrinceThorald() != null) {
+            if (4 + totalHeroesBV - fight.getCreatureBattleScore() >= 0) {
+                return ActivateShieldFightResponses.ERROR_INAPPROPIRATE_SHIELD_ACTIVATION;
+            }
+        } else {
+            if (totalHeroesBV - fight.getCreatureBattleScore() >= 0) {
+                return ActivateShieldFightResponses.ERROR_INAPPROPIRATE_SHIELD_ACTIVATION;
+            }
+        }
+
+        for (Iterator<Item> it = h.getItems().iterator(); it.hasNext();) {
+            Item item = it.next();
+
+            if (item.getItemType() == ItemType.SHIELD) {
+                h.setShieldActivatedFight(true);
+                item.setNumUses(item.getNumUses()-1);
+                if (item.getNumUses() == 0) {
+                    it.remove();
+                }
+            }
+        }
+
+        return ActivateShieldFightResponses.ERROR_DOES_NOT_OWN_SHIELD;
+    }
+
 
     public BuyFromMerchantResponses buyFromMerchant (String gameName, String username, MerchantPurchase merchantPurchase) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();

@@ -21,7 +21,8 @@ public class Hero {
     private int rank;
     private boolean movedPrince;
     private ArrayList<RuneStone> runeStones;
-
+    private boolean bowActivated;
+    private boolean shieldActivatedFight;
 
     public Hero() {}
 
@@ -157,5 +158,21 @@ public class Hero {
 
     public void setRuneStones(ArrayList<RuneStone> runeStones) {
         this.runeStones = runeStones;
+    }
+
+    public boolean isBowActivated() {
+        return bowActivated;
+    }
+
+    public void setBowActivated(boolean bowActivated) {
+        this.bowActivated = bowActivated;
+    }
+
+    public boolean isShieldActivatedFight() {
+        return shieldActivatedFight;
+    }
+
+    public void setShieldActivatedFight(boolean shieldActivatedFight) {
+        this.shieldActivatedFight = shieldActivatedFight;
     }
 }

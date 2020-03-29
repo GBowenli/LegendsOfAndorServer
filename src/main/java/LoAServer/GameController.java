@@ -1,13 +1,11 @@
 package LoAServer;
 
-import LoAServer.PublicEnums.FightResponses;
 import LoAServer.ReturnClasses.*;
 import eu.kartoffelquadrat.asyncrestlib.ResponseGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 @RestController
@@ -74,9 +72,14 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().pass(gameName, username);
     }
 
+    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getPossibleCreaturesToFight")
+    public GetPossibleCreaturesToFightRC getPossibleCreaturesToFight(@PathVariable String gameName, @PathVariable String username) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().getPossibleCreaturesToFight(gameName, username);
+    }
+
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/fight")
-    public FightRC fight(@PathVariable String gameName, @PathVariable String username) {
-        return MasterDatabase.getInstance().getMasterGameDatabase().fight(gameName, username);
+    public Fight fight(@PathVariable String gameName, @PathVariable String username, @RequestBody Integer targetRegion) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().fight(gameName, username, targetRegion);
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/joinFight")
@@ -112,6 +115,16 @@ public class GameController {
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/endBattleRound")
     public EndBattleRoundResponses calculateCreatureBattleValue(@PathVariable String gameName, @PathVariable String username) {
         return MasterDatabase.getInstance().getMasterGameDatabase().endBattleRound(gameName, username);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/activateHelm")
+    public ActivateHelmResponses activateHelm(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().activateHelm(gameName, username);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/activateShieldFight")
+    public ActivateShieldFightResponses activateShieldFight(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().activateShieldFight(gameName, username);
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/buyFromMerchant")
