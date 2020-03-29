@@ -91,7 +91,7 @@ enum ActivateHelmResponses {
 }
 
 enum ActivateShieldFightResponses {
-    ERROR_DOES_NOT_OWN_SHIELD, ERROR_SHIELD_ALREADY_ACTIVATED, ERROR_INAPPROPIRATE_SHIELD_ACTIVATION, SHIELD_ACTIVATED
+    ERROR_DOES_NOT_OWN_SHIELD, ERROR_SHIELD_ALREADY_ACTIVATED, ERROR_INAPPROPRIATE_SHIELD_ACTIVATION, SHIELD_ACTIVATED
 }
 
 
@@ -1392,30 +1392,40 @@ public class GameDatabase {
         Game g = getGame(gameName);
         Fight fight = g.getCurrentFight();
         Hero h = g.getSinglePlayer(username).getHero();
+        boolean shieldFound = false;
 
         if (h.isShieldActivatedFight()) {
             return ActivateShieldFightResponses.ERROR_SHIELD_ALREADY_ACTIVATED;
+        }
+
+        for (Item item : h.getItems()) {
+            if (item.getItemType() == ItemType.SHIELD) {
+                shieldFound = true;
+            }
+        }
+        if (!shieldFound) {
+            return ActivateShieldFightResponses.ERROR_DOES_NOT_OWN_SHIELD;
         }
 
         int totalHeroesBV = 0;
         for (Integer bv : fight.getHeroesBattleScores()) {
             totalHeroesBV += bv;
             if (bv == 0) {
-                return ActivateShieldFightResponses.ERROR_INAPPROPIRATE_SHIELD_ACTIVATION;
+                return ActivateShieldFightResponses.ERROR_INAPPROPRIATE_SHIELD_ACTIVATION;
             }
         }
 
         if (fight.getCreatureBattleScore() == 0) {
-            return ActivateShieldFightResponses.ERROR_INAPPROPIRATE_SHIELD_ACTIVATION;
+            return ActivateShieldFightResponses.ERROR_INAPPROPRIATE_SHIELD_ACTIVATION;
         }
 
         if (getGame(gameName).getPrinceThorald() != null) {
             if (4 + totalHeroesBV - fight.getCreatureBattleScore() >= 0) {
-                return ActivateShieldFightResponses.ERROR_INAPPROPIRATE_SHIELD_ACTIVATION;
+                return ActivateShieldFightResponses.ERROR_INAPPROPRIATE_SHIELD_ACTIVATION;
             }
         } else {
             if (totalHeroesBV - fight.getCreatureBattleScore() >= 0) {
-                return ActivateShieldFightResponses.ERROR_INAPPROPIRATE_SHIELD_ACTIVATION;
+                return ActivateShieldFightResponses.ERROR_INAPPROPRIATE_SHIELD_ACTIVATION;
             }
         }
 
@@ -1430,8 +1440,7 @@ public class GameDatabase {
                 }
             }
         }
-
-        return ActivateShieldFightResponses.ERROR_DOES_NOT_OWN_SHIELD;
+        return ActivateShieldFightResponses.SHIELD_ACTIVATED;
     }
 
 
