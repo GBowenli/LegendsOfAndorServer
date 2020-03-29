@@ -1041,14 +1041,32 @@ public class GameDatabase {
         }
 
         int max = 0;
-        if (h.getHeroClass() != HeroClass.ARCHER) {
-            for (int i : diceRolls) {
-                if (i > max) {
-                    max = i;
+
+        if (h.getHeroClass() == HeroClass.ARCHER || h.isBowActivated()) {
+            int indexOfZero = -1;
+
+            for (int i = 0; i < diceRolls.size(); i++) {
+                if (diceRolls.get(i) == 0) {
+                    indexOfZero = i;
+                    break;
                 }
             }
+
+            if (indexOfZero == -1) {
+                max = diceRolls.get(diceRolls.size()-1);
+            } else {
+                max = diceRolls.get(indexOfZero-1);
+            }
         } else {
-            max = diceRolls.get(diceRolls.size()-1);
+            if (h.getHeroClass() != HeroClass.ARCHER) {
+                for (int i : diceRolls) {
+                    if (i > max) {
+                        max = i;
+                    }
+                }
+            } else {
+                max = diceRolls.get(diceRolls.size() - 1);
+            }
         }
 
         getGame(gameName).getCurrentFight().getHeroesBattleScores().set(getGame(gameName).getCurrentFight().getHeroes().indexOf(h), max + h.getStrength());
