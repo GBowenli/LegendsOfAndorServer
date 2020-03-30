@@ -94,6 +94,13 @@ enum ActivateShieldFightResponses {
     ERROR_DOES_NOT_OWN_SHIELD, ERROR_SHIELD_ALREADY_ACTIVATED, ERROR_INAPPROPRIATE_SHIELD_ACTIVATION, SHIELD_ACTIVATED
 }
 
+enum ActivateWitchesBrewFightResponses {
+    ERROR_DOES_NOT_OWN_WITCHES_BREW, ERROR_BV_NOT_SET, ERROR_CANNOT_USE_AFTER_CREATURE_ROLL_DIE, WITCHES_BREW_ACTIVATED
+}
+
+enum ActivateMedicinalHerbFightResponses {
+    ERROR_DOES_NOT_OWN_MEDICINAL_HERB, ERROR_BV_NOT_SET, ERROR_CANNOT_USE_AFTER_CREATURE_ROLL_DIE, MEDICINAL_HERB_ACTIVATED
+}
 
 public class GameDatabase {
     private ArrayList<Game> games;
@@ -1438,9 +1445,96 @@ public class GameDatabase {
                 if (item.getNumUses() == 0) {
                     it.remove();
                 }
+                break;
             }
         }
         return ActivateShieldFightResponses.SHIELD_ACTIVATED;
+    }
+
+    public ActivateWitchesBrewFightResponses activateWitchesBrewFight(String gameName, String username) {
+        Game g = getGame(gameName);
+        Fight fight = g.getCurrentFight();
+        Hero h = g.getSinglePlayer(username).getHero();
+        boolean witchesBrewFond = false;
+
+        for (Item item : h.getItems()) {
+            if (item.getItemType() == ItemType.WITCH_BREW) {
+                witchesBrewFond = true;
+            }
+        }
+        if (!witchesBrewFond) {
+            return ActivateWitchesBrewFightResponses.ERROR_DOES_NOT_OWN_WITCHES_BREW;
+        }
+
+        if (fight.getHeroesBattleScores().get(fight.getHeroes().indexOf(h)) == 0) {
+            return ActivateWitchesBrewFightResponses.ERROR_BV_NOT_SET;
+        } else if (fight.getCreatureDice().get(0) > 0) {
+            return ActivateWitchesBrewFightResponses.ERROR_CANNOT_USE_AFTER_CREATURE_ROLL_DIE;
+        } else {
+            for (Iterator<Item> it = h.getItems().iterator(); it.hasNext();) {
+                Item item = it.next();
+
+                if (item.getItemType() == ItemType.WITCH_BREW) {
+                    item.setNumUses(item.getNumUses()-1);
+                    if (item.getNumUses() == 0) {
+                        it.remove();
+                    }
+
+                    int max;
+
+                    if (h.getHeroClass() == HeroClass.ARCHER) {
+                        max = Collections.max(fight.getArcherDice());
+                    } else if (h.getHeroClass() == HeroClass.DWARF) {
+                        max = Collections.max(fight.getDwarfDice());
+                    } else if (h.getHeroClass() == HeroClass.WARRIOR) {
+                        max = Collections.max(fight.getWarriorDice());
+                    } else { // wizard
+                        max = Collections.max(fight.getWizardDice());
+                    }
+                    fight.getHeroesBattleScores().set(fight.getHeroes().indexOf(h), max + h.getStrength());
+
+                    break;
+                }
+            }
+
+            return ActivateWitchesBrewFightResponses.WITCHES_BREW_ACTIVATED;
+        }
+    }
+
+    public ActivateMedicinalHerbFightResponses activateMedicinalHerbFight(String gameName, String username) {
+        Game g = getGame(gameName);
+        Fight fight = g.getCurrentFight();
+        Hero h = g.getSinglePlayer(username).getHero();
+        boolean medicinalHerbFound = false;
+
+        for (Item item : h.getItems()) {
+            if (item.getItemType() == ItemType.MEDICINAL_HERB) {
+                medicinalHerbFound = true;
+            }
+        }
+        if (!medicinalHerbFound) {
+            return ActivateMedicinalHerbFightResponses.ERROR_DOES_NOT_OWN_MEDICINAL_HERB;
+        }
+
+        if (fight.getHeroesBattleScores().get(fight.getHeroes().indexOf(h)) == 0) {
+            return ActivateMedicinalHerbFightResponses.ERROR_BV_NOT_SET;
+        } else if (fight.getCreatureDice().get(0) > 0) {
+            return ActivateMedicinalHerbFightResponses.ERROR_CANNOT_USE_AFTER_CREATURE_ROLL_DIE;
+        } else {
+            for (Iterator<Item> it = h.getItems().iterator(); it.hasNext();) {
+                Item item = it.next();
+
+                if (item.getItemType() == ItemType.MEDICINAL_HERB) {
+                    it.remove();
+
+                    fight.getHeroesBattleScores().set(fight.getHeroes().indexOf(h), fight.getHeroesBattleScores().get(fight.getHeroes().indexOf(h)) + 4);
+
+                    break;
+                }
+            }
+
+            return ActivateMedicinalHerbFightResponses.MEDICINAL_HERB_ACTIVATED;
+        }
     }
 
 

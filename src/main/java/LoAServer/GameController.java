@@ -127,6 +127,16 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().activateShieldFight(gameName, username);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/activateWitchesBrewFight")
+    public ActivateWitchesBrewFightResponses activateWitchesBrewFight(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().activateWitchesBrewFight(gameName, username);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/activateMedicinalHerbFight")
+    public ActivateMedicinalHerbFightResponses activateMedicinalHerbFight(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().activateMedicinalHerbFight(gameName, username);
+    }
+
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/buyFromMerchant")
     public BuyFromMerchantResponses buyFromMerchant (@PathVariable String gameName, @PathVariable String username, @RequestBody MerchantPurchase merchantPurchase) {
         return MasterDatabase.getInstance().getMasterGameDatabase().buyFromMerchant(gameName, username, merchantPurchase);
