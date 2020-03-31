@@ -1555,18 +1555,19 @@ public class GameDatabase {
             totalGold += merchantPurchase.getItems().size() * 2;
 
             if (h.getGold() >= totalGold) {
-
-                ArrayList<Item> items = merchantPurchase.getItems();
-                for (Item item : items){
+                ArrayList<Item> purchaseItems = merchantPurchase.getItems();
+                ArrayList<Item> heroItems = hero.getItems();
+                ArrayList<Item> heroItemsReset = new ArrayList<Item>(heroItems);
+                for (Item item : purchaseItems){
                     ItemType type = item.getItemType();
                     if (canAddItem(hero,type) == false){
+                        h.setItems(heroItemsReset);
                         return BuyFromMerchantResponses.MAX_ITEMS;
                     }
+                    h.getItems().add(item);
                 }
-
                 h.setGold(h.getGold() - totalGold);
                 h.setStrength(h.getStrength() + merchantPurchase.getStrength());
-                h.getItems().addAll(merchantPurchase.getItems());
 
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                     masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
