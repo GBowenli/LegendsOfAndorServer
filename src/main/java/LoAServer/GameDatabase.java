@@ -71,7 +71,7 @@ enum EndBattleRoundResponses {
 }
 
 enum BuyFromMerchantResponses {
-    SUCCESS, NOT_ENOUGH_GOLD, MERCHANT_DNE
+    SUCCESS, NOT_ENOUGH_GOLD, MERCHANT_DNE, MAX_ITEMS
 }
 
 enum EndMovePrinceThoraldResponses {
@@ -1555,6 +1555,15 @@ public class GameDatabase {
             totalGold += merchantPurchase.getItems().size() * 2;
 
             if (h.getGold() >= totalGold) {
+
+                ArrayList<Item> items = merchantPurchase.getItems();
+                for (Item item : items){
+                    ItemType type = item.getItemType();
+                    if (canAddItem(hero,type) == false){
+                        return BuyFromMerchantResponses.MAX_ITEMS;
+                    }
+                }
+
                 h.setGold(h.getGold() - totalGold);
                 h.setStrength(h.getStrength() + merchantPurchase.getStrength());
                 h.getItems().addAll(merchantPurchase.getItems());
