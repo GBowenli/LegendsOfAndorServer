@@ -35,6 +35,7 @@ public class Game implements BroadcastContent {
     private int skralStronghold;
     private boolean gameLoaded;
     private boolean foundWitch;
+    private boolean leftGame;
 
     public Game() {}
 
@@ -344,6 +345,14 @@ public class Game implements BroadcastContent {
 
     public void setFoundWitch(boolean foundWitch) {
         this.foundWitch = foundWitch;
+    }
+
+    public boolean isLeftGame() {
+        return leftGame;
+    }
+
+    public void setLeftGame(boolean leftGame) {
+        this.leftGame = leftGame;
     }
 
     @Override

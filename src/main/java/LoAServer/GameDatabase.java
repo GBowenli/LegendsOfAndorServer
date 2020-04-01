@@ -2250,4 +2250,19 @@ public class GameDatabase {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
     }
+
+    public void leaveGame(String gameName, String username) {
+        getGame(gameName).setLeftGame(true);
+
+        System.out.println("ok");
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+
+        games.remove(getGame(gameName));
+        masterDatabase.removeGameBCM(gameName);
+        masterDatabase.deleteMessageDatabase(gameName);
+    }
 }

@@ -273,7 +273,10 @@ public class GameController {
         MasterDatabase.getInstance().getMasterGameDatabase().foundWitch(gameName, username);
     }
 
-
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{gameName}/{username}/leaveGame")
+    public void leaveGame(@PathVariable String gameName, @PathVariable String username){
+        MasterDatabase.getInstance().getMasterGameDatabase().leaveGame(gameName, username);
+    }
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6
     // add turnoptions movePrinceThorald to android and
