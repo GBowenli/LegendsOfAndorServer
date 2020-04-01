@@ -3,6 +3,7 @@ package LoAServer;
 
 import LoAServer.PublicEnums.*;
 import LoAServer.ReturnClasses.*;
+import ch.qos.logback.core.db.dialect.MySQLDialect;
 import com.google.gson.Gson;
 
 import java.io.BufferedWriter;
@@ -2229,5 +2230,14 @@ public class GameDatabase {
         }
 
         return LoadGameResponses.LOAD_GAME_SUCCESS;
+    }
+
+    public void foundWitch(String gameName, String username) {
+        getGame(gameName).setFoundWitch(true);
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
     }
 }

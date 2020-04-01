@@ -268,6 +268,11 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().dropRunestone(username,gameName, colour);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/foundWitch")
+    public void foundWitch(@PathVariable String gameName, @PathVariable String username){
+        MasterDatabase.getInstance().getMasterGameDatabase().foundWitch(gameName, username);
+    }
+
 
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6
