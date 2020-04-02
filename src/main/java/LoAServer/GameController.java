@@ -277,6 +277,11 @@ public class GameController {
     public void leaveGame(@PathVariable String gameName, @PathVariable String username){
         MasterDatabase.getInstance().getMasterGameDatabase().leaveGame(gameName, username);
     }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/buyWitchBrew")
+    public BuyWitchBrewResponses buyWitchBrew(@PathVariable String gameName, @PathVariable String username, @RequestBody Integer quantity){
+        return MasterDatabase.getInstance().getMasterGameDatabase().buyWitchBrew(gameName, username, quantity);
+    }
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6
     // add turnoptions movePrinceThorald to android and

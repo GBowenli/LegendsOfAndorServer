@@ -48,7 +48,7 @@ enum PickUpFarmersResponses {
 }
 
 enum EndMoveResponses {
-    BUY_FROM_MERCHANT, EMPTY_WELL, ACTIVATE_FOG, MOVE_ALREADY_ENDED, MUST_MOVE_TO_END_MOVE, NONE
+    BUY_FROM_MERCHANT, EMPTY_WELL, BUY_WITCH_BREW, ACTIVATE_FOG, MOVE_ALREADY_ENDED, MUST_MOVE_TO_END_MOVE, NONE
 }
 
 enum EmptyWellResponses {
@@ -101,6 +101,10 @@ enum ActivateWitchesBrewFightResponses {
 
 enum ActivateMedicinalHerbFightResponses {
     ERROR_DOES_NOT_OWN_MEDICINAL_HERB, ERROR_BV_NOT_SET, ERROR_CANNOT_USE_AFTER_CREATURE_ROLL_DIE, MEDICINAL_HERB_ACTIVATED
+}
+
+enum BuyWitchBrewResponses {
+    ERROR_NOT_ENOUGH_GOLD, SUCCESS, MAX_ITEMS
 }
 
 public class GameDatabase {
@@ -463,6 +467,11 @@ public class GameDatabase {
                 return EndMoveResponses.EMPTY_WELL;
             } else if ((regionDatabase.getRegion(h.getCurrentSpace()).getFog() != FogKind.NONE) && (regionDatabase.getRegion(h.getCurrentSpace()).isFogRevealed() == false)) {
                 return EndMoveResponses.ACTIVATE_FOG; // display a prompt where user must click activate fog
+            } else if (getGame(gameName).getWitch() != null) {
+                if (h.getCurrentSpace() == getGame(gameName).getWitch().getCurrentPosition()) {
+                    return EndMoveResponses.BUY_WITCH_BREW;
+                }
+                return EndMoveResponses.NONE;
             } else {
                 return EndMoveResponses.NONE;
             }
@@ -1928,7 +1937,7 @@ public class GameDatabase {
         Hero h = g.getSinglePlayer(username).getHero();
         RegionDatabase regionDatabase = g.getRegionDatabase();
 
-        g.setWitch(new Witch(h.getCurrentSpace()));
+        g.setWitch(new Witch(h.getCurrentSpace(), g.getCurrentNumPlayers()));
         h.getItems().add(new Item(ItemType.WITCH_BREW));
 
         Creature gor = new Creature(CreatureType.GOR);
@@ -2254,8 +2263,6 @@ public class GameDatabase {
     public void leaveGame(String gameName, String username) {
         getGame(gameName).setLeftGame(true);
 
-        System.out.println("ok");
-
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
@@ -2264,5 +2271,45 @@ public class GameDatabase {
         games.remove(getGame(gameName));
         masterDatabase.removeGameBCM(gameName);
         masterDatabase.deleteMessageDatabase(gameName);
+    }
+
+    public BuyWitchBrewResponses buyWitchBrew(String gameName, String username, Integer quantity) {
+        Game g = getGame(gameName);
+        Hero h = g.getSinglePlayer(username).getHero();
+
+        int totalGold;
+
+        if (h.getHeroClass() == HeroClass.ARCHER) {
+            totalGold = quantity * g.getWitch().getCostOfWitchBrewArcher();
+        } else {
+            totalGold = quantity * g.getWitch().getCostOfWitchBrew();
+        }
+
+        if (h.getGold() >= totalGold) {
+            ArrayList<Item> purchaseItems = new ArrayList<>();
+            for (int i = 0; i < quantity; i++) {
+                purchaseItems.add(new Item(ItemType.WITCH_BREW));
+            }
+            ArrayList<Item> heroItems = h.getItems();
+            ArrayList<Item> heroItemsReset = new ArrayList<Item>(heroItems);
+            for (Item item : purchaseItems){
+                ItemType type = item.getItemType();
+                if (canAddItem(h,type) == false){
+                    h.setItems(heroItemsReset);
+                    return BuyWitchBrewResponses.MAX_ITEMS;
+                }
+                h.getItems().add(item);
+            }
+            h.setGold(h.getGold() - totalGold);
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+            return BuyWitchBrewResponses.SUCCESS;
+        } else {
+            return BuyWitchBrewResponses.ERROR_NOT_ENOUGH_GOLD;
+        }
     }
 }
