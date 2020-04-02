@@ -282,6 +282,11 @@ public class GameController {
     public BuyWitchBrewResponses buyWitchBrew(@PathVariable String gameName, @PathVariable String username, @RequestBody Integer quantity){
         return MasterDatabase.getInstance().getMasterGameDatabase().buyWitchBrew(gameName, username, quantity);
     }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/activateWizardAbility")
+    public ActivateWizardAbilityResponses activateWizardAbility(@PathVariable String gameName, @PathVariable String username, @RequestBody ActivateWizardTarget activateWizardTarget){
+        return MasterDatabase.getInstance().getMasterGameDatabase().activateWizardAbility(gameName, username, activateWizardTarget);
+    }
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6
     // add turnoptions movePrinceThorald to android and
