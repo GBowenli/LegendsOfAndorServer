@@ -52,7 +52,7 @@ public class Item {
     }
 
     public boolean isLargeItem(){
-        if(this.itemType == ItemType.FALCON || this.itemType == ItemType.SHIELD || this.itemType == ItemType.BOW){
+        if(this.itemType == ItemType.FALCON || this.itemType == ItemType.SHIELD || this.itemType == ItemType.BOW) {
             return true;
         }else{
             return false;

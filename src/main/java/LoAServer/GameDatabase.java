@@ -95,6 +95,15 @@ enum ActivateShieldFightResponses {
     ERROR_DOES_NOT_OWN_SHIELD, ERROR_SHIELD_ALREADY_ACTIVATED, ERROR_INAPPROPRIATE_SHIELD_ACTIVATION, SHIELD_ACTIVATED
 }
 
+enum PendingFalconTradeResponses {
+    HERO_IN_FALCON_TRADE, PENDING_TRADE_SUCCESS,PENDING_TRADE_FAILURE, HERO_AWAITING_FALCON_TRADE
+}
+
+enum AcceptFalconTradeResponses{
+    FALCON_TRADE_ACCEPTED, FALCON_TRADE_ACCEPT_FAILURE
+}
+
+
 enum ActivateWitchesBrewFightResponses {
     ERROR_DOES_NOT_OWN_WITCHES_BREW, ERROR_BV_NOT_SET, ERROR_CANNOT_USE_AFTER_CREATURE_ROLL_DIE, WITCHES_BREW_ACTIVATED
 }
@@ -2260,6 +2269,89 @@ public class GameDatabase {
 
         return LoadGameResponses.LOAD_GAME_SUCCESS;
     }
+
+    public PendingFalconTradeResponses sendFalconTradeRequest(String gameName, String username, HeroClass hero){
+        Game game = getGame(gameName);
+        HeroClass myHero = null;
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getUsername().equals(username)){
+                myHero = game.getPlayers()[i].getHero().getHeroClass();
+                game.getPlayers()[i].getHero().setFalconTradeStatus(FalconTradeStatus.TRADE_PENDING);
+                game.getPlayers()[i].getHero().setFalconTradingWith(hero);
+            }
+        }
+
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getHero().getHeroClass() == hero){
+                if(game.getPlayers()[i].getHero().getFalconTradeStatus() == FalconTradeStatus.IN_TRADE){
+                    return PendingFalconTradeResponses.HERO_IN_FALCON_TRADE;
+                }else if(game.getPlayers()[i].getHero().getFalconTradeStatus() == FalconTradeStatus.TRADE_PENDING){
+                    return PendingFalconTradeResponses.HERO_AWAITING_FALCON_TRADE;
+                }else if (game.getPlayers()[i].getHero().getFalconTradeStatus() == FalconTradeStatus.NOT_IN_TRADE){
+                    game.getPlayers()[i].getHero().setFalconTradeStatus(FalconTradeStatus.TRADE_PENDING);
+                    game.getPlayers()[i].getHero().setFalconTradingWith(myHero);
+                    return PendingFalconTradeResponses.PENDING_TRADE_SUCCESS;
+                }
+            }
+        }
+        return PendingFalconTradeResponses.PENDING_TRADE_FAILURE;
+    }
+
+    public AcceptFalconTradeResponses joinFalconTrade(String gameName, String username, HeroClass heroToTradeWith){
+        Game game = getGame(gameName);
+        HeroClass myHero = null;
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getUsername().equals(username)){
+                myHero = game.getPlayers()[i].getHero().getHeroClass();
+                if(game.getPlayers()[i].getHero().getFalconTradeStatus() == FalconTradeStatus.TRADE_PENDING){
+                    game.getPlayers()[i].getHero().setFalconTradeStatus(FalconTradeStatus.IN_TRADE);
+                    break;
+                }else{
+                    return AcceptFalconTradeResponses.FALCON_TRADE_ACCEPT_FAILURE;
+                }
+            }
+        }
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            if(getGame(gameName).getPlayers()[i].getHero().getHeroClass() == heroToTradeWith){
+                getGame(gameName).getPlayers()[i].getHero().setFalconTradeStatus(FalconTradeStatus.IN_TRADE);
+                FalconTradeObject falconTradeObject = new FalconTradeObject();
+                falconTradeObject.setP1_heroclass(heroToTradeWith);
+                falconTradeObject.setP2_heroclass(myHero);
+                getGame(gameName).getPlayers()[i].getHero().setCurrentFalconTrade(falconTradeObject);
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+        }
+        return AcceptFalconTradeResponses.FALCON_TRADE_ACCEPTED;
+    }
+
+    public void updateFalconTradeObject(String gameName, String username, FalconTradeObject falconTradeObject){
+        Game game = getGame(gameName);
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getHero().getHeroClass() == falconTradeObject.getP1_heroclass()){
+                game.getPlayers()[i].getHero().setCurrentFalconTrade(falconTradeObject);
+            }
+        }
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            if(getGame(gameName).getPlayers()[i].getHero().getHeroClass() == falconTradeObject.getP1_heroclass() || getGame(gameName).getPlayers()[i].getHero().getHeroClass() == falconTradeObject.getP2_heroclass()){
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                System.out.println("pinging " + getGame(gameName).getPlayers()[i].getHero().getHeroClass() );
+            }
+        }
+    }
+
+    public void leaveFalconTrade(String gameName, String username, HeroClass tradingWith){
+        Game game = getGame(gameName);
+        for(int i = 0; i < game.getCurrentNumPlayers(); i++){
+            if(game.getPlayers()[i].getUsername().equals(username) || game.getPlayers()[i].getHero().getHeroClass() == tradingWith){
+                game.getPlayers()[i].getHero().setCurrentFalconTrade(null);
+                game.getPlayers()[i].getHero().setFalconTradingWith(null);
+                game.getPlayers()[i].getHero().setFalconTradeStatus(FalconTradeStatus.NOT_IN_TRADE);
+            }
+        }
+    }
+
 
     public void foundWitch(String gameName, String username) {
         getGame(gameName).setFoundWitch(true);

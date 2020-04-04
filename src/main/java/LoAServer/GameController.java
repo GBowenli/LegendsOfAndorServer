@@ -268,6 +268,27 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().dropRunestone(username,gameName, colour);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/sendFalconTradeRequest")
+    public PendingFalconTradeResponses sendFalconTradeRequest(@PathVariable String gameName,@PathVariable String username, @RequestBody HeroClass hero){
+        return MasterDatabase.getInstance().getMasterGameDatabase().sendFalconTradeRequest(gameName,username,hero);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/joinFalconTrade")
+    public AcceptFalconTradeResponses joinFalconTrade(@PathVariable String gameName, @PathVariable String username, @RequestBody HeroClass hero){
+        return MasterDatabase.getInstance().getMasterGameDatabase().joinFalconTrade(gameName,username,hero);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/updateFalconTradeObject")
+    public void updateFalconTradeObject(@PathVariable String gameName, @PathVariable String username, @RequestBody FalconTradeObject falconTradeObject){
+        MasterDatabase.getInstance().getMasterGameDatabase().updateFalconTradeObject(gameName,username,falconTradeObject);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/leaveFalconTrade")
+    public void leaveFalconTrade(@PathVariable String gameName, @PathVariable String username, @RequestBody HeroClass hero){
+        MasterDatabase.getInstance().getMasterGameDatabase().leaveFalconTrade(gameName,username,hero);
+    }
+
+
     @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/foundWitch")
     public void foundWitch(@PathVariable String gameName, @PathVariable String username){
         MasterDatabase.getInstance().getMasterGameDatabase().foundWitch(gameName, username);
