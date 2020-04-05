@@ -288,6 +288,11 @@ public class GameController {
         MasterDatabase.getInstance().getMasterGameDatabase().leaveFalconTrade(gameName,username,hero);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/processFalconTrade")
+    public ProcessFalconTradeResponses processFalconTrade(@PathVariable String gameName, @RequestBody FalconTradeObject falconTradeObject){
+        return MasterDatabase.getInstance().getMasterGameDatabase().processFalconTrade(gameName,falconTradeObject);
+    }
+
 
     @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/foundWitch")
     public void foundWitch(@PathVariable String gameName, @PathVariable String username){
@@ -308,6 +313,8 @@ public class GameController {
     public ActivateWizardAbilityResponses activateWizardAbility(@PathVariable String gameName, @PathVariable String username, @RequestBody ActivateWizardTarget activateWizardTarget){
         return MasterDatabase.getInstance().getMasterGameDatabase().activateWizardAbility(gameName, username, activateWizardTarget);
     }
+
+
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6
     // add turnoptions movePrinceThorald to android and
