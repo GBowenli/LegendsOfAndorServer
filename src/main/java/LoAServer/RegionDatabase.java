@@ -136,7 +136,7 @@ public class RegionDatabase {
         regionDatabase.get(4).setAdjacentRegions(new ArrayList<>(Arrays.asList(0, 1, 3, 20, 21, 5)));
         regionDatabase.get(5).setAdjacentRegions(new ArrayList<>(Arrays.asList(0, 4, 21)));
         regionDatabase.get(6).setAdjacentRegions(new ArrayList<>(Arrays.asList(0, 11, 13, 17, 14, 2)));
-        regionDatabase.get(7).setAdjacentRegions(new ArrayList<>(Arrays.asList(0, 13, 9, 8, 11)));
+        regionDatabase.get(7).setAdjacentRegions(new ArrayList<>(Arrays.asList(0, 15, 9, 8, 11)));
         regionDatabase.get(8).setAdjacentRegions(new ArrayList<>(Arrays.asList(7, 9, 11)));
         regionDatabase.get(9).setAdjacentRegions(new ArrayList<>(Arrays.asList(15, 7, 8)));
         regionDatabase.get(10).setAdjacentRegions(new ArrayList<>(Arrays.asList(3, 14, 18, 19)));
