@@ -314,6 +314,11 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().activateWizardAbility(gameName, username, activateWizardTarget);
     }
 
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateEvent")
+    public void activateEvent (@PathVariable String gameName, @PathVariable String username, @RequestBody Integer r) {
+        MasterDatabase.getInstance().getMasterGameDatabase().activateEvent(gameName, username, r);
+    }
+
 
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6

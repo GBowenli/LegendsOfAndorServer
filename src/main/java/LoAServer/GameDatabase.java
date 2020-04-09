@@ -11,6 +11,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+import static LoAServer.HeroClass.WIZARD;
+
 enum HostGameResponses {
     HOST_GAME_SUCCESS, ERROR_GAME_ALREADY_EXISTS
 }
@@ -295,7 +297,7 @@ public class GameDatabase {
                 getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getWarriorItems());
                 getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getWarriorGold() + " Gold and " + itemDistribution.getWarriorItems().size() + " Wineskins");
             }
-            if(getGame(gameName).getPlayers()[i].getHero().getHeroClass()== HeroClass.WIZARD){
+            if(getGame(gameName).getPlayers()[i].getHero().getHeroClass()== WIZARD){
                 getGame(gameName).getPlayers()[i].getHero().setGold(itemDistribution.getWizardGold());
                 getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getWizardItems());
                 getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getWizardGold() + " Gold and " + itemDistribution.getWizardItems().size() + " Wineskins");
@@ -929,7 +931,7 @@ public class GameDatabase {
             }
         }
 
-        if (h.getHeroClass() == HeroClass.WIZARD) {
+        if (h.getHeroClass() == WIZARD) {
             if (greenRuneStoneFound && blueRuneStoneFound && yellowRuneStoneFound) {
                 fight.setWizardDice(new ArrayList<>(Arrays.asList(-1)));
 
@@ -1363,7 +1365,7 @@ public class GameDatabase {
 
         if (h.getHeroClass() == HeroClass.ARCHER) {
             return ActivateHelmResponses.ERROR_ARCHER;
-        } else if (h.getHeroClass() == HeroClass.WIZARD) {
+        } else if (h.getHeroClass() == WIZARD) {
             return ActivateHelmResponses.ERROR_WIZARD;
         }
 
@@ -2428,7 +2430,7 @@ public class GameDatabase {
             return ActivateWizardAbilityResponses.ERROR_WIZARD_ABILITY_ALREADY_USED;
         }
 
-        if (h.getHeroClass() != HeroClass.WIZARD) {
+        if (h.getHeroClass() != WIZARD) {
             return ActivateWizardAbilityResponses.ERROR_NOT_WIZARD;
         } else {
             if (activateWizardTarget.getHeroClass() == HeroClass.ARCHER) {
@@ -2747,5 +2749,61 @@ public class GameDatabase {
         return ProcessFalconTradeResponses.TRADE_PROCESSED;
 
     }
+    public void activateEvent(String gameName, String username, int r) {
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        Player[] players = getGame(gameName).getPlayers();
 
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        int region = h.getCurrentSpace();
+
+
+            if (r == 0) {
+                Hero w = getGame(gameName).getHeroByHC(HeroClass.WIZARD);
+                Hero a = getGame(gameName).getHeroByHC(HeroClass.ARCHER);
+                if(w!=null){ w.setWillPower(w.getWillPower()+3);}
+                if(a!=null){ a.setWillPower(a.getWillPower()+3);}
+
+            } else if (r == 1) {
+                for(int i=0; i<players.length;i++)
+                {
+                    Hero ph= players[i].getHero();
+                    if(ph.getCurrentSpace()<=20 && ph.getCurrentSpace()>=0 )
+                    {ph.setWillPower(ph.getWillPower()-3);}
+                }
+
+            } else if (r == 2) {
+                for(int i=0; i<players.length;i++)
+                {
+                    Hero ph= players[i].getHero();
+                    if(ph.getCurrentHour()==0)
+                    {ph.setWillPower(ph.getWillPower()-2);}
+                }
+            } else if (r == 3) {
+                for(int i=0; i<players.length;i++)
+                {
+                    Hero ph= players[i].getHero();
+                    if(ph.getCurrentHour()==0)
+                    {ph.setWillPower(ph.getWillPower()+2);}
+                }
+            } else if (r == 4) {
+                for(int i=0; i<players.length;i++)
+                {
+                    Hero ph= players[i].getHero();
+                    if(ph.getCurrentSpace()<=70 && ph.getCurrentSpace()>=37 )
+                    {ph.setWillPower(ph.getWillPower()-3);}
+                }
+
+            } else{
+
+            }
+
+
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+            }
+
+
+
+    }
 }
