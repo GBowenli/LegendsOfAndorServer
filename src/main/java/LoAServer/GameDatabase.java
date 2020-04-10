@@ -2736,7 +2736,7 @@ public class GameDatabase {
         for(Item item : hero1.getItems()){
             if(item.getItemType() == ItemType.FALCON){
                 item.setNumUses(item.getNumUses()-1);
-                break;
+                break; //only update one falcon
             }
         }
 
