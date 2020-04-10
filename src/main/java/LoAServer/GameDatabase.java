@@ -2342,7 +2342,6 @@ public class GameDatabase {
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             if(getGame(gameName).getPlayers()[i].getHero().getHeroClass() == falconTradeObject.getP1_heroclass() || getGame(gameName).getPlayers()[i].getHero().getHeroClass() == falconTradeObject.getP2_heroclass()){
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                System.out.println("pinging " + getGame(gameName).getPlayers()[i].getHero().getHeroClass() );
             }
         }
     }
@@ -2737,6 +2736,7 @@ public class GameDatabase {
         for(Item item : hero1.getItems()){
             if(item.getItemType() == ItemType.FALCON){
                 item.setNumUses(item.getNumUses()-1);
+                break;
             }
         }
 
