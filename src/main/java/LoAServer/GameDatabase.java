@@ -126,6 +126,10 @@ enum ActivateWizardAbilityResponses {
     ERROR_NOT_WIZARD, ERROR_DIE_NOT_FLIPPABLE, ERROR_HERO_ALREADY_CALCULATED_BV, ERROR_WIZARD_ABILITY_ALREADY_USED, SUCCESS
 }
 
+enum RollDieOneByOneResponses {
+    ERROR_NO_MORE_DIE_TO_ROLL, SUCCESS
+}
+
 public class GameDatabase {
     private ArrayList<Game> games;
 
@@ -1056,6 +1060,101 @@ public class GameDatabase {
 
                     return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
                 }
+            }
+        }
+    }
+
+    public RollDieOneByOneResponses rollDieOneByOne(String gameName, String username, Integer dieRoll) {
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+        Fight fight = getGame(gameName).getCurrentFight();
+
+        if (h.getHeroClass().equals(HeroClass.ARCHER)) {
+            int indexOfZero = -1;
+
+            for (int i = 0; i < fight.getArcherDice().size(); i++) {
+                if (fight.getArcherDice().get(i) == 0) {
+                    indexOfZero = i;
+                    break;
+                }
+            }
+
+            if (indexOfZero != -1) {
+                fight.getArcherDice().set(indexOfZero, dieRoll);
+
+                MasterDatabase masterDatabase = MasterDatabase.getInstance();
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
+                return RollDieOneByOneResponses.SUCCESS;
+            } else {
+                return RollDieOneByOneResponses.ERROR_NO_MORE_DIE_TO_ROLL;
+            }
+        } else if (h.getHeroClass().equals(HeroClass.WIZARD)) {
+            int indexOfZero = -1;
+
+            for (int i = 0; i < fight.getWizardDice().size(); i++) {
+                if (fight.getWizardDice().get(i) == 0) {
+                    indexOfZero = i;
+                    break;
+                }
+            }
+
+            if (indexOfZero != -1) {
+                fight.getWizardDice().set(indexOfZero, dieRoll);
+
+                MasterDatabase masterDatabase = MasterDatabase.getInstance();
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
+                return RollDieOneByOneResponses.SUCCESS;
+            } else {
+                return RollDieOneByOneResponses.ERROR_NO_MORE_DIE_TO_ROLL;
+            }
+        } else if (h.getHeroClass().equals(HeroClass.WARRIOR)) {
+            int indexOfZero = -1;
+
+            for (int i = 0; i < fight.getWarriorDice().size(); i++) {
+                if (fight.getWarriorDice().get(i) == 0) {
+                    indexOfZero = i;
+                    break;
+                }
+            }
+
+            if (indexOfZero != -1) {
+                fight.getWarriorDice().set(indexOfZero, dieRoll);
+
+                MasterDatabase masterDatabase = MasterDatabase.getInstance();
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
+                return RollDieOneByOneResponses.SUCCESS;
+            } else {
+                return RollDieOneByOneResponses.ERROR_NO_MORE_DIE_TO_ROLL;
+            }
+        } else { // dwarf
+            int indexOfZero = -1;
+
+            for (int i = 0; i < fight.getDwarfDice().size(); i++) {
+                if (fight.getDwarfDice().get(i) == 0) {
+                    indexOfZero = i;
+                    break;
+                }
+            }
+
+            if (indexOfZero != -1) {
+                fight.getDwarfDice().set(indexOfZero, dieRoll);
+
+                MasterDatabase masterDatabase = MasterDatabase.getInstance();
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                }
+
+                return RollDieOneByOneResponses.SUCCESS;
+            } else {
+                return RollDieOneByOneResponses.ERROR_NO_MORE_DIE_TO_ROLL;
             }
         }
     }

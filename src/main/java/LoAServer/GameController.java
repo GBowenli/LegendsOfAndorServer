@@ -97,6 +97,11 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().getDice(gameName, username);
     }
 
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/rollDieOneByOne")
+    public RollDieOneByOneResponses rollDieOneByOne(@PathVariable String gameName, @PathVariable String username, @RequestBody Integer diceRoll) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().rollDieOneByOne(gameName, username, diceRoll);
+    }
+
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/calculateBattleValue")
     public Integer calculateBattleValue(@PathVariable String gameName, @PathVariable String username, @RequestBody ArrayList<Integer> diceRolls) {
         return MasterDatabase.getInstance().getMasterGameDatabase().calculateBattleValue(gameName, username, diceRolls);
