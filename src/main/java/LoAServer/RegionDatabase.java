@@ -341,30 +341,38 @@ public class RegionDatabase {
         ArrayList<Region> regionsWithCreatures = new ArrayList<>();
 
         for (Region region : regionDatabase) {
-            if (region.getCurrentCreatures().size() > 0) {
-                if (region.getCurrentCreatures().get(0).getCreatureType() == CreatureType.GOR) {
-                    regionsWithCreatures.add(region);
+            if (region.getNumber() != 80) {
+                if (region.getCurrentCreatures().size() > 0) {
+                    if (region.getCurrentCreatures().get(0).getCreatureType() == CreatureType.GOR) {
+                        regionsWithCreatures.add(region);
+                    }
                 }
             }
         }
         for (Region region : regionDatabase) {
-            if (region.getCurrentCreatures().size() > 0) {
-                if (region.getCurrentCreatures().get(0).getCreatureType() == CreatureType.SKRAL) {
-                    regionsWithCreatures.add(region);
+            if (region.getNumber() != 80) {
+                if (region.getCurrentCreatures().size() > 0) {
+                    if (region.getCurrentCreatures().get(0).getCreatureType() == CreatureType.SKRAL) {
+                        regionsWithCreatures.add(region);
+                    }
                 }
             }
         }
         for (Region region : regionDatabase) {
-            if (region.getCurrentCreatures().size() > 0) {
-                if (region.getCurrentCreatures().get(0).getCreatureType() == CreatureType.WARDRAKS) {
-                    regionsWithCreatures.add(region);
+            if (region.getNumber() != 80) {
+                if (region.getCurrentCreatures().size() > 0) {
+                    if (region.getCurrentCreatures().get(0).getCreatureType() == CreatureType.WARDRAKS) {
+                        regionsWithCreatures.add(region);
+                    }
                 }
             }
         }
         for (Region region : regionDatabase) {
-            if (region.getCurrentCreatures().size() > 0) {
-                if (region.getCurrentCreatures().get(0).getCreatureType() == CreatureType.TROLL) {
-                    regionsWithCreatures.add(region);
+            if (region.getNumber() != 80) {
+                if (region.getCurrentCreatures().size() > 0) {
+                    if (region.getCurrentCreatures().get(0).getCreatureType() == CreatureType.TROLL) {
+                        regionsWithCreatures.add(region);
+                    }
                 }
             }
         }
@@ -375,9 +383,11 @@ public class RegionDatabase {
     public ArrayList<Region> getAllRegionsWithWardraks() {
         ArrayList<Region> regionsWithWardraks = new ArrayList<>();
         for (Region region : regionDatabase) {
-            if (region.getCurrentCreatures().size() > 0) {
-                if (region.getCurrentCreatures().get(0).getCreatureType() == CreatureType.WARDRAKS) {
-                    regionsWithWardraks.add(region);
+            if (region.getNumber() != 80) {
+                if (region.getCurrentCreatures().size() > 0) {
+                    if (region.getCurrentCreatures().get(0).getCreatureType() == CreatureType.WARDRAKS) {
+                        regionsWithWardraks.add(region);
+                    }
                 }
             }
         }
