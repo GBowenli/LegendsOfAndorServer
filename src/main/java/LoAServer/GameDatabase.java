@@ -1784,6 +1784,9 @@ public class GameDatabase {
     }
 
     public void saveGame(String gameName) {
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        masterDatabase.getSavedGameDatabase().put(gameName, getGame(gameName));
+
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter("savedGames", true));
             writer.write(new Gson().toJson(getGame(gameName)));
