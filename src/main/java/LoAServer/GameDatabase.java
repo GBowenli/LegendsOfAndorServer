@@ -370,6 +370,10 @@ public class GameDatabase {
 
     public GetAvailableRegionsRC getAvailableRegions (String gameName, String username) {
         Player p = getGame(gameName).getSinglePlayer(username);
+        ArrayList<Integer> adjacentRegions = new ArrayList<>();
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+
+        adjacentRegions.addAll(regionDatabase.getRegion(p.getHero().getCurrentSpace()).getAdjacentRegions());
 
         if (getGame(gameName).getCurrentHero().equals(p.getHero())) {
             if (p.getHero().getCurrentHour() == 10) {
@@ -387,10 +391,7 @@ public class GameDatabase {
                     return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.NOT_ENOUGH_WILLPOWER);
                 }
 
-                ArrayList<Integer> adjacentRegions = new ArrayList<>();
-                RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
 
-                adjacentRegions.addAll(regionDatabase.getRegion(p.getHero().getCurrentSpace()).getAdjacentRegions());
 
                 if (regionDatabase.getRegion(p.getHero().getCurrentSpace()).isBridge()) {
                     adjacentRegions.add(regionDatabase.getRegion(p.getHero().getCurrentSpace()).getBridgeAdjacentRegion());
@@ -403,7 +404,7 @@ public class GameDatabase {
                 }
             }
         } else {
-            return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.NOT_CURRENT_TURN);
+            return new GetAvailableRegionsRC(adjacentRegions, GetAvailableRegionsReponses.NOT_CURRENT_TURN);
         }
     }
 
