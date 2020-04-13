@@ -756,12 +756,13 @@ public class GameDatabase {
 
             if (h.getHeroClass() == HeroClass.ARCHER || ownsBow) {
                 ArrayList<Integer> possibleCreaturesToFight = new ArrayList<>();
-                ArrayList<Integer> adjacentRegions = new ArrayList<>();
+                ArrayList<Integer> adjacentRegions;
 
                 adjacentRegions = regionDatabase.getRegion(h.getCurrentSpace()).getAdjacentRegions();
                 if (regionDatabase.getRegion(h.getCurrentSpace()).isBridge()) {
                     adjacentRegions.add(regionDatabase.getRegion(h.getCurrentSpace()).getBridgeAdjacentRegion());
                 }
+                adjacentRegions.add(h.getCurrentSpace());
 
                 for (Integer space : adjacentRegions) {
                     if (regionDatabase.getRegion(space).getCurrentCreatures().size() > 0) {
@@ -2582,7 +2583,7 @@ public class GameDatabase {
 
                     return ActivateWizardAbilityResponses.SUCCESS;
                 }
-            } else { // dwarf
+            } else if (activateWizardTarget.getHeroClass() == HeroClass.DWARF) {
                 if (fight.getDwarfDice().get(activateWizardTarget.getDieIndex()) == 0 || fight.getDwarfDice().get(activateWizardTarget.getDieIndex()) == -1) {
                     return ActivateWizardAbilityResponses.ERROR_DIE_NOT_FLIPPABLE;
                 }
@@ -2598,6 +2599,30 @@ public class GameDatabase {
                     return ActivateWizardAbilityResponses.ERROR_HERO_ALREADY_CALCULATED_BV;
                 } else {
                     fight.getDwarfDice().set(activateWizardTarget.getDieIndex(), activateWizardTarget.getNewDieValue());
+
+                    fight.setWizardAbilityUsed(true);
+                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                        masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                    }
+
+                    return ActivateWizardAbilityResponses.SUCCESS;
+                }
+            } else { // wizard
+                if (fight.getWizardDice().get(activateWizardTarget.getDieIndex()) == 0 || fight.getWizardDice().get(activateWizardTarget.getDieIndex()) == -1) {
+                    return ActivateWizardAbilityResponses.ERROR_DIE_NOT_FLIPPABLE;
+                }
+
+                int targetHeroIndex = 0;
+                for (int i = 0; i < fight.getHeroes().size(); i++) {
+                    if (fight.getHeroes().get(i).getHeroClass() == WIZARD) {
+                        targetHeroIndex = i;
+                    }
+                }
+
+                if (fight.getHeroesBattleScores().get(targetHeroIndex) > 0) {
+                    return ActivateWizardAbilityResponses.ERROR_HERO_ALREADY_CALCULATED_BV;
+                } else {
+                    fight.getWizardDice().set(activateWizardTarget.getDieIndex(), activateWizardTarget.getNewDieValue());
 
                     fight.setWizardAbilityUsed(true);
                     for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
