@@ -282,6 +282,9 @@ public class GameDatabase {
                 getGame(gameName).setGoldenShields(1);
             }
 
+            // testing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DELETE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            getGame(gameName).setGoldenShields(10000);
+
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
@@ -1808,6 +1811,8 @@ public class GameDatabase {
         regionDatabase.getRegion(skralStronghold).getCurrentCreatures().clear();
         regionDatabase.getRegion(skralStronghold).getCurrentCreatures().add(new Creature(getGame(gameName).getDifficultMode(), getGame(gameName).getCurrentNumPlayers()));
 
+        System.out.println("!!!!!!" + regionDatabase.getRegion(skralStronghold).getCurrentCreatures().size());
+
         regionDatabase.getRegion(27).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
         regionDatabase.getRegion(31).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
         regionDatabase.getRegion(29).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
@@ -1919,28 +1924,34 @@ public class GameDatabase {
                 }
 
                 // add all regions adjacent by 2 spaces
+                ArrayList<Integer> adjacentMoves  = new ArrayList<>();
                 for (Integer move : moves) {
-                    moves.addAll(regionDatabase.getRegion(move).getAdjacentRegions());
+                    adjacentMoves.addAll(regionDatabase.getRegion(move).getAdjacentRegions());
                     if (regionDatabase.getRegion(move).isBridge()) {
-                        moves.add(regionDatabase.getRegion(move).getBridgeAdjacentRegion());
+                        adjacentMoves.add(regionDatabase.getRegion(move).getBridgeAdjacentRegion());
                     }
                 }
+                moves.addAll(adjacentMoves);
 
                 // add all regions adjacent by 3 spaces
+                adjacentMoves  = new ArrayList<>();
                 for (Integer move : moves) {
-                    moves.addAll(regionDatabase.getRegion(move).getAdjacentRegions());
+                    adjacentMoves.addAll(regionDatabase.getRegion(move).getAdjacentRegions());
                     if (regionDatabase.getRegion(move).isBridge()) {
-                        moves.add(regionDatabase.getRegion(move).getBridgeAdjacentRegion());
+                        adjacentMoves.add(regionDatabase.getRegion(move).getBridgeAdjacentRegion());
                     }
                 }
+                moves.addAll(adjacentMoves);
 
                 // add all regions adjacent by 4 spaces
+                adjacentMoves  = new ArrayList<>();
                 for (Integer move : moves) {
-                    moves.addAll(regionDatabase.getRegion(move).getAdjacentRegions());
+                    adjacentMoves.addAll(regionDatabase.getRegion(move).getAdjacentRegions());
                     if (regionDatabase.getRegion(move).isBridge()) {
-                        moves.add(regionDatabase.getRegion(move).getBridgeAdjacentRegion());
+                        adjacentMoves.add(regionDatabase.getRegion(move).getBridgeAdjacentRegion());
                     }
                 }
+                moves.addAll(adjacentMoves);
 
                 // remove duplicates
                 LinkedHashSet<Integer> hashSet = new LinkedHashSet<>(moves);
