@@ -711,6 +711,7 @@ public class GameDatabase {
             return PassResponses.MUST_END_DAY;
         } else { // can pass turn
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
+            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
             if (getGame(gameName).getCurrentHero() == null) {
                 getGame(gameName).setCurrentHero(h);
@@ -722,8 +723,6 @@ public class GameDatabase {
                 h.setWillPower(h.getWillPower()-2);
                 return PassResponses.PASS_SUCCESSFUL_WP_DEDUCTED;
             }
-
-            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
             MasterDatabase masterDatabase = MasterDatabase.getInstance();
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
@@ -899,6 +898,8 @@ public class GameDatabase {
         int index = fight.getHeroes().indexOf(h);
         if (index != -1) {
             if (fight.getHeroesBattleScores().get(index) > 0) {
+                System.out.println("wtf3");
+
                 return LeaveFightResponses.CANNOT_LEAVE_AFTER_ROLLING;
             }
         }
@@ -911,13 +912,12 @@ public class GameDatabase {
         if (fight.getHeroes().size() == 0) {
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
+            getGame(gameName).setCurrentFight(null);
         }
 
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
-
-        getGame(gameName).setCurrentFight(null);
 
         return LeaveFightResponses.SUCCESS;
     }
@@ -2483,9 +2483,14 @@ public class GameDatabase {
     }
 
     public void leaveGame(String gameName, String username) {
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
         getGame(gameName).setLeftGame(true);
 
-        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterPlayerDatabase().getPlayer(getGame(gameName).getPlayers()[i].getUsername()).setHero(null);
+            masterDatabase.getMasterPlayerDatabase().getPlayer(getGame(gameName).getPlayers()[i].getUsername()).setReady(false);
+        }
+
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
@@ -2569,7 +2574,14 @@ public class GameDatabase {
                     max = fight.getArcherDice().get(indexOfZero-1);
                 }
 
-                getGame(gameName).getCurrentFight().getHeroesBattleScores().set(getGame(gameName).getCurrentFight().getHeroes().indexOf(h), max + h.getStrength());
+                int indexOfArcher = 0;
+                for (int i = 0; i < fight.getHeroes().size(); i++) {
+                    if (fight.getHeroes().get(i).getHeroClass() == HeroClass.ARCHER) {
+                        indexOfArcher = i;
+                    }
+                }
+
+                getGame(gameName).getCurrentFight().getHeroesBattleScores().set(indexOfArcher, max + h.getStrength());
 
                 fight.setWizardAbilityUsed(true);
 
@@ -2608,7 +2620,14 @@ public class GameDatabase {
                     }
                 }
 
-                getGame(gameName).getCurrentFight().getHeroesBattleScores().set(getGame(gameName).getCurrentFight().getHeroes().indexOf(h), max + h.getStrength());
+                int indexOfWarrior = 0;
+                for (int i = 0; i < fight.getHeroes().size(); i++) {
+                    if (fight.getHeroes().get(i).getHeroClass() == HeroClass.WARRIOR) {
+                        indexOfWarrior = i;
+                    }
+                }
+
+                getGame(gameName).getCurrentFight().getHeroesBattleScores().set(indexOfWarrior, max + h.getStrength());
 
                 fight.setWizardAbilityUsed(true);
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
@@ -2646,7 +2665,14 @@ public class GameDatabase {
                     }
                 }
 
-                getGame(gameName).getCurrentFight().getHeroesBattleScores().set(getGame(gameName).getCurrentFight().getHeroes().indexOf(h), max + h.getStrength());
+                int indexOfDwarf = 0;
+                for (int i = 0; i < fight.getHeroes().size(); i++) {
+                    if (fight.getHeroes().get(i).getHeroClass() == HeroClass.DWARF) {
+                        indexOfDwarf = i;
+                    }
+                }
+
+                getGame(gameName).getCurrentFight().getHeroesBattleScores().set(indexOfDwarf, max + h.getStrength());
 
                 fight.setWizardAbilityUsed(true);
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
@@ -2692,7 +2718,14 @@ public class GameDatabase {
                     }
                 }
 
-                getGame(gameName).getCurrentFight().getHeroesBattleScores().set(getGame(gameName).getCurrentFight().getHeroes().indexOf(h), max + h.getStrength());
+                int indexOfWizard = 0;
+                for (int i = 0; i < fight.getHeroes().size(); i++) {
+                    if (fight.getHeroes().get(i).getHeroClass() == HeroClass.WIZARD) {
+                        indexOfWizard = i;
+                    }
+                }
+
+                getGame(gameName).getCurrentFight().getHeroesBattleScores().set(indexOfWizard, max + h.getStrength());
 
                 fight.setWizardAbilityUsed(true);
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
