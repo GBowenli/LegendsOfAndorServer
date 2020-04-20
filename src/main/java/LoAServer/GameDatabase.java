@@ -210,6 +210,9 @@ public class GameDatabase {
             masterDatabase.removeGameBCM(username);
             masterDatabase.removeMessageDatabaseBCM(username);
 
+            masterDatabase.getMasterPlayerDatabase().getPlayer(username).setHero(null);
+            masterDatabase.getMasterPlayerDatabase().getPlayer(username).setReady(false);
+
             if (getGame(gameName).getCurrentNumPlayers() == 1) {
                 games.remove(getGame(gameName));
                 masterDatabase.deleteMessageDatabase(gameName);
