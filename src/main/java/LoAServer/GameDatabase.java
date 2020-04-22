@@ -287,9 +287,6 @@ public class GameDatabase {
 
             // testing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DELETE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             getGame(gameName).setGoldenShields(10000);
-            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().setGold(10000);
-            }
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
@@ -325,6 +322,11 @@ public class GameDatabase {
                 getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getArcherItems());
                 getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getArcherGold() + " Gold and " + itemDistribution.getArcherItems().size() + " Wineskins");
             }
+        }
+
+        // TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            MasterDatabase.getInstance().getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().setGold(10000);
         }
 
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
