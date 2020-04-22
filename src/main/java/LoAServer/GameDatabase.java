@@ -684,8 +684,9 @@ public class GameDatabase {
                 }
 
                 if (getGame(gameName).getGoldenShields() < 0) { // game over
-                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) { // reset heroes
+                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) { // reset heroes and ready
                         masterDatabase.getMasterPlayerDatabase().getPlayer(getGame(gameName).getPlayers()[i].getUsername()).setHero(null);
+                        masterDatabase.getMasterPlayerDatabase().getPlayer(getGame(gameName).getPlayers()[i].getUsername()).setReady(false);
                     }
 
                     games.remove(getGame(gameName));
@@ -749,12 +750,9 @@ public class GameDatabase {
             return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.NOT_CURRENT_TURN, new ArrayList<>());
         } else if (h.isHasEndedDay()) {
             return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.DAY_ENDED, new ArrayList<>());
-        } else if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().size() == 0) {
-            return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.NO_CREATURE_FOUND, new ArrayList<>());
         } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
             return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.CANNOT_FIGHT_AFTER_MOVE, new ArrayList<>());
         } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE_PRINCE) {
-            System.out.println("wtf");
             return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.CANNOT_FIGHT_AFTER_MOVE_PRINCE, new ArrayList<>());
         } else {
             boolean ownsBow = false;
@@ -780,9 +778,17 @@ public class GameDatabase {
                         possibleCreaturesToFight.add(space);
                     }
                 }
-                return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.SUCCESS, possibleCreaturesToFight);
+                if (possibleCreaturesToFight.size() > 0) {
+                    return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.SUCCESS, possibleCreaturesToFight);
+                } else {
+                    return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.NO_CREATURE_FOUND, new ArrayList<>());
+                }
             } else {
-                return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.SUCCESS, new ArrayList<>(Arrays.asList(h.getCurrentSpace())));
+                if (regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().size() == 0) {
+                    return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.NO_CREATURE_FOUND, new ArrayList<>());
+                } else {
+                    return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.SUCCESS, new ArrayList<>(Arrays.asList(h.getCurrentSpace())));
+                }
             }
         }
     }
@@ -1588,8 +1594,8 @@ public class GameDatabase {
 
             if (item.getItemType() == ItemType.SHIELD) {
                 h.setShieldActivatedFight(true);
-                item.setNumUses(item.getNumUses()-1);
-                if (item.getNumUses() == 0) {
+                item.setNumUses(item.getNumUses()+1);
+                if (item.getNumUses() == 2) {
                     it.remove();
                 }
                 break;
@@ -1622,8 +1628,8 @@ public class GameDatabase {
                 Item item = it.next();
 
                 if (item.getItemType() == ItemType.WITCH_BREW) {
-                    item.setNumUses(item.getNumUses()-1);
-                    if (item.getNumUses() == 0) {
+                    item.setNumUses(item.getNumUses()+1);
+                    if (item.getNumUses() == 2) {
                         it.remove();
                     }
 
@@ -2109,6 +2115,7 @@ public class GameDatabase {
         Game g = getGame(gameName);
         RegionDatabase regionDatabase = g.getRegionDatabase();
         boolean medicinalHerbInCastle = false;
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
         for (Item item : regionDatabase.getRegion(0).getItems()) {
             if (item.getItemType() == ItemType.MEDICINAL_HERB) {
@@ -2123,7 +2130,11 @@ public class GameDatabase {
             g.setGameStatus(GameStatus.GAME_LOST);
         }
 
-        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterPlayerDatabase().getPlayer(getGame(gameName).getPlayers()[i].getUsername()).setHero(null);
+            masterDatabase.getMasterPlayerDatabase().getPlayer(getGame(gameName).getPlayers()[i].getUsername()).setReady(false);
+        }
+
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
