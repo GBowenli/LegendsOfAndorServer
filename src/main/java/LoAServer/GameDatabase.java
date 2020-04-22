@@ -278,7 +278,8 @@ public class GameDatabase {
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
             if (getGame(gameName).getCurrentNumPlayers() == 2) {
-                getGame(gameName).setGoldenShields(3);
+                //getGame(gameName).setGoldenShields(3);
+                getGame(gameName).setGoldenShields(50);
             } else if (getGame(gameName).getCurrentNumPlayers() == 3) {
                 getGame(gameName).setGoldenShields(2);
             } else { // equals 4
@@ -2760,7 +2761,7 @@ public class GameDatabase {
         Game game = getGame(gameName);
         Hero hero1 = null;
         Hero hero2 = null;
-
+        System.out.println(falconTrade.toString());
         for(int i = 0; i < game.getCurrentNumPlayers(); i++){
             if(game.getPlayers()[i].getHero().getHeroClass() == falconTrade.getP1_heroclass()){
                 hero1 = game.getPlayers()[i].getHero();
@@ -2791,7 +2792,7 @@ public class GameDatabase {
         for(Item item : hero1.getItems()){
             if(item.getItemType() == ItemType.HELM){
                 p1_currentNumHelms++;
-            }else{
+            }else if(item.getItemType() == ItemType.WITCH_BREW || item.getItemType() == ItemType.WINESKIN || item.getItemType() == ItemType.TELESCOPE || item.getItemType() == ItemType.MEDICINAL_HERB){
                 p1_currentNumItems++;
             }
         }
@@ -2799,203 +2800,207 @@ public class GameDatabase {
         for(Item item : hero2.getItems()){
             if(item.getItemType() == ItemType.HELM){
                 p2_currentNumHelms++;
-            }else{
+            }else if(item.getItemType() == ItemType.WITCH_BREW || item.getItemType() == ItemType.WINESKIN || item.getItemType() == ItemType.TELESCOPE || item.getItemType() == ItemType.MEDICINAL_HERB){
                 p2_currentNumItems++;
             }
         }
 
-        if(p1_smallItemsToRecieve + p1_currentNumItems > 3 || p2_smallItemsToRecieve + p2_currentNumItems > 3 ){
+        if(p1_smallItemsToRecieve - p2_smallItemsToRecieve + p1_currentNumItems > 3 || p2_smallItemsToRecieve - p1_smallItemsToRecieve + p2_currentNumItems > 3 || p1_currentNumHelms + falconTrade.getP2_helm() - falconTrade.getP1_helm() > 1 || p2_currentNumHelms + falconTrade.getP1_helm() - falconTrade.getP2_helm() > 1 ) {
+            System.out.println("P1 Small Items to recieve: " + p1_smallItemsToRecieve);
+            System.out.println("P1 Current Num small Items: " + p1_currentNumItems);
+            System.out.println("P2 Small Items to recieve: " + p2_smallItemsToRecieve);
+            System.out.println("P2 Current Num small Items: " + p2_currentNumItems);
+            System.out.println("P1 helm to recieve: " + falconTrade.getP2_helm());
+            System.out.println("P1 Current num helms: " + p1_currentNumHelms);
+            System.out.println("P2 helms to recieve: " + falconTrade.getP1_helm());
+            System.out.println("P2 Current Num small Items: " + p2_currentNumHelms);
             return ProcessFalconTradeResponses.CANNOT_ACCEPT_ITEMS;
-        }
+        }else{
+            hero1.setGold(hero1.getGold() - falconTrade.getP1_gold() + falconTrade.getP2_gold());
+            hero2.setGold(hero2.getGold() - falconTrade.getP2_gold() + falconTrade.getP1_gold());
 
-        if(p1_currentNumHelms + falconTrade.getP2_helm() > 1 || p2_currentNumHelms + falconTrade.getP1_helm() > 1){
-            return ProcessFalconTradeResponses.CANNOT_ACCEPT_ITEMS;
-        }
+            for(int i = 0; i < falconTrade.getP1_wineskin(); i++){
+                for(Item item : hero1.getItems()){
+                    if(item.getItemType() == ItemType.WINESKIN){
+                        hero1.getItems().remove(item);
+                        hero2.getItems().add(item);
+                        break;
+                    }
+                }
+            }
 
-        hero1.setGold(hero1.getGold() - falconTrade.getP1_gold() + falconTrade.getP2_gold());
-        hero2.setGold(hero2.getGold() - falconTrade.getP2_gold() + falconTrade.getP1_gold());
+            for(int i = 0; i < falconTrade.getP2_wineskin(); i++){
+                for(Item item : hero2.getItems()){
+                    if(item.getItemType() == ItemType.WINESKIN){
+                        hero2.getItems().remove(item);
+                        hero1.getItems().add(item);
+                        break;
+                    }
+                }
+            }
 
-        for(int i = 0; i < falconTrade.getP1_wineskin(); i++){
+            for(int i = 0; i < falconTrade.getP1_telescope(); i++){
+                for(Item item : hero1.getItems()){
+                    if(item.getItemType() == ItemType.TELESCOPE){
+                        hero1.getItems().remove(item);
+                        hero2.getItems().add(item);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP2_telescope(); i++){
+                for(Item item : hero2.getItems()){
+                    if(item.getItemType() == ItemType.TELESCOPE){
+                        hero2.getItems().remove(item);
+                        hero1.getItems().add(item);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP1_helm(); i++){
+                for(Item item : hero1.getItems()){
+                    if(item.getItemType() == ItemType.HELM){
+                        hero1.getItems().remove(item);
+                        hero2.getItems().add(item);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP2_helm(); i++){
+                for(Item item : hero2.getItems()){
+                    if(item.getItemType() == ItemType.HELM){
+                        hero2.getItems().remove(item);
+                        hero1.getItems().add(item);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP1_medicinal_herb(); i++){
+                for(Item item : hero1.getItems()){
+                    if (item.getItemType() == ItemType.MEDICINAL_HERB){
+                        hero1.getItems().remove(item);
+                        hero2.getItems().add(item);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP2_medicinal_herb(); i++){
+                for(Item item : hero2.getItems()){
+                    if (item.getItemType() == ItemType.MEDICINAL_HERB){
+                        hero2.getItems().remove(item);
+                        hero1.getItems().add(item);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP1_witch_brew(); i++){
+                for(Item item : hero1.getItems()){
+                    if(item.getItemType() == ItemType.WITCH_BREW){
+                        hero1.getItems().remove(item);
+                        hero2.getItems().add(item);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP2_witch_brew(); i++){
+                for(Item item : hero2.getItems()){
+                    if(item.getItemType() == ItemType.WITCH_BREW){
+                        hero2.getItems().remove(item);
+                        hero1.getItems().add(item);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP1_runestone_blue(); i++){
+                for(RuneStone stone : hero1.getRuneStones()){
+                    if(stone.getColour() == Colour.BLUE){
+                        hero1.getRuneStones().remove(stone);
+                        hero2.getRuneStones().add(stone);
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP2_runestone_blue(); i++){
+                for(RuneStone stone : hero2.getRuneStones()){
+                    if(stone.getColour() == Colour.BLUE){
+                        hero2.getRuneStones().remove(stone);
+                        hero1.getRuneStones().add(stone);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP2_runestone_yellow(); i++){
+                for(RuneStone stone : hero2.getRuneStones()){
+                    if(stone.getColour() == Colour.YELLOW){
+                        hero2.getRuneStones().remove(stone);
+                        hero1.getRuneStones().add(stone);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP1_runestone_yellow(); i++){
+                for(RuneStone stone : hero1.getRuneStones()){
+                    if(stone.getColour() == Colour.YELLOW){
+                        hero1.getRuneStones().remove(stone);
+                        hero2.getRuneStones().add(stone);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP1_runestone_green(); i++){
+                for(RuneStone stone : hero1.getRuneStones()){
+                    if(stone.getColour() == Colour.GREEN){
+                        hero1.getRuneStones().remove(stone);
+                        hero2.getRuneStones().add(stone);
+                        break;
+                    }
+                }
+            }
+
+            for(int i = 0; i < falconTrade.getP2_runestone_green(); i++){
+                for(RuneStone stone : hero2.getRuneStones()){
+                    if(stone.getColour() == Colour.GREEN){
+                        hero2.getRuneStones().remove(stone);
+                        hero1.getRuneStones().add(stone);
+                        break;
+                    }
+                }
+            }
+
+            hero1.setFalconTradeStatus(FalconTradeStatus.NOT_IN_TRADE);
+            hero2.setFalconTradeStatus(FalconTradeStatus.NOT_IN_TRADE);
+            hero1.setFalconTradingWith(null);
+            hero2.setFalconTradingWith(null);
+            hero1.setCurrentFalconTrade(null);
+            hero2.setCurrentFalconTrade(null);
+
             for(Item item : hero1.getItems()){
-                if(item.getItemType() == ItemType.WINESKIN){
-                    hero1.getItems().remove(item);
-                    hero2.getItems().add(item);
-                    break;
+                if(item.getItemType() == ItemType.FALCON){
+                    item.setNumUses(item.getNumUses()+1);
+                    System.out.println(hero1.getHeroClass() + " FALCON NOW HAS "+ item.getNumUses() + " USES");
+                    break; //only update one falcon
                 }
             }
-        }
 
-        for(int i = 0; i < falconTrade.getP2_wineskin(); i++){
-            for(Item item : hero2.getItems()){
-                if(item.getItemType() == ItemType.WINESKIN){
-                    hero2.getItems().remove(item);
-                    hero1.getItems().add(item);
-                    break;
+            MasterDatabase masterDatabase = MasterDatabase.getInstance();
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                if(getGame(gameName).getPlayers()[i].getHero().getHeroClass() == falconTrade.getP1_heroclass() || getGame(gameName).getPlayers()[i].getHero().getHeroClass() == falconTrade.getP2_heroclass()){
+                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
                 }
             }
+            return ProcessFalconTradeResponses.TRADE_PROCESSED;
         }
-
-        for(int i = 0; i < falconTrade.getP1_telescope(); i++){
-            for(Item item : hero1.getItems()){
-                if(item.getItemType() == ItemType.TELESCOPE){
-                    hero1.getItems().remove(item);
-                    hero2.getItems().add(item);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP2_telescope(); i++){
-            for(Item item : hero2.getItems()){
-                if(item.getItemType() == ItemType.TELESCOPE){
-                    hero2.getItems().remove(item);
-                    hero1.getItems().add(item);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP1_helm(); i++){
-            for(Item item : hero1.getItems()){
-                if(item.getItemType() == ItemType.HELM){
-                    hero1.getItems().remove(item);
-                    hero2.getItems().add(item);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP2_helm(); i++){
-            for(Item item : hero2.getItems()){
-                if(item.getItemType() == ItemType.HELM){
-                    hero2.getItems().remove(item);
-                    hero1.getItems().add(item);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP1_medicinal_herb(); i++){
-            for(Item item : hero1.getItems()){
-                if (item.getItemType() == ItemType.MEDICINAL_HERB){
-                    hero1.getItems().remove(item);
-                    hero2.getItems().add(item);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP2_medicinal_herb(); i++){
-            for(Item item : hero2.getItems()){
-                if (item.getItemType() == ItemType.MEDICINAL_HERB){
-                    hero2.getItems().remove(item);
-                    hero1.getItems().add(item);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP1_witch_brew(); i++){
-            for(Item item : hero1.getItems()){
-                if(item.getItemType() == ItemType.WITCH_BREW){
-                    hero1.getItems().remove(item);
-                    hero2.getItems().add(item);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP2_witch_brew(); i++){
-            for(Item item : hero2.getItems()){
-                if(item.getItemType() == ItemType.WITCH_BREW){
-                    hero2.getItems().remove(item);
-                    hero1.getItems().add(item);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP1_runestone_blue(); i++){
-            for(RuneStone stone : hero1.getRuneStones()){
-                if(stone.getColour() == Colour.BLUE){
-                    hero1.getRuneStones().remove(stone);
-                    hero2.getRuneStones().add(stone);
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP2_runestone_blue(); i++){
-            for(RuneStone stone : hero2.getRuneStones()){
-                if(stone.getColour() == Colour.BLUE){
-                    hero2.getRuneStones().remove(stone);
-                    hero1.getRuneStones().add(stone);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP2_runestone_yellow(); i++){
-            for(RuneStone stone : hero2.getRuneStones()){
-                if(stone.getColour() == Colour.YELLOW){
-                    hero2.getRuneStones().remove(stone);
-                    hero1.getRuneStones().add(stone);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP1_runestone_yellow(); i++){
-            for(RuneStone stone : hero1.getRuneStones()){
-                if(stone.getColour() == Colour.YELLOW){
-                    hero1.getRuneStones().remove(stone);
-                    hero2.getRuneStones().add(stone);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP1_runestone_green(); i++){
-            for(RuneStone stone : hero1.getRuneStones()){
-                if(stone.getColour() == Colour.GREEN){
-                    hero1.getRuneStones().remove(stone);
-                    hero2.getRuneStones().add(stone);
-                    break;
-                }
-            }
-        }
-
-        for(int i = 0; i < falconTrade.getP2_runestone_green(); i++){
-            for(RuneStone stone : hero2.getRuneStones()){
-                if(stone.getColour() == Colour.GREEN){
-                    hero2.getRuneStones().remove(stone);
-                    hero1.getRuneStones().add(stone);
-                    break;
-                }
-            }
-        }
-
-        hero1.setFalconTradeStatus(FalconTradeStatus.NOT_IN_TRADE);
-        hero2.setFalconTradeStatus(FalconTradeStatus.NOT_IN_TRADE);
-        hero1.setFalconTradingWith(null);
-        hero2.setFalconTradingWith(null);
-        hero1.setCurrentFalconTrade(null);
-        hero2.setCurrentFalconTrade(null);
-
-        for(Item item : hero1.getItems()){
-            if(item.getItemType() == ItemType.FALCON){
-                item.setNumUses(item.getNumUses()-1);
-                break; //only update one falcon
-            }
-        }
-
-        MasterDatabase masterDatabase = MasterDatabase.getInstance();
-        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-            if(getGame(gameName).getPlayers()[i].getHero().getHeroClass() == falconTrade.getP1_heroclass() || getGame(gameName).getPlayers()[i].getHero().getHeroClass() == falconTrade.getP2_heroclass()){
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-            }
-        }
-        return ProcessFalconTradeResponses.TRADE_PROCESSED;
-
     }
     public void activateEvent(String gameName, String username, int r) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();

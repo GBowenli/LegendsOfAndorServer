@@ -9,20 +9,21 @@ public class Item {
     private int uses;
 
     public Item() {
-        this.uses = 0;
     }
 
     public Item(ItemType itemType) {
         this.itemType = itemType;
         if (itemType == ItemType.WINESKIN) {
-            uses = 2;
+            this.uses = 2;
             //falcon can only be used once per day
         } else if (itemType == ItemType.FALCON) {
-            uses = 1;
+            this.uses = 0;
         } else if (itemType == ItemType.SHIELD){
-            uses = 2;
+            this.uses = 2;
         } else if (itemType == ItemType.WITCH_BREW) {
-            uses = 2;
+            this.uses = 2;
+        }else{
+            this.uses = 0;
         }
     }
 

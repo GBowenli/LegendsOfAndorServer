@@ -209,4 +209,26 @@ public class FalconTradeObject {
     public void setDontUpdate(boolean dontUpdate) {
         this.dontUpdate = dontUpdate;
     }
+
+    public String toString(){
+        return "Values: " +
+                "p1 gold: " + this.p1_gold +
+                "p1 wineskin: " + this.p1_wineskin +
+                "p1 blue runestone: " + this.p1_runestone_blue +
+                "p1 yellow runestone: " + this.p1_runestone_yellow +
+                "p1 telescope: " + this.p1_telescope +
+                "p1 helm: " + this.p1_helm +
+                "p1 medicinal herb: " + this.p1_medicinal_herb +
+                "p1 witch brew: " + this.p1_witch_brew +
+                "p1 runestone green: " + this.p1_runestone_green +
+                "p2 gold: " + this.p2_gold +
+                "p2 wineskin: " + this.p2_wineskin +
+                "p2 blue runestone: " + this.p2_runestone_blue +
+                "p2 yellow runestone: " + this.p2_runestone_yellow +
+                "p2 telescope: " + this.p2_telescope +
+                "p2 helm: " + this.p2_helm +
+                "p2 medicinal herb: " + this.p2_medicinal_herb +
+                "p2 witch brew: " + this.p2_witch_brew +
+                "p2 runestone green: " + this.p2_runestone_green;
+    }
 }
