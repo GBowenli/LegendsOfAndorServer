@@ -680,8 +680,13 @@ public class GameDatabase {
                 // refresh wells
                 // narrator advances one step
 
+                // reset all falcon uses
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                    for (Item item : getGame(gameName).getPlayers()[i].getHero().getItems()) {
+                        if (item.getItemType() == ItemType.FALCON) {
+                            item.setNumUses(0);
+                        }
+                    }
                 }
 
                 if (getGame(gameName).getGoldenShields() < 0) { // game over
@@ -690,12 +695,20 @@ public class GameDatabase {
                         masterDatabase.getMasterPlayerDatabase().getPlayer(getGame(gameName).getPlayers()[i].getUsername()).setReady(false);
                     }
 
+                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                        masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                    }
+
                     games.remove(getGame(gameName));
                     masterDatabase.removeGameBCM(gameName);
                     masterDatabase.deleteMessageDatabase(gameName);
 
                     return EndDayResponses.GAME_OVER;
                 } else {
+                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                        masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                    }
+
                     return EndDayResponses.NEW_DAY;
                 }
             } else {
