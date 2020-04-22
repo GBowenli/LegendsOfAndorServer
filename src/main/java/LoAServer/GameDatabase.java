@@ -287,6 +287,9 @@ public class GameDatabase {
 
             // testing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DELETE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             getGame(gameName).setGoldenShields(10000);
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                masterDatabase.getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().setGold(10000);
+            }
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
