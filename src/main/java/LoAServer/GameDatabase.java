@@ -62,7 +62,7 @@ enum EndDayResponses {
 }
 
 enum PassResponses {
-    PASS_SUCCESSFUL, MUST_END_DAY, ONLY_PLAYER_LEFT, NOT_CURRENT_TURN, DAY_ENDED, PASS_SUCCESSFUL_WP_DEDUCTED
+    PASS_SUCCESSFUL, MUST_END_DAY, ONLY_PLAYER_LEFT, NOT_CURRENT_TURN, DAY_ENDED, PASS_SUCCESSFUL_WP_DEDUCTED, CANNOT_PASS_AFTER_MOVE, CANNOT_PASS_AFTER_MOVE_PRINCE
 }
 
 enum LeaveFightResponses {
@@ -732,6 +732,10 @@ public class GameDatabase {
             return PassResponses.NOT_CURRENT_TURN;
         } else if (h.getCurrentHour() == 10 || (h.getWillPower() <= 2 && h.getCurrentHour() >= 7)) {
             return PassResponses.MUST_END_DAY;
+        } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
+            return PassResponses.CANNOT_PASS_AFTER_MOVE;
+        } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE_PRINCE) {
+            return PassResponses.CANNOT_PASS_AFTER_MOVE_PRINCE;
         } else { // can pass turn
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
