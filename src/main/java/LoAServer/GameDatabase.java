@@ -836,9 +836,9 @@ public class GameDatabase {
                 }
 
                 if (p.getHero().getHeroClass() == HeroClass.ARCHER || ownsBow) {
-                    Region region = regionDatabase.getRegion(p.getHero().getCurrentSpace());
+                    Region region = regionDatabase.getRegion(targetRegion);
                     ArrayList<Integer> adjacentRegions = region.getAdjacentRegions();
-                    adjacentRegions.add(p.getHero().getCurrentSpace());
+                    adjacentRegions.add(targetRegion);
 
                     if (region.isBridge()) {
                         adjacentRegions.add(region.getBridgeAdjacentRegion());
@@ -856,7 +856,7 @@ public class GameDatabase {
                         }
                     }
                 } else {
-                    if (p.getHero().getCurrentSpace() == h.getCurrentSpace()) {
+                    if (p.getHero().getCurrentSpace() == targetRegion) {
                         if (h.getCurrentHour() >= 7 && h.getCurrentHour() != 10) {
                             if (h.getWillPower() >= 3) {
                                 fight.getPendingInvitedHeroes().add(p.getHero());
@@ -926,8 +926,6 @@ public class GameDatabase {
         int index = fight.getHeroes().indexOf(h);
         if (index != -1) {
             if (fight.getHeroesBattleScores().get(index) > 0) {
-                System.out.println("wtf3");
-
                 return LeaveFightResponses.CANNOT_LEAVE_AFTER_ROLLING;
             }
         }
