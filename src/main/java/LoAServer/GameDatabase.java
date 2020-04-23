@@ -1610,8 +1610,8 @@ public class GameDatabase {
 
             if (item.getItemType() == ItemType.SHIELD) {
                 h.setShieldActivatedFight(true);
-                item.setNumUses(item.getNumUses()+1);
-                if (item.getNumUses() == 2) {
+                item.setNumUses(item.getNumUses()-1);
+                if (item.getNumUses() == 0) {
                     it.remove();
                 }
                 break;
@@ -1644,8 +1644,8 @@ public class GameDatabase {
                 Item item = it.next();
 
                 if (item.getItemType() == ItemType.WITCH_BREW) {
-                    item.setNumUses(item.getNumUses()+1);
-                    if (item.getNumUses() == 2) {
+                    item.setNumUses(item.getNumUses()-1);
+                    if (item.getNumUses() == 0) {
                         it.remove();
                     }
 
