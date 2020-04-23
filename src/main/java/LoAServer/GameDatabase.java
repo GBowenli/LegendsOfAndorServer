@@ -1839,8 +1839,6 @@ public class GameDatabase {
         regionDatabase.getRegion(skralStronghold).getCurrentCreatures().clear();
         regionDatabase.getRegion(skralStronghold).getCurrentCreatures().add(new Creature(getGame(gameName).getDifficultMode(), getGame(gameName).getCurrentNumPlayers()));
 
-        System.out.println("!!!!!!" + regionDatabase.getRegion(skralStronghold).getCurrentCreatures().size());
-
         regionDatabase.getRegion(27).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
         regionDatabase.getRegion(31).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
         regionDatabase.getRegion(29).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
@@ -2018,7 +2016,7 @@ public class GameDatabase {
     public EndMovePrinceThoraldResponses endMovePrinceThorald(String gameName, String username) {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
-        if (!h.isMoved()) {
+        if (!h.isMovedPrince()) {
             return EndMovePrinceThoraldResponses.MUST_MOVE_PRINCE_TO_END_MOVE;
         }
 
