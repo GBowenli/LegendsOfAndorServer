@@ -684,7 +684,7 @@ public class GameDatabase {
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                     for (Item item : getGame(gameName).getPlayers()[i].getHero().getItems()) {
                         if (item.getItemType() == ItemType.FALCON) {
-                            item.setNumUses(0);
+                            item.setNumUses(1);
                         }
                     }
                 }
@@ -3000,8 +3000,8 @@ public class GameDatabase {
 
             for(Item item : hero1.getItems()){
                 if(item.getItemType() == ItemType.FALCON){
-                    item.setNumUses(item.getNumUses()+1);
-                    System.out.println(hero1.getHeroClass() + " FALCON NOW HAS "+ item.getNumUses() + " USES");
+                    item.setNumUses(item.getNumUses()-1);
+                    System.out.println(hero1.getHeroClass() + " FALCON NOW HAS "+ item.getNumUses() + " USES LEFT");
                     break; //only update one falcon
                 }
             }
