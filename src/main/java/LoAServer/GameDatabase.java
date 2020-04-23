@@ -395,8 +395,6 @@ public class GameDatabase {
                     return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.CANNOT_MOVE_AFTER_FIGHT);
                 } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE_PRINCE) {
                     return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.CANNOT_MOVE_AFTER_MOVE_PRINCE);
-                } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.NONE) {
-                    getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.MOVE);
                 }
 
                 if (p.getHero().getCurrentHour() >= 7 && p.getHero().getWillPower() <= 2) {
@@ -423,6 +421,8 @@ public class GameDatabase {
     public MoveRC move(String gameName, String username, Integer targetRegion) { // do the verification on android (checking if is feasible adjacent)
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+
+        getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.MOVE);
 
         h.setMoved(true);
         h.setCurrentSpace(targetRegion);
@@ -1933,8 +1933,6 @@ public class GameDatabase {
                     return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.CANNOT_MOVE_PRINCE_AFTER_FIGHT);
                 } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
                     return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.CANNOT_MOVE_PRINCE_AFTER_MOVE);
-                } else if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.NONE) {
-                    getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.MOVE_PRINCE);
                 }
 
                 if (p.getHero().getCurrentHour() >= 7 && p.getHero().getWillPower() <= 2) {
@@ -1999,6 +1997,8 @@ public class GameDatabase {
     public void movePrinceThorald (String gameName, String username, Integer targetRegion) {
         Game g = getGame(gameName);
         Hero h = g.getSinglePlayer(username).getHero();
+
+        getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.MOVE_PRINCE);
 
         h.setMovedPrince(true);
 
