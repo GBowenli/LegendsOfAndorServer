@@ -1637,38 +1637,39 @@ public class GameDatabase {
 
         if (fight.getHeroesBattleScores().get(fight.getHeroes().indexOf(h)) == 0) {
             return ActivateWitchesBrewFightResponses.ERROR_BV_NOT_SET;
-        } else if (fight.getCreatureDice().get(0) > 0) {
-            return ActivateWitchesBrewFightResponses.ERROR_CANNOT_USE_AFTER_CREATURE_ROLL_DIE;
-        } else {
-            for (Iterator<Item> it = h.getItems().iterator(); it.hasNext();) {
-                Item item = it.next();
-
-                if (item.getItemType() == ItemType.WITCH_BREW) {
-                    item.setNumUses(item.getNumUses()-1);
-                    if (item.getNumUses() == 0) {
-                        it.remove();
-                    }
-
-                    int max;
-
-                    if (h.getHeroClass() == HeroClass.ARCHER) {
-                        max = Collections.max(fight.getArcherDice());
-                    } else if (h.getHeroClass() == HeroClass.DWARF) {
-                        max = Collections.max(fight.getDwarfDice());
-                    } else if (h.getHeroClass() == HeroClass.WARRIOR) {
-                        max = Collections.max(fight.getWarriorDice());
-                    } else { // wizard
-                        max = Collections.max(fight.getWizardDice());
-                    }
-                    fight.getHeroesBattleScores().set(fight.getHeroes().indexOf(h), max + h.getStrength());
-
-                    break;
-                }
+        } else if (fight.getCreatureDice().size() > 0) {
+            if (fight.getCreatureDice().get(0) > 0) {
+                return ActivateWitchesBrewFightResponses.ERROR_CANNOT_USE_AFTER_CREATURE_ROLL_DIE;
             }
-
-            return ActivateWitchesBrewFightResponses.WITCHES_BREW_ACTIVATED;
         }
+        for (Iterator<Item> it = h.getItems().iterator(); it.hasNext(); ) {
+            Item item = it.next();
+
+            if (item.getItemType() == ItemType.WITCH_BREW) {
+                item.setNumUses(item.getNumUses() - 1);
+                if (item.getNumUses() == 0) {
+                    it.remove();
+                }
+
+                int max;
+
+                if (h.getHeroClass() == HeroClass.ARCHER) {
+                    max = Collections.max(fight.getArcherDice());
+                } else if (h.getHeroClass() == HeroClass.DWARF) {
+                    max = Collections.max(fight.getDwarfDice());
+                } else if (h.getHeroClass() == HeroClass.WARRIOR) {
+                    max = Collections.max(fight.getWarriorDice());
+                } else { // wizard
+                    max = Collections.max(fight.getWizardDice());
+                }
+                fight.getHeroesBattleScores().set(fight.getHeroes().indexOf(h), max + h.getStrength());
+
+                break;
+            }
+        }
+        return ActivateWitchesBrewFightResponses.WITCHES_BREW_ACTIVATED;
     }
+
 
     public ActivateMedicinalHerbFightResponses activateMedicinalHerbFight(String gameName, String username) {
         Game g = getGame(gameName);
@@ -2667,7 +2668,7 @@ public class GameDatabase {
                     masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
                 }
 
-                    return ActivateWizardAbilityResponses.SUCCESS;
+                return ActivateWizardAbilityResponses.SUCCESS;
             } else if (activateWizardTarget.getHeroClass() == HeroClass.DWARF) {
                 if (fight.getDwarfDice().get(activateWizardTarget.getDieIndex()) == 0 || fight.getDwarfDice().get(activateWizardTarget.getDieIndex()) == -1) {
                     return ActivateWizardAbilityResponses.ERROR_DIE_NOT_FLIPPABLE;
@@ -2789,12 +2790,12 @@ public class GameDatabase {
 
 
         int p1_smallItemsToRecieve = falconTrade.getP2_medicinal_herb() + falconTrade.getP2_runestone_blue()
-                                    + falconTrade.getP2_runestone_green() + falconTrade.getP2_runestone_yellow()
-                                    + falconTrade.getP2_telescope() + falconTrade.getP2_wineskin() + falconTrade.getP2_witch_brew();
+                + falconTrade.getP2_runestone_green() + falconTrade.getP2_runestone_yellow()
+                + falconTrade.getP2_telescope() + falconTrade.getP2_wineskin() + falconTrade.getP2_witch_brew();
 
         int p2_smallItemsToRecieve = falconTrade.getP1_medicinal_herb() + falconTrade.getP1_runestone_blue()
-                                    + falconTrade.getP1_runestone_green() + falconTrade.getP1_runestone_yellow()
-                                    + falconTrade.getP1_telescope() + falconTrade.getP1_wineskin() + falconTrade.getP1_witch_brew();
+                + falconTrade.getP1_runestone_green() + falconTrade.getP1_runestone_yellow()
+                + falconTrade.getP1_telescope() + falconTrade.getP1_wineskin() + falconTrade.getP1_witch_brew();
 
 
         int p1_currentNumItems = hero1.getRuneStones().size();
@@ -3023,51 +3024,51 @@ public class GameDatabase {
         int region = h.getCurrentSpace();
 
 
-            if (r == 0) {
-                Hero w = getGame(gameName).getHeroByHC(HeroClass.WIZARD);
-                Hero a = getGame(gameName).getHeroByHC(HeroClass.ARCHER);
-                if(w!=null){ w.setWillPower(w.getWillPower()+3);}
-                if(a!=null){ a.setWillPower(a.getWillPower()+3);}
+        if (r == 0) {
+            Hero w = getGame(gameName).getHeroByHC(HeroClass.WIZARD);
+            Hero a = getGame(gameName).getHeroByHC(HeroClass.ARCHER);
+            if(w!=null){ w.setWillPower(w.getWillPower()+3);}
+            if(a!=null){ a.setWillPower(a.getWillPower()+3);}
 
-            } else if (r == 1) {
-                for(int i=0; i<players.length;i++)
-                {
-                    Hero ph= players[i].getHero();
-                    if(ph.getCurrentSpace()<=20 && ph.getCurrentSpace()>=0 )
-                    {ph.setWillPower(ph.getWillPower()-3);}
-                }
-
-            } else if (r == 2) {
-                for(int i=0; i<players.length;i++)
-                {
-                    Hero ph= players[i].getHero();
-                    if(ph.getCurrentHour()==0)
-                    {ph.setWillPower(ph.getWillPower()-2);}
-                }
-            } else if (r == 3) {
-                for(int i=0; i<players.length;i++)
-                {
-                    Hero ph= players[i].getHero();
-                    if(ph.getCurrentHour()==0)
-                    {ph.setWillPower(ph.getWillPower()+2);}
-                }
-            } else if (r == 4) {
-                for(int i=0; i<players.length;i++)
-                {
-                    Hero ph= players[i].getHero();
-                    if(ph.getCurrentSpace()<=70 && ph.getCurrentSpace()>=37 )
-                    {ph.setWillPower(ph.getWillPower()-3);}
-                }
-
-            } else{
-
+        } else if (r == 1) {
+            for(int i=0; i<players.length;i++)
+            {
+                Hero ph= players[i].getHero();
+                if(ph.getCurrentSpace()<=20 && ph.getCurrentSpace()>=0 )
+                {ph.setWillPower(ph.getWillPower()-3);}
             }
 
-
-            MasterDatabase masterDatabase = MasterDatabase.getInstance();
-            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        } else if (r == 2) {
+            for(int i=0; i<players.length;i++)
+            {
+                Hero ph= players[i].getHero();
+                if(ph.getCurrentHour()==0)
+                {ph.setWillPower(ph.getWillPower()-2);}
             }
+        } else if (r == 3) {
+            for(int i=0; i<players.length;i++)
+            {
+                Hero ph= players[i].getHero();
+                if(ph.getCurrentHour()==0)
+                {ph.setWillPower(ph.getWillPower()+2);}
+            }
+        } else if (r == 4) {
+            for(int i=0; i<players.length;i++)
+            {
+                Hero ph= players[i].getHero();
+                if(ph.getCurrentSpace()<=70 && ph.getCurrentSpace()>=37 )
+                {ph.setWillPower(ph.getWillPower()-3);}
+            }
+
+        } else{
+
+        }
+
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
 
 
 
