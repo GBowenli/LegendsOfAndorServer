@@ -2414,7 +2414,7 @@ public class GameDatabase {
 
         game.setGoldenShields(g.getGoldenShields());
         for (int i = 0; i < game.getCurrentNumPlayers(); i++) {
-            for (int j = 0; i < g.getCurrentNumPlayers(); i++) {
+            for (int j = 0; j < g.getCurrentNumPlayers(); j++) {
                 if (game.getPlayers()[i].getHero().getHeroClass() == g.getPlayers()[j].getHero().getHeroClass()) {
                     game.getPlayers()[i].setHero(g.getPlayers()[j].getHero());
                 }
