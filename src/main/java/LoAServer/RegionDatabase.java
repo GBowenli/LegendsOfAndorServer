@@ -297,10 +297,6 @@ public class RegionDatabase {
             FogKind fog = fogs.get(rand);
             fogs.remove(rand);
 
-            if (fog == FogKind.WITCHBREW) {
-                System.out.println("!!!!!!" + i);
-            }
-
             if (i == 0) {
                 regionDatabase.get(8).setFog(fog);
             } else if (i == 1) {

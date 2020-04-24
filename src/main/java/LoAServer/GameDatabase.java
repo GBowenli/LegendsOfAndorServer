@@ -848,25 +848,25 @@ public class GameDatabase {
                         adjacentRegions.add(region.getBridgeAdjacentRegion());
                     }
 
-                    if (adjacentRegions.contains(h.getCurrentSpace())) {
-                        if (h.getCurrentHour() >= 7 && h.getCurrentHour() != 10) {
-                            if (h.getWillPower() >= 3) {
+                    if (adjacentRegions.contains(p.getHero().getCurrentSpace())) {
+                        if (p.getHero().getCurrentHour() >= 7 && p.getHero().getCurrentHour() != 10) {
+                            if (p.getHero().getWillPower() >= 3) {
                                 fight.getPendingInvitedHeroes().add(p.getHero());
                             }
                         } else {
-                            if (h.getWillPower() >= 1) {
+                            if (p.getHero().getWillPower() >= 1) {
                                 fight.getPendingInvitedHeroes().add(p.getHero());
                             }
                         }
                     }
                 } else {
                     if (p.getHero().getCurrentSpace() == targetRegion) {
-                        if (h.getCurrentHour() >= 7 && h.getCurrentHour() != 10) {
-                            if (h.getWillPower() >= 3) {
+                        if (p.getHero().getCurrentHour() >= 7 && p.getHero().getCurrentHour() != 10) {
+                            if (p.getHero().getWillPower() >= 3) {
                                 fight.getPendingInvitedHeroes().add(p.getHero());
                             }
                         } else {
-                            if (h.getWillPower() >= 1) {
+                            if (p.getHero().getWillPower() >= 1) {
                                 fight.getPendingInvitedHeroes().add(p.getHero());
                             }
                         }
