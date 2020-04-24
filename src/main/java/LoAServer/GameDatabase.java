@@ -3110,5 +3110,32 @@ public class GameDatabase {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
     }
+
+    public void rejectEvent(String gameName, String username) {
+        if(getGame(gameName).getFoundEvent()!=-1)
+        {
+            getGame(gameName).setFoundEvent(-1);
+            ArrayList<Item> myItems = getGame(gameName).getSinglePlayer(username).getHero().getItems();
+            for(int i=0; i<myItems.size(); i++)
+            {
+                if(myItems.get(i).getItemType()==ItemType.SHIELD)
+                {
+                    int num=myItems.get(i).getNumUses();
+                    myItems.get(i).setNumUses(num-1);
+                    if(myItems.get(i).getNumUses()==0)
+                    {
+                        myItems.remove(i);
+                    }
+                }
+                break;
+            }
+
+        }
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+    }
 }
 
