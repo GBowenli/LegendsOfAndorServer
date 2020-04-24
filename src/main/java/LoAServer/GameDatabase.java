@@ -3036,6 +3036,7 @@ public class GameDatabase {
             return ProcessFalconTradeResponses.TRADE_PROCESSED;
         }
     }
+
     public void activateEvent(String gameName, String username, int r) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Player[] players = getGame(gameName).getPlayers();
@@ -3043,54 +3044,71 @@ public class GameDatabase {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         int region = h.getCurrentSpace();
 
+        if(getGame(gameName).getFoundEvent()!=-1) {
+            if (r == 0) {
+                Hero w = getGame(gameName).getHeroByHC(HeroClass.WIZARD);
+                Hero a = getGame(gameName).getHeroByHC(HeroClass.ARCHER);
+                if (w != null) {
+                    w.setWillPower(w.getWillPower() + 3);
+                }
+                if (a != null) {
+                    a.setWillPower(a.getWillPower() + 3);
+                }
 
-        if (r == 0) {
-            Hero w = getGame(gameName).getHeroByHC(HeroClass.WIZARD);
-            Hero a = getGame(gameName).getHeroByHC(HeroClass.ARCHER);
-            if(w!=null){ w.setWillPower(w.getWillPower()+3);}
-            if(a!=null){ a.setWillPower(a.getWillPower()+3);}
+            } else if (r == 1) {
+                for (int i = 0; i < players.length; i++) {
+                    Hero ph = players[i].getHero();
+                    if (ph.getCurrentSpace() <= 20 && ph.getCurrentSpace() >= 0) {
+                        ph.setWillPower(ph.getWillPower() - 3);
+                    }
+                }
 
-        } else if (r == 1) {
-            for(int i=0; i<players.length;i++)
-            {
-                Hero ph= players[i].getHero();
-                if(ph.getCurrentSpace()<=20 && ph.getCurrentSpace()>=0 )
-                {ph.setWillPower(ph.getWillPower()-3);}
+            } else if (r == 2) {
+                for (int i = 0; i < players.length; i++) {
+                    Hero ph = players[i].getHero();
+                    if (ph.getCurrentHour() == 0) {
+                        ph.setWillPower(ph.getWillPower() - 2);
+                    }
+                }
+            } else if (r == 3) {
+                for (int i = 0; i < players.length; i++) {
+                    Hero ph = players[i].getHero();
+                    if (ph.getCurrentHour() == 0) {
+                        ph.setWillPower(ph.getWillPower() + 2);
+                    }
+                }
+            } else if (r == 4) {
+                for (int i = 0; i < players.length; i++) {
+                    Hero ph = players[i].getHero();
+                    if (ph.getCurrentSpace() <= 70 && ph.getCurrentSpace() >= 37) {
+                        ph.setWillPower(ph.getWillPower() - 3);
+                    }
+                }
+
+            } else {
+
             }
-
-        } else if (r == 2) {
-            for(int i=0; i<players.length;i++)
-            {
-                Hero ph= players[i].getHero();
-                if(ph.getCurrentHour()==0)
-                {ph.setWillPower(ph.getWillPower()-2);}
-            }
-        } else if (r == 3) {
-            for(int i=0; i<players.length;i++)
-            {
-                Hero ph= players[i].getHero();
-                if(ph.getCurrentHour()==0)
-                {ph.setWillPower(ph.getWillPower()+2);}
-            }
-        } else if (r == 4) {
-            for(int i=0; i<players.length;i++)
-            {
-                Hero ph= players[i].getHero();
-                if(ph.getCurrentSpace()<=70 && ph.getCurrentSpace()>=37 )
-                {ph.setWillPower(ph.getWillPower()-3);}
-            }
-
-        } else{
-
         }
 
+        getGame(gameName).setFoundEvent(-1);
 
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
 
+    }
 
+    public void foundEvent(String gameName, String username, int eventID) {
+        if(getGame(gameName).getFoundEvent()==-1)
+        {
+            getGame(gameName).setFoundEvent(eventID);
+        }
 
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
     }
 }
+
