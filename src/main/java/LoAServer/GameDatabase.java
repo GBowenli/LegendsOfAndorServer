@@ -909,6 +909,17 @@ public class GameDatabase {
         }
     }
 
+    public void declineFightInvitation(String gameName, String username) {
+        Hero h = getGame(gameName).getSinglePlayer(username).getHero();
+
+        getGame(gameName).getCurrentFight().getPendingInvitedHeroes().remove(h);
+
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+        }
+    }
+
     public LeaveFightResponses leaveFight(String gameName, String username) {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         Fight fight = getGame(gameName).getCurrentFight();
