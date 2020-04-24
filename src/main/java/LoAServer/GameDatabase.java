@@ -327,6 +327,12 @@ public class GameDatabase {
 
         // TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+            if (i == 0) {
+                MasterDatabase.getInstance().getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().getRuneStones().add(new RuneStone(Colour.BLUE));
+                MasterDatabase.getInstance().getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().getRuneStones().add(new RuneStone(Colour.GREEN));
+                MasterDatabase.getInstance().getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().getRuneStones().add(new RuneStone(Colour.YELLOW));
+            }
+
             MasterDatabase.getInstance().getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().setGold(10000);
         }
 
@@ -418,7 +424,7 @@ public class GameDatabase {
         }
     }
 
-    public MoveRC move(String gameName, String username, Integer targetRegion) { // do the verification on android (checking if is feasible adjacent)
+    public MoveRC move(String gameName, String username, Integer targetRegion) {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
 
@@ -595,6 +601,7 @@ public class GameDatabase {
                 getGame(gameName).setFirstHeroInNextDay(h);
             }
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
+            getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
             if (getGame(gameName).getCurrentHero() == null) { // new day
                 getGame(gameName).setCurrentHero(getGame(gameName).getFirstHeroInNextDay());
@@ -631,6 +638,7 @@ public class GameDatabase {
                         }
                     } else {
                         regionDatabase.getRegion(newCreatureSpace).setCurrentCreatures(new ArrayList<>(Arrays.asList(creature)));
+                        regionDatabase.getRegion(newCreatureSpace).getFarmers().clear();
                     }
                 }
 
@@ -1424,8 +1432,8 @@ public class GameDatabase {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
 
-            if (fight.getHeroes().size() == 0) { // force client to press leave fight!!!!!
-                if (fight.getCreature().getCreatureType() == CreatureType.GOR) { // TEST THIS OUT NOT SURE IF WILL CHANGE CREATURE
+            if (fight.getHeroes().size() == 0) {
+                if (fight.getCreature().getCreatureType() == CreatureType.GOR) {
                     regionDatabase.getRegion(fight.getRegionNumber()).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
                 } else if (fight.getCreature().getCreatureType() == CreatureType.SKRAL) {
                     regionDatabase.getRegion(fight.getRegionNumber()).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
@@ -1465,12 +1473,12 @@ public class GameDatabase {
             fight.getCreature().setWillpower(fight.getCreature().getWillpower()-difference);
             Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
-            if (fight.getCreature().getWillpower() <= 0) { // force player to press leave fight!!!!
+            if (fight.getCreature().getWillpower() <= 0) {
                 if (fight.getCreature().getMedicinalHerb() != null) {
                     fight.getHeroes().get(0).getItems().add(fight.getCreature().getMedicinalHerb());
                 }
 
-                regionDatabase.getRegion(h.getCurrentSpace()).getCurrentCreatures().clear();
+                regionDatabase.getRegion(fight.getRegionNumber()).getCurrentCreatures().clear();
                 regionDatabase.getRegion(80).getCurrentCreatures().add(fight.getCreature());
 
                 getGame(gameName).getNarrator().incrementNarrator();
@@ -1662,7 +1670,7 @@ public class GameDatabase {
                 } else { // wizard
                     max = Collections.max(fight.getWizardDice());
                 }
-                fight.getHeroesBattleScores().set(fight.getHeroes().indexOf(h), max + h.getStrength());
+                fight.getHeroesBattleScores().set(fight.getHeroes().indexOf(h), 2*max + h.getStrength());
 
                 break;
             }
@@ -1845,6 +1853,7 @@ public class GameDatabase {
         regionDatabase.getRegion(27).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
         regionDatabase.getRegion(31).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.GOR))));
         regionDatabase.getRegion(29).setCurrentCreatures(new ArrayList<>(Arrays.asList(new Creature(CreatureType.SKRAL))));
+        
         getGame(gameName).setPrinceThorald(new PrinceThorald(72));
 
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
