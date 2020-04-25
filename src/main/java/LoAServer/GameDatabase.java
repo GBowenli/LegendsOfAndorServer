@@ -1878,6 +1878,7 @@ public class GameDatabase {
         RegionDatabase regionDatabase = g.getRegionDatabase();
         Region r = regionDatabase.getRegion(26);
 
+        g.setPrinceThorald(null);
         if (regionDatabase.getRegion(26).getCurrentCreatures().size() > 0) {
             Creature creature = r.getCurrentCreatures().get(0);
             r.getCurrentCreatures().clear();
