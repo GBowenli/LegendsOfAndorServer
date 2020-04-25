@@ -273,6 +273,8 @@ public class RegionDatabase {
         regionDatabase.get(84).setCoordinatesa(new float[] {1180,862});
     }
 
+
+
     public void setRandomizedFogs() {
         ArrayList<FogKind> fogs = new ArrayList<>();
         fogs.add(FogKind.EVENT);

@@ -329,6 +329,16 @@ public class GameController {
         MasterDatabase.getInstance().getMasterGameDatabase().activateEvent(gameName, username, r);
     }
 
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/foundEvent")
+    public void foundEvent (@PathVariable String gameName, @PathVariable String username, @RequestBody Integer r) {
+        MasterDatabase.getInstance().getMasterGameDatabase().foundEvent(gameName, username, r);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/rejectEvent")
+    public void rejectEvent (@PathVariable String gameName, @PathVariable String username) {
+        MasterDatabase.getInstance().getMasterGameDatabase().rejectEvent(gameName, username);
+    }
+
 
     // to do.. move prince
     // wardraks reward is gold + willpwoer = 6

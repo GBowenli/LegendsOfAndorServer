@@ -36,6 +36,7 @@ public class Game implements BroadcastContent {
     private boolean gameLoaded;
     private boolean foundWitch;
     private boolean leftGame;
+    private int foundEvent;
 
     public Game() {}
 
@@ -345,6 +346,14 @@ public class Game implements BroadcastContent {
 
     public void setFoundWitch(boolean foundWitch) {
         this.foundWitch = foundWitch;
+    }
+
+    public int getFoundEvent() {
+        return foundEvent;
+    }
+
+    public void setFoundEvent(int foundEvent) {
+        this.foundEvent = foundEvent;
     }
 
     public boolean isLeftGame() {
