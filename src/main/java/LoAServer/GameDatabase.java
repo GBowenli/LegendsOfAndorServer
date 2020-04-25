@@ -979,140 +979,144 @@ public class GameDatabase {
         boolean blueRuneStoneFound = false;
         boolean yellowRuneStoneFound = false;
 
-        for (RuneStone r : h.getRuneStones()) {
-            if (r.getColour() == Colour.GREEN) {
-                greenRuneStoneFound = true;
-            } else if (r.getColour() == Colour.BLUE) {
-                blueRuneStoneFound = true;
-            } else { // yellow
-                yellowRuneStoneFound = true;
+        if (h.getCurrentHour() >= 7 && h.getWillPower() <= 2) {
+            return new ArrayList<>();
+        } else {
+            for (RuneStone r : h.getRuneStones()) {
+                if (r.getColour() == Colour.GREEN) {
+                    greenRuneStoneFound = true;
+                } else if (r.getColour() == Colour.BLUE) {
+                    blueRuneStoneFound = true;
+                } else { // yellow
+                    yellowRuneStoneFound = true;
+                }
             }
-        }
 
-        if (h.getHeroClass() == WIZARD) {
-            if (greenRuneStoneFound && blueRuneStoneFound && yellowRuneStoneFound) {
-                fight.setWizardDice(new ArrayList<>(Arrays.asList(-1)));
-
-                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                }
-
-                return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
-            } else {
-                fight.setWizardDice(new ArrayList<>(Arrays.asList(0)));
-
-                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                }
-
-                return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE)));
-            }
-        } else if (h.getHeroClass() == HeroClass.WARRIOR) {
-            if (greenRuneStoneFound && blueRuneStoneFound && yellowRuneStoneFound) {
-                fight.setWarriorDice(new ArrayList<>(Arrays.asList(-1)));
-
-                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                }
-
-                return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
-            } else {
-                if (h.getWillPower() < 7) {
-                    fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0)));
+            if (h.getHeroClass() == WIZARD) {
+                if (greenRuneStoneFound && blueRuneStoneFound && yellowRuneStoneFound) {
+                    fight.setWizardDice(new ArrayList<>(Arrays.asList(-1)));
 
                     for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                         masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
                     }
 
-                    return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
-                } else if (h.getWillPower() < 14) {
-                    fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
-
-                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                        masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                    }
-
-                    return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
                 } else {
-                    fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0)));
-
-                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                        masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                    }
-
-                    return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
-                }
-            }
-        } else if (h.getHeroClass() == HeroClass.DWARF) {
-            if (greenRuneStoneFound && blueRuneStoneFound && yellowRuneStoneFound) {
-                fight.setDwarfDice(new ArrayList<>(Arrays.asList(-1)));
-
-                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                }
-
-                return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
-            } else {
-                if (h.getWillPower() < 7) {
-                    fight.setDwarfDice(new ArrayList<>(Arrays.asList(0)));
+                    fight.setWizardDice(new ArrayList<>(Arrays.asList(0)));
 
                     for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                         masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
                     }
 
                     return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE)));
-                } else if (h.getWillPower() < 14) {
-                    fight.setDwarfDice(new ArrayList<>(Arrays.asList(0, 0)));
-
-                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                        masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                    }
-
-                    return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
-                } else {
-                    fight.setDwarfDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
-
-                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                        masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                    }
-
-                    return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
                 }
-            }
-        } else { // ARCHER
-            if (greenRuneStoneFound && blueRuneStoneFound && yellowRuneStoneFound) {
-                fight.setArcherDice(new ArrayList<>(Arrays.asList(-1)));
-
-                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                    masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                }
-
-                return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
-            } else {
-                if (h.getWillPower() < 7) {
-                    fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
+            } else if (h.getHeroClass() == HeroClass.WARRIOR) {
+                if (greenRuneStoneFound && blueRuneStoneFound && yellowRuneStoneFound) {
+                    fight.setWarriorDice(new ArrayList<>(Arrays.asList(-1)));
 
                     for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                         masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
                     }
 
-                    return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
-                } else if (h.getWillPower() < 14) {
-                    fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0)));
-
-                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-                        masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
-                    }
-
-                    return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
                 } else {
-                    fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0)));
+                    if (h.getWillPower() < 7) {
+                        fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0)));
+
+                        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                        }
+
+                        return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    } else if (h.getWillPower() < 14) {
+                        fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
+
+                        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                        }
+
+                        return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    } else {
+                        fight.setWarriorDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0)));
+
+                        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                        }
+
+                        return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    }
+                }
+            } else if (h.getHeroClass() == HeroClass.DWARF) {
+                if (greenRuneStoneFound && blueRuneStoneFound && yellowRuneStoneFound) {
+                    fight.setDwarfDice(new ArrayList<>(Arrays.asList(-1)));
 
                     for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                         masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
                     }
 
-                    return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
+                } else {
+                    if (h.getWillPower() < 7) {
+                        fight.setDwarfDice(new ArrayList<>(Arrays.asList(0)));
+
+                        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                        }
+
+                        return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE)));
+                    } else if (h.getWillPower() < 14) {
+                        fight.setDwarfDice(new ArrayList<>(Arrays.asList(0, 0)));
+
+                        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                        }
+
+                        return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    } else {
+                        fight.setDwarfDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
+
+                        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                        }
+
+                        return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    }
+                }
+            } else { // ARCHER
+                if (greenRuneStoneFound && blueRuneStoneFound && yellowRuneStoneFound) {
+                    fight.setArcherDice(new ArrayList<>(Arrays.asList(-1)));
+
+                    for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                        masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                    }
+
+                    return new ArrayList<>(Arrays.asList(new Die(DieType.BLACK_DIE)));
+                } else {
+                    if (h.getWillPower() < 7) {
+                        fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0)));
+
+                        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                        }
+
+                        return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    } else if (h.getWillPower() < 14) {
+                        fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0)));
+
+                        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                        }
+
+                        return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    } else {
+                        fight.setArcherDice(new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0)));
+
+                        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                            masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
+                        }
+
+                        return new ArrayList<>(Arrays.asList(new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE), new Die(DieType.REGULAR_DIE)));
+                    }
                 }
             }
         }
