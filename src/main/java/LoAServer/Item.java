@@ -22,7 +22,7 @@ public class Item {
             this.numUses = 2;
         } else if (itemType == ItemType.WITCH_BREW) {
             this.numUses = 2;
-        }else{
+        } else {
             this.numUses = 0;
         }
     }

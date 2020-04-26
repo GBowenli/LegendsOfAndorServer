@@ -27,6 +27,9 @@ public class Hero {
     private ArrayList<RuneStone> runeStones;
     private boolean bowActivated;
     private boolean shieldActivatedFight;
+    private boolean medicinalHerbActivatedMove;
+    private int possibleMovesMedHerb;
+    private boolean wineskinActivated;
     private FalconTradeStatus falconTradeStatus;
     private HeroClass falconTradingWith;
     private FalconTradeObject currentFalconTrade;
@@ -209,5 +212,35 @@ public class Hero {
 
     public void setCurrentFalconTrade(FalconTradeObject currentFalconTrade) {
         this.currentFalconTrade = currentFalconTrade;
+    }
+
+    public void setMedicinalHerbActivatedMove(boolean medicinalHerbActivatedMove){
+        this.medicinalHerbActivatedMove = medicinalHerbActivatedMove;
+        if (medicinalHerbActivatedMove){
+            this.possibleMovesMedHerb = 4;
+        }
+        else {
+            this.possibleMovesMedHerb = 0;
+        }
+    }
+
+    public boolean isMedicinalHerbActivatedMove(){
+        return medicinalHerbActivatedMove;
+    }
+
+    public void setPossibleMovesMedHerb(int possibleMovesMedHerb){
+        this.possibleMovesMedHerb = possibleMovesMedHerb;
+    }
+
+    public int getPossibleMovesMedHerb(){
+        return possibleMovesMedHerb;
+    }
+
+    public void setWineskinActivated(boolean wineskinActivated){
+        this.wineskinActivated = wineskinActivated;
+    }
+
+    public boolean isWineskinActivated(){
+        return wineskinActivated;
     }
 }

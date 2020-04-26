@@ -45,7 +45,7 @@ public class MasterDatabase {
         }
     }
 
-    public ArrayList<Game> getSavedGames(String gameName, String username) {
+    public ArrayList<Game> getSavedGames() {
         Collection<Game> values = savedGameDatabase.values();
         return new ArrayList<Game>(values);
     }

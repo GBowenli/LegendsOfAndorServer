@@ -147,6 +147,26 @@ public class GameController {
         return MasterDatabase.getInstance().getMasterGameDatabase().activateMedicinalHerbFight(gameName, username);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/medicinalHerbWillPower")
+    public MedicinalHerbWillPowerResponses medicinalHerbWillPower(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().medicinalHerbWillPower(gameName, username);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/medicinalHerbMove")
+    public MedicinalHerbMoveResponses medicinalHerbMove(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().medicinalHerbMove(gameName, username);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/{gameName}/{username}/activateWineskin")
+    public ActivateWineskinResponses activateWineskin(@PathVariable String gameName, @PathVariable String username){
+        return MasterDatabase.getInstance().getMasterGameDatabase().activateWineskin(gameName, username);
+    }
+
+    @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/useTelescope")
+    public UseTelescopeRC useTelescope(@PathVariable String gameName, @PathVariable String username, @RequestBody Integer targetRegion) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().useTelescope(gameName, username, targetRegion);
+    }
+
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/buyFromMerchant")
     public BuyFromMerchantResponses buyFromMerchant (@PathVariable String gameName, @PathVariable String username, @RequestBody MerchantPurchase merchantPurchase) {
         return MasterDatabase.getInstance().getMasterGameDatabase().buyFromMerchant(gameName, username, merchantPurchase);
@@ -189,8 +209,8 @@ public class GameController {
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/saveGame")
-    public void saveGame (@PathVariable String gameName) {
-        MasterDatabase.getInstance().getMasterGameDatabase().saveGame(gameName);
+    public SaveGameResponses saveGame (@PathVariable String gameName) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().saveGame(gameName);
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/activateLegendCardC")
@@ -238,14 +258,14 @@ public class GameController {
         MasterDatabase.getInstance().getMasterGameDatabase().activateLegendCardN(gameName, username);
     }
 
-    @RequestMapping(method=RequestMethod.GET, value="/{gameName}/{username}/getSavedGames")
-    public ArrayList<Game> getSavedGames (@PathVariable String gameName, @PathVariable String username) {
-        return MasterDatabase.getInstance().getSavedGames(gameName, username);
+    @RequestMapping(method=RequestMethod.GET, value="/getSavedGames")
+    public ArrayList<Game> getSavedGames () {
+        return MasterDatabase.getInstance().getSavedGames();
     }
 
     @RequestMapping(method=RequestMethod.POST, value="/{gameName}/{username}/loadGame")
-    public LoadGameResponses loadGame (@PathVariable String gameName, @PathVariable String username, @RequestBody Game g) {
-        return MasterDatabase.getInstance().getMasterGameDatabase().loadGame(gameName, username, g);
+    public LoadGameResponses loadGame (@PathVariable String gameName, @PathVariable String username, @RequestBody String gameName2) {
+        return MasterDatabase.getInstance().getMasterGameDatabase().loadGame(gameName, username, gameName2);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{gameName}/{username}/getItems")

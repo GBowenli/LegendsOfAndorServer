@@ -3,7 +3,6 @@ package LoAServer;
 
 import LoAServer.PublicEnums.*;
 import LoAServer.ReturnClasses.*;
-import ch.qos.logback.core.db.dialect.MySQLDialect;
 import com.google.gson.Gson;
 
 import java.io.BufferedWriter;
@@ -74,7 +73,7 @@ enum EndBattleRoundResponses {
 }
 
 enum BuyFromMerchantResponses {
-    SUCCESS, NOT_ENOUGH_GOLD, MERCHANT_DNE, MAX_ITEMS
+    SUCCESS, NOT_ENOUGH_GOLD, MERCHANT_DNE, MAX_ITEMS, MUST_END_MOVE
 }
 
 enum EndMovePrinceThoraldResponses {
@@ -82,7 +81,7 @@ enum EndMovePrinceThoraldResponses {
 }
 
 enum LoadGameResponses {
-    ERROR_NOT_ALL_PLAYERS_SELECTED_HEROES, ERROR_PLAYER_NUM_MISMATCH, ERROR_HERO_MISMATCH, ERROR_DIFFICULTY_MISMATCH, LOAD_GAME_SUCCESS
+    ERROR_NOT_ALL_PLAYERS_SELECTED_HEROES, ERROR_PLAYER_NUM_MISMATCH, ERROR_HERO_MISMATCH, ERROR_DIFFICULTY_MISMATCH, NOT_HOST, NOT_ALL_PLAYERS_READY, NOT_ENOUGH_PLAYERS, LOAD_GAME_SUCCESS
 }
 
 enum AddDropItemResponses{
@@ -122,12 +121,28 @@ enum BuyWitchBrewResponses {
     ERROR_NOT_ENOUGH_GOLD, SUCCESS, MAX_ITEMS
 }
 
+enum MedicinalHerbWillPowerResponses {
+        ERROR_DOES_NOT_OWN_MEDICINAL_HERB, MEDICINAL_HERB_WILLPOWER_SUCCESS
+}
+
+enum MedicinalHerbMoveResponses {
+    ERROR_DOES_NOT_OWN_MEDICINAL_HERB, ERROR_NOT_CURRENT_HERO ,MEDICINAL_HERB_MOVE_SUCCESS
+}
+
+enum ActivateWineskinResponses {
+    ERROR_DOES_NOT_OWN_WINESKIN, ERROR_NOT_CURRENT_HERO, WINESKIN_ACTIVATED
+}
+
 enum ActivateWizardAbilityResponses {
     ERROR_NOT_WIZARD, ERROR_DIE_NOT_FLIPPABLE, ERROR_WIZARD_ABILITY_ALREADY_USED, SUCCESS
 }
 
 enum RollDieOneByOneResponses {
     ERROR_NO_MORE_DIE_TO_ROLL, SUCCESS
+}
+
+enum SaveGameResponses {
+    SUCCESS, MUST_END_FIGHT
 }
 
 public class GameDatabase {
@@ -432,10 +447,22 @@ public class GameDatabase {
 
         h.setMoved(true);
         h.setCurrentSpace(targetRegion);
-        if (h.getCurrentHour() >= 7) {
-            h.setWillPower(h.getWillPower()-2);
+
+        //medicinal herb
+        int possibleMovesMedHerb = h.getPossibleMovesMedHerb();
+        if (h.isMedicinalHerbActivatedMove() && possibleMovesMedHerb > 0){
+            h.setPossibleMovesMedHerb(possibleMovesMedHerb - 1);
         }
-        h.setCurrentHour(h.getCurrentHour()+1);
+        //wineskin
+        else if (h.isWineskinActivated()){
+            h.setWineskinActivated(false);
+        }
+        else {
+            if (h.getCurrentHour() >= 7) {
+                h.setWillPower(h.getWillPower() - 2);
+            }
+            h.setCurrentHour(h.getCurrentHour() + 1);
+        }
 
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
@@ -498,6 +525,18 @@ public class GameDatabase {
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
+
+            //medicinal herb
+            if (h.isMedicinalHerbActivatedMove()){
+                h.setMedicinalHerbActivatedMove(false);
+                for (Item item : h.getItems()){
+                    if (item.getItemType() == ItemType.MEDICINAL_HERB){
+                        h.getItems().remove(item);
+                        break;
+                    }
+                }
+            }
+
             MasterDatabase masterDatabase = MasterDatabase.getInstance();
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
@@ -546,6 +585,43 @@ public class GameDatabase {
             }
         } else {
             return EmptyWellResponses.WELL_DNE;
+        }
+    }
+
+    public UseTelescopeRC useTelescope(String gameName, String username, Integer targetRegion) {
+        RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
+        Region region = regionDatabase.getRegion(targetRegion);
+        Hero hero = getGame(gameName).getSinglePlayer(username).getHero();
+        FogKind f = region.getFog();
+        ArrayList<RuneStone> runeStones = region.getRuneStones();
+
+        boolean telescopeFound = false;
+        for (Item item : hero.getItems()) {
+            if (item.getItemType() == ItemType.TELESCOPE) {
+                telescopeFound = true;
+                break;
+            }
+        }
+        if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
+            return new UseTelescopeRC(FogKind.NONE, UseTelescopeResponses.MUST_END_MOVE_TELESCOPE, runeStones);
+        }
+        else if (!telescopeFound) {
+            return new UseTelescopeRC(FogKind.NONE, UseTelescopeResponses.DOES_NOT_OWN_TELESCOPE, runeStones);
+        }
+        else if (f != FogKind.NONE) {
+            if (region.getRuneStones().size() == 0){
+                return new UseTelescopeRC(f, UseTelescopeResponses.RUNE_STONE_DNE, runeStones);
+            } else {
+                return new UseTelescopeRC(f, UseTelescopeResponses.RUNE_STONE, runeStones);
+            }
+        }
+        else {
+            if (region.getRuneStones().size() == 0) {
+                return new UseTelescopeRC(FogKind.NONE, UseTelescopeResponses.RUNE_STONE_DNE, runeStones);
+            }
+            else {
+                return new UseTelescopeRC(FogKind.NONE, UseTelescopeResponses.RUNE_STONE, runeStones);
+            }
         }
     }
 
@@ -684,9 +760,22 @@ public class GameDatabase {
                         r.setFountainStatus(true);
                     }
                 }
+
+                //reset all falcons' numUses to 1
+                for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                    Hero hero = getGame(gameName).getPlayers()[i].getHero();
+                    ArrayList<Item> items = hero.getItems();
+                    for (Item item : items){
+                        if (item.getItemType() == ItemType.FALCON){
+                            item.setNumUses(1);
+                        }
+                    }
+                }
+
                 // advance creatures
                 // refresh wells
                 // narrator advances one step
+                //reset falcons
 
                 // reset all falcon uses
                 for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
@@ -1730,10 +1819,89 @@ public class GameDatabase {
         }
     }
 
+    public MedicinalHerbWillPowerResponses medicinalHerbWillPower(String gameName, String username){
+        Game game = getGame(gameName);
+        Hero hero = game.getSinglePlayer(username).getHero();
+        Item medHerb = null;
+        boolean medicinalHerbFound = false;
+        for (Item item : hero.getItems()) {
+            if (item.getItemType() == ItemType.MEDICINAL_HERB) {
+                medicinalHerbFound = true;
+                medHerb = item;
+            }
+        }
+        if (!medicinalHerbFound) {
+            return MedicinalHerbWillPowerResponses.ERROR_DOES_NOT_OWN_MEDICINAL_HERB;
+        }
+        else {
+            int willpower = hero.getWillPower();
+            hero.setWillPower(willpower + 4);
+            hero.getItems().remove(medHerb);
+            return MedicinalHerbWillPowerResponses.MEDICINAL_HERB_WILLPOWER_SUCCESS;
+        }
+    }
+
+    public MedicinalHerbMoveResponses medicinalHerbMove(String gameName, String username){
+        Game game = getGame(gameName);
+        Hero hero = game.getSinglePlayer(username).getHero();
+        Item medHerb = null;
+        boolean medicinalHerbFound = false;
+        for (Item item : hero.getItems()) {
+            if (item.getItemType() == ItemType.MEDICINAL_HERB) {
+                medicinalHerbFound = true;
+                medHerb = item;
+            }
+        }
+        if (!medicinalHerbFound) {
+            return MedicinalHerbMoveResponses.ERROR_DOES_NOT_OWN_MEDICINAL_HERB;
+        }
+        else if (game.getCurrentHero() != hero){
+            return MedicinalHerbMoveResponses.ERROR_NOT_CURRENT_HERO;
+        }
+        else {
+            hero.setMedicinalHerbActivatedMove(true);
+            return MedicinalHerbMoveResponses.MEDICINAL_HERB_MOVE_SUCCESS;
+        }
+    }
+
+    public ActivateWineskinResponses activateWineskin(String gameName, String username){
+        Game game = getGame(gameName);
+        Hero hero = game.getSinglePlayer(username).getHero();
+        boolean wineskinFound = false;
+        Item wineskin = null;
+        for (Item item : hero.getItems()) {
+            if (item.getItemType() == ItemType.WINESKIN) {
+                wineskinFound = true;
+                wineskin = item;
+                break;
+            }
+        }
+        if (!wineskinFound) {
+            return ActivateWineskinResponses.ERROR_DOES_NOT_OWN_WINESKIN;
+        }
+        else if (game.getCurrentHero() != hero){
+            return ActivateWineskinResponses.ERROR_NOT_CURRENT_HERO;
+        }
+        else {
+            hero.setWineskinActivated(true);
+            int uses = wineskin.getNumUses();
+            System.out.println("uses:" + uses);
+            wineskin.setNumUses(uses - 1);
+            System.out.println(("uses after - 1:" + wineskin.getNumUses()));
+            if (wineskin.getNumUses() == 0) {
+                hero.getItems().remove(wineskin);
+            }
+            return ActivateWineskinResponses.WINESKIN_ACTIVATED;
+        }
+    }
 
     public BuyFromMerchantResponses buyFromMerchant (String gameName, String username, MerchantPurchase merchantPurchase) {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero hero = getGame(gameName).getSinglePlayer(username).getHero();
+
+        if (getGame(gameName).getCurrentHeroSelectedOption() == TurnOptions.MOVE) {
+            return BuyFromMerchantResponses.MUST_END_MOVE;
+        }
 
         if (regionDatabase.getRegion(hero.getCurrentSpace()).isMerchant()) {
             int totalGold = 0;
@@ -1747,17 +1915,40 @@ public class GameDatabase {
             }
             totalGold += merchantPurchase.getItems().size() * 2;
 
+            int numHelms = 0;
+            int numSmallItems = 0;
+            int numLargeItems = 0;
+            numSmallItems = hero.getRuneStones().size();
+            ArrayList<Item> currentItems = hero.getItems();
+            for (Item item: currentItems) {
+                if (item.getItemType() == ItemType.HELM) {
+                    numHelms++;
+                } else if(item.getItemType() == ItemType.WITCH_BREW || item.getItemType() == ItemType.WINESKIN || item.getItemType() == ItemType.TELESCOPE || item.getItemType() == ItemType.MEDICINAL_HERB){
+                    numSmallItems++;
+                } else if (item.getItemType() == ItemType.FALCON || item.getItemType() == ItemType.BOW || item.getItemType() == ItemType.SHIELD){
+                    numLargeItems++;
+                }
+            }
+            ArrayList<Item> purchaseItems = merchantPurchase.getItems();
+            for (Item item: purchaseItems) {
+                if (item.getItemType() == ItemType.HELM) {
+                    numHelms++;
+                } else if(item.getItemType() == ItemType.WITCH_BREW || item.getItemType() == ItemType.WINESKIN || item.getItemType() == ItemType.TELESCOPE || item.getItemType() == ItemType.MEDICINAL_HERB){
+                    numSmallItems++;
+                } else if (item.getItemType() == ItemType.FALCON || item.getItemType() == ItemType.BOW || item.getItemType() == ItemType.SHIELD){
+                    numLargeItems++;
+                }
+            }
+
             if (h.getGold() >= totalGold) {
-                ArrayList<Item> purchaseItems = merchantPurchase.getItems();
-                ArrayList<Item> heroItems = hero.getItems();
-                ArrayList<Item> heroItemsReset = new ArrayList<Item>(heroItems);
-                for (Item item : purchaseItems){
-                    ItemType type = item.getItemType();
-                    if (canAddItem(hero,type) == false){
-                        h.setItems(heroItemsReset);
-                        return BuyFromMerchantResponses.MAX_ITEMS;
-                    }
-                    h.getItems().add(item);
+
+                if((numHelms > 1) || (numSmallItems > 3) || (numLargeItems > 1)) {
+                    return BuyFromMerchantResponses.MAX_ITEMS;
+                }
+
+                for (Item item: purchaseItems) {
+                    currentItems.add(item);
+                    hero.setItems(currentItems);
                 }
                 h.setGold(h.getGold() - totalGold);
                 h.setStrength(h.getStrength() + merchantPurchase.getStrength());
@@ -1842,18 +2033,24 @@ public class GameDatabase {
         }
     }
 
-    public void saveGame(String gameName) {
+    public SaveGameResponses saveGame(String gameName) {
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
         masterDatabase.getSavedGameDatabase().put(gameName, getGame(gameName));
 
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter("savedGames", true));
-            writer.write(new Gson().toJson(getGame(gameName)));
-            writer.newLine();
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        Game g = getGame(gameName);
+        if (g.getCurrentFight() != null) {
+            return SaveGameResponses.MUST_END_FIGHT;
+        } else {
+            try {
+                BufferedWriter writer = new BufferedWriter(new FileWriter("savedGames", true));
+                writer.write(new Gson().toJson(getGame(gameName)));
+                writer.newLine();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        return SaveGameResponses.SUCCESS;
     }
 
     public void activateLegendCardC(String gameName, String username, Integer dieRoll) {
@@ -2132,7 +2329,18 @@ public class GameDatabase {
         RegionDatabase regionDatabase = g.getRegionDatabase();
 
         g.setWitch(new Witch(h.getCurrentSpace(), g.getCurrentNumPlayers()));
-        h.getItems().add(new Item(ItemType.WITCH_BREW));
+
+        int numSmallItems = 0;
+        numSmallItems = h.getRuneStones().size();
+        ArrayList<Item> currentItems = h.getItems();
+        for (Item item: currentItems) {
+            if(item.getItemType() == ItemType.WITCH_BREW || item.getItemType() == ItemType.WINESKIN || item.getItemType() == ItemType.TELESCOPE || item.getItemType() == ItemType.MEDICINAL_HERB){
+                numSmallItems++;
+            }
+        }
+        if(numSmallItems < 3) {
+            h.getItems().add(new Item(ItemType.WITCH_BREW));
+        }
 
         Creature gor = new Creature(CreatureType.GOR);
         gor.setMedicinalHerb(new Item(ItemType.MEDICINAL_HERB));
@@ -2388,8 +2596,29 @@ public class GameDatabase {
 
 
 
-    public LoadGameResponses loadGame(String gameName, String username, Game g) {
+    public LoadGameResponses loadGame(String gameName, String username, String gameName2) {
         Game game = getGame(gameName);
+        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+        ArrayList<Game> savedGames = masterDatabase.getSavedGames();
+        Game g = null;
+        for(Game gg: savedGames){
+            if(gg.getGameName().equals(gameName2)){
+                g = gg;
+            }
+        }
+
+        if (getGame(gameName).getCurrentNumPlayers() == 1) {
+            return LoadGameResponses.NOT_ENOUGH_PLAYERS;
+        }
+
+        if (!getGame(gameName).getPlayers()[0].getUsername().equals(username)) {
+            return LoadGameResponses.NOT_HOST;
+        }
+
+        if (!getGame(gameName).allReady()) {
+            return LoadGameResponses.NOT_ALL_PLAYERS_READY;
+        }
+
         for (int i = 0; i < game.getCurrentNumPlayers(); i++) {
             if (game.getPlayers()[i].getHero() == null) {
                 return LoadGameResponses.ERROR_NOT_ALL_PLAYERS_SELECTED_HEROES;
@@ -2418,6 +2647,7 @@ public class GameDatabase {
         }
 
         game.setGoldenShields(g.getGoldenShields());
+
         for (int i = 0; i < game.getCurrentNumPlayers(); i++) {
             for (int j = 0; j < g.getCurrentNumPlayers(); j++) {
                 if (game.getPlayers()[i].getHero().getHeroClass() == g.getPlayers()[j].getHero().getHeroClass()) {
@@ -2425,6 +2655,7 @@ public class GameDatabase {
                 }
             }
         }
+
         game.setActive(g.isActive());
         game.setItemsDistributed(g.isItemsDistributed());
         game.setItemsDistributedMessage(g.getItemsDistributedMessage());
@@ -2442,7 +2673,7 @@ public class GameDatabase {
         game.setWitch(g.getWitch());
         game.setSkralStronghold(g.getSkralStronghold());
         game.setGameLoaded(true);
-        MasterDatabase masterDatabase = MasterDatabase.getInstance();
+
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
         }
@@ -2572,19 +2803,27 @@ public class GameDatabase {
         }
 
         if (h.getGold() >= totalGold) {
+
+            int numSmallItems = 0;
+            numSmallItems = h.getRuneStones().size();
+            ArrayList<Item> currentItems = h.getItems();
+            for (Item item: currentItems) {
+                if(item.getItemType() == ItemType.WITCH_BREW || item.getItemType() == ItemType.WINESKIN || item.getItemType() == ItemType.TELESCOPE || item.getItemType() == ItemType.MEDICINAL_HERB){
+                    numSmallItems++;
+                }
+            }
             ArrayList<Item> purchaseItems = new ArrayList<>();
             for (int i = 0; i < quantity; i++) {
                 purchaseItems.add(new Item(ItemType.WITCH_BREW));
             }
-            ArrayList<Item> heroItems = h.getItems();
-            ArrayList<Item> heroItemsReset = new ArrayList<Item>(heroItems);
-            for (Item item : purchaseItems){
-                ItemType type = item.getItemType();
-                if (canAddItem(h,type) == false){
-                    h.setItems(heroItemsReset);
-                    return BuyWitchBrewResponses.MAX_ITEMS;
-                }
-                h.getItems().add(item);
+            numSmallItems += quantity;
+            if(numSmallItems > 3) {
+                return BuyWitchBrewResponses.MAX_ITEMS;
+            }
+
+            for (Item item: purchaseItems) {
+                currentItems.add(item);
+                h.setItems(currentItems);
             }
             h.setGold(h.getGold() - totalGold);
 
