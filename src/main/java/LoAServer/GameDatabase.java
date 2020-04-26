@@ -3304,6 +3304,14 @@ public class GameDatabase {
                     Hero ph = players[i].getHero();
                     if (ph.getCurrentSpace() <= 20 && ph.getCurrentSpace() >= 0) {
                         ph.setWillPower(ph.getWillPower() - 3);
+                        if(ph.getWillPower()<=0)
+                        {
+                            ph.setWillPower(3);
+                            if(ph.getStrength()>1)
+                            {
+                                ph.setStrength(ph.getStrength()-1);
+                            }
+                        }
                     }
                 }
 
@@ -3312,6 +3320,14 @@ public class GameDatabase {
                     Hero ph = players[i].getHero();
                     if (ph.getCurrentHour() == 0) {
                         ph.setWillPower(ph.getWillPower() - 2);
+                        if(ph.getWillPower()<=0)
+                        {
+                            ph.setWillPower(3);
+                            if(ph.getStrength()>1)
+                            {
+                                ph.setStrength(ph.getStrength()-1);
+                            }
+                        }
                     }
                 }
             } else if (r == 3) {
@@ -3326,6 +3342,14 @@ public class GameDatabase {
                     Hero ph = players[i].getHero();
                     if (ph.getCurrentSpace() <= 70 && ph.getCurrentSpace() >= 37) {
                         ph.setWillPower(ph.getWillPower() - 3);
+                        if(ph.getWillPower()<=0)
+                        {
+                            ph.setWillPower(3);
+                            if(ph.getStrength()>1)
+                            {
+                                ph.setStrength(ph.getStrength()-1);
+                            }
+                        }
                     }
                 }
 
