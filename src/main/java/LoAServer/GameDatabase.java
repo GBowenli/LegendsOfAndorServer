@@ -3380,8 +3380,8 @@ public class GameDatabase {
                 for (int i = 0; i < players.length; i++) {
                     Hero ph = players[i].getHero();
                     int sp = ph.getCurrentSpace();
-                    if (regionDatabase.getRegion(sp).getFog()!= FogKind.NONE || (sp>=26&&sp<=33)||(sp>=37&&sp<=42)||sp==9||sp==15) {
-                        h.getItems().add(new Item(ItemType.WINESKIN));
+                    if ((sp>=11&&sp<=13)||(sp>=47&&sp<=49)||(sp>=63&&sp<=64)||(sp==44||sp==46||sp==56)||(sp>=26&&sp<=33)||(sp>=37&&sp<=42)||(sp>=8&&sp<=9)||(sp>=15&&sp<=16)) {
+                        ph.getItems().add(new Item(ItemType.WINESKIN));
                     }
                 }
             } else {
