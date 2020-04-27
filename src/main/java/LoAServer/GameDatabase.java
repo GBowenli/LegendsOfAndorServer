@@ -667,7 +667,7 @@ public class GameDatabase {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
 
-        if (!getGame(gameName).getCurrentHero().equals(getGame(gameName).getSinglePlayer(username).getHero())) {
+        if (!getGame(gameName).getCurrentHero().getHeroClass().equals(getGame(gameName).getSinglePlayer(username).getHero().getHeroClass())) {
             return EndDayResponses.NOT_CURRENT_TURN;
         }
 
