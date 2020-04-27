@@ -1031,9 +1031,9 @@ public class GameDatabase {
             return LeaveFightResponses.SUCCESS;
         }
 
-        if (h.isFought()) {
-            return LeaveFightResponses.CANNOT_LEAVE_WITHOUT_FIGHTING;
-        }
+//        if (!h.isFought()) {
+//            return LeaveFightResponses.CANNOT_LEAVE_WITHOUT_FIGHTING;
+//        }
 
         int index = fight.getHeroes().indexOf(h);
         if (index != -1) {
@@ -1044,14 +1044,17 @@ public class GameDatabase {
 
         fight.getHeroes().remove(index);
         fight.getHeroesBattleScores().remove(index);
-        h.setFought(false);
-        h.setBowActivated(false);
 
         if (fight.getHeroes().size() == 0) {
-            getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
+            if (h.isFought()) {
+                getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(getGame(gameName).getCurrentHero().getHeroClass()));
+            }
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
             getGame(gameName).setCurrentFight(null);
         }
+
+        h.setFought(false);
+        h.setBowActivated(false);
 
         for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
             masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
@@ -1068,7 +1071,7 @@ public class GameDatabase {
         boolean blueRuneStoneFound = false;
         boolean yellowRuneStoneFound = false;
 
-        if (h.getCurrentHour() >= 7 && h.getWillPower() <= 2) {
+        if (h.getCurrentHour() >= 7 && h.getWillPower() <= 2 || h.getCurrentHour() == 10) {
             return new ArrayList<>();
         } else {
             for (RuneStone r : h.getRuneStones()) {
@@ -1219,7 +1222,7 @@ public class GameDatabase {
             int indexOfZero = -1;
 
             for (int i = 0; i < fight.getArcherDice().size(); i++) {
-                if (fight.getArcherDice().get(i) == 0) {
+                if (fight.getArcherDice().get(i) == 0 || fight.getArcherDice().get(i) == -1) {
                     indexOfZero = i;
                     break;
                 }
@@ -1241,7 +1244,7 @@ public class GameDatabase {
             int indexOfZero = -1;
 
             for (int i = 0; i < fight.getWizardDice().size(); i++) {
-                if (fight.getWizardDice().get(i) == 0) {
+                if (fight.getWizardDice().get(i) == 0 || fight.getWizardDice().get(i) == -1) {
                     indexOfZero = i;
                     break;
                 }
@@ -1263,7 +1266,7 @@ public class GameDatabase {
             int indexOfZero = -1;
 
             for (int i = 0; i < fight.getWarriorDice().size(); i++) {
-                if (fight.getWarriorDice().get(i) == 0) {
+                if (fight.getWarriorDice().get(i) == 0 || fight.getWarriorDice().get(i) == -1) {
                     indexOfZero = i;
                     break;
                 }
@@ -1285,7 +1288,7 @@ public class GameDatabase {
             int indexOfZero = -1;
 
             for (int i = 0; i < fight.getDwarfDice().size(); i++) {
-                if (fight.getDwarfDice().get(i) == 0) {
+                if (fight.getDwarfDice().get(i) == 0 || fight.getDwarfDice().get(i) == -1) {
                     indexOfZero = i;
                     break;
                 }
@@ -1310,7 +1313,7 @@ public class GameDatabase {
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
         Fight fight = getGame(gameName).getCurrentFight();
 
-        h.setFought(false);
+        h.setFought(true);
 
         if (h.getHeroClass().equals(HeroClass.WARRIOR)) {
             fight.setWarriorDice(diceRolls);
