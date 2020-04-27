@@ -3307,6 +3307,14 @@ public class GameDatabase {
                     Hero ph = players[i].getHero();
                     if (ph.getCurrentSpace() <= 20 && ph.getCurrentSpace() >= 0) {
                         ph.setWillPower(ph.getWillPower() - 3);
+                        if(ph.getWillPower()<=0)
+                        {
+                            ph.setWillPower(3);
+                            if(ph.getStrength()>1)
+                            {
+                                ph.setStrength(ph.getStrength()-1);
+                            }
+                        }
                     }
                 }
 
@@ -3315,6 +3323,14 @@ public class GameDatabase {
                     Hero ph = players[i].getHero();
                     if (ph.getCurrentHour() == 0) {
                         ph.setWillPower(ph.getWillPower() - 2);
+                        if(ph.getWillPower()<=0)
+                        {
+                            ph.setWillPower(3);
+                            if(ph.getStrength()>1)
+                            {
+                                ph.setStrength(ph.getStrength()-1);
+                            }
+                        }
                     }
                 }
             } else if (r == 3) {
@@ -3329,9 +3345,48 @@ public class GameDatabase {
                     Hero ph = players[i].getHero();
                     if (ph.getCurrentSpace() <= 70 && ph.getCurrentSpace() >= 37) {
                         ph.setWillPower(ph.getWillPower() - 3);
+                        if(ph.getWillPower()<=0)
+                        {
+                            ph.setWillPower(3);
+                            if(ph.getStrength()>1)
+                            {
+                                ph.setStrength(ph.getStrength()-1);
+                            }
+                        }
                     }
                 }
 
+            } else if (r == 5) {
+                for (int i = 0; i < players.length; i++) {
+                    Hero ph = players[i].getHero();
+                    if (ph.getWillPower() > 12) {
+                        ph.setWillPower(12);
+                    }
+                }
+            } else if (r == 6) {
+                for (int i = 0; i < players.length; i++) {
+                    Hero ph = players[i].getHero();
+                    if ((ph.getCurrentSpace() < 47 || ph.getCurrentSpace() > 60) && ph.getCurrentSpace()!=62 && ph.getCurrentSpace()!=63 && ph.getCurrentSpace()!=71 && ph.getCurrentSpace()!=72 && ph.getCurrentSpace()!=0) {
+                        ph.setWillPower(ph.getWillPower() - 2);
+                        if(ph.getWillPower()<=0)
+                        {
+                            ph.setWillPower(3);
+                            if(ph.getStrength()>1)
+                            {
+                                ph.setStrength(ph.getStrength()-1);
+                            }
+                        }
+                    }
+                }
+
+            } else if (r == 7) {
+                for (int i = 0; i < players.length; i++) {
+                    Hero ph = players[i].getHero();
+                    int sp = ph.getCurrentSpace();
+                    if ((sp>=11&&sp<=13)||(sp>=47&&sp<=49)||(sp>=63&&sp<=64)||(sp==44||sp==46||sp==56)||(sp>=26&&sp<=33)||(sp>=37&&sp<=42)||(sp>=8&&sp<=9)||(sp>=15&&sp<=16)) {
+                        ph.getItems().add(new Item(ItemType.WINESKIN));
+                    }
+                }
             } else {
 
             }
