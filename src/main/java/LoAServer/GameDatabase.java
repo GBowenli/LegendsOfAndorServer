@@ -2024,9 +2024,9 @@ public class GameDatabase {
 
     public SaveGameResponses saveGame(String gameName) {
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
-        masterDatabase.getSavedGameDatabase().put(gameName, getGame(gameName));
 
         Game g = getGame(gameName);
+
         if (g.getCurrentFight() != null) {
             return SaveGameResponses.MUST_END_FIGHT;
         } else {
@@ -2039,6 +2039,9 @@ public class GameDatabase {
                 e.printStackTrace();
             }
         }
+
+        masterDatabase.loadGames();
+
         return SaveGameResponses.SUCCESS;
     }
 

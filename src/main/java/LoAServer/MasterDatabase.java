@@ -30,6 +30,8 @@ public class MasterDatabase {
     }
 
     public void loadGames() {
+        savedGameDatabase = new HashMap<>();
+
         try {
             BufferedReader reader = new BufferedReader(new FileReader("savedGames"));
 
