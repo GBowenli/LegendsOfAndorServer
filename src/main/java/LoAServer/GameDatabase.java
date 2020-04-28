@@ -300,6 +300,7 @@ public class GameDatabase {
                 getGame(gameName).setGoldenShields(1);
             }
 
+            // for testing purposes setting op stats to everyone
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 getGame(gameName).getPlayers()[i].getHero().setStrength(10);
             }
