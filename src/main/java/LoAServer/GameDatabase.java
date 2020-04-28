@@ -847,7 +847,7 @@ public class GameDatabase {
         RegionDatabase regionDatabase = getGame(gameName).getRegionDatabase();
         Hero h = getGame(gameName).getSinglePlayer(username).getHero();
 
-        if (!getGame(gameName).getCurrentHero().equals(h)) {
+        if (!getGame(gameName).getCurrentHero().getHeroClass().equals(h.getHeroClass())) {
             return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.NOT_CURRENT_TURN, new ArrayList<>());
         } else if (h.isHasEndedDay()) {
             return new GetPossibleCreaturesToFightRC(GetPossibleCreaturesToFightResponses.DAY_ENDED, new ArrayList<>());
