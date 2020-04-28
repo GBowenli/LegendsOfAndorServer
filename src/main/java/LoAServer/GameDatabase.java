@@ -393,7 +393,7 @@ public class GameDatabase {
 
         adjacentRegions.addAll(regionDatabase.getRegion(p.getHero().getCurrentSpace()).getAdjacentRegions());
 
-        if (getGame(gameName).getCurrentHero().equals(p.getHero())) {
+        if (getGame(gameName).getCurrentHero().getHeroClass().equals(p.getHero().getHeroClass())) {
             if (p.getHero().getCurrentHour() == 10) {
                 return new GetAvailableRegionsRC(new ArrayList<>(), GetAvailableRegionsReponses.CURRENT_HOUR_MAXED);
             } else {
@@ -2139,7 +2139,7 @@ public class GameDatabase {
             return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.PRINCE_DNE);
         }
 
-        if (getGame(gameName).getCurrentHero().equals(p.getHero())) {
+        if (getGame(gameName).getCurrentHero().getHeroClass().equals(p.getHero().getHeroClass())) {
             if (p.getHero().getCurrentHour() == 10) {
                 return new GetPrinceThoraldMovesRC(new ArrayList<>(), GetPrinceThoraldMovesResponses.CURRENT_HOUR_MAXED);
             } else {
