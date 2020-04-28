@@ -670,7 +670,7 @@ public class GameDatabase {
             getGame(gameName).setCurrentHero(getGame(gameName).getNextHero(username));
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
-            if (getGame(gameName).getCurrentHero() == null) { // new day
+            if (getGame(gameName).getCurrentHero().getHeroClass() == h.getHeroClass()) { // new day
                 getGame(gameName).setCurrentHero(getGame(gameName).getFirstHeroInNextDay());
                 getGame(gameName).setFirstHeroInNextDay(null);
 
