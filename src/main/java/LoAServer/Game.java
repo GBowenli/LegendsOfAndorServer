@@ -182,9 +182,8 @@ public class Game implements BroadcastContent {
             if (!players[currentHeroIndex+i].getHero().isHasEndedDay()) {
                 return players[currentHeroIndex+i].getHero();
             }
-
         }
-        return null;
+        return players[currentHeroIndex].getHero();
     }
 
     public Hero getNextHero(HeroClass heroClass) {
@@ -204,7 +203,7 @@ public class Game implements BroadcastContent {
             }
 
         }
-        return null;
+        return players[currentHeroIndex].getHero();
     }
 
     public Hero getHeroByHC(HeroClass heroClass) { // not sure if necessary
