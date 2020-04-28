@@ -300,6 +300,9 @@ public class GameDatabase {
                 getGame(gameName).setGoldenShields(1);
             }
 
+            for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
+                getGame(gameName).getPlayers()[i].getHero().setStrength(10);
+            }
             getGame(gameName).setGoldenShields(100);
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
