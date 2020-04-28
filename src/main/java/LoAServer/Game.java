@@ -175,12 +175,13 @@ public class Game implements BroadcastContent {
             }
         }
 
+        int newHeroIndex = currentHeroIndex;
         for (int i = 1; i < currentNumPlayers; i++) {
-            if (currentHeroIndex+i == currentNumPlayers) {
-                currentHeroIndex = i * -1;
+            if (newHeroIndex+i == currentNumPlayers) {
+                newHeroIndex = i * -1;
             }
-            if (!players[currentHeroIndex+i].getHero().isHasEndedDay()) {
-                return players[currentHeroIndex+i].getHero();
+            if (!players[newHeroIndex+i].getHero().isHasEndedDay()) {
+                return players[newHeroIndex+i].getHero();
             }
         }
         return players[currentHeroIndex].getHero();
@@ -194,14 +195,14 @@ public class Game implements BroadcastContent {
             }
         }
 
+        int newHeroIndex = currentHeroIndex;
         for (int i = 1; i < currentNumPlayers; i++) {
-            if (currentHeroIndex+i == currentNumPlayers) {
-                currentHeroIndex = i * -1;
+            if (newHeroIndex+i == currentNumPlayers) {
+                newHeroIndex = i * -1;
             }
-            if (!players[currentHeroIndex+i].getHero().isHasEndedDay()) {
-                return players[currentHeroIndex+i].getHero();
+            if (!players[newHeroIndex+i].getHero().isHasEndedDay()) {
+                return players[newHeroIndex+i].getHero();
             }
-
         }
         return players[currentHeroIndex].getHero();
     }
