@@ -293,13 +293,14 @@ public class GameDatabase {
             getGame(gameName).setCurrentHeroSelectedOption(TurnOptions.NONE);
 
             if (getGame(gameName).getCurrentNumPlayers() == 2) {
-                //getGame(gameName).setGoldenShields(3);
-                getGame(gameName).setGoldenShields(50);
+                getGame(gameName).setGoldenShields(3);
             } else if (getGame(gameName).getCurrentNumPlayers() == 3) {
                 getGame(gameName).setGoldenShields(2);
             } else { // equals 4
                 getGame(gameName).setGoldenShields(1);
             }
+
+            getGame(gameName).setGoldenShields(100);
 
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
