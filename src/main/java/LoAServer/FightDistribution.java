@@ -85,4 +85,11 @@ public class FightDistribution {
     public void setDwarfWillpower(int dwarfWillpower) {
         this.dwarfWillpower = dwarfWillpower;
     }
+
+    public String toString(){
+        return "Dwarf: " + dwarfGold + " : " + dwarfWillpower +
+                "Warrior: " + warriorGold + " : " + warriorWillpower +
+                "Wizard: " + wizardGold + " : " + wizardWillpower +
+                "Archer: " + archerGold+ " : " + archerWillpower;
+    }
 }
