@@ -810,7 +810,7 @@ public class GameDatabase {
 
         if (h.isHasEndedDay()) {
             return PassResponses.DAY_ENDED;
-        } else if (!getGame(gameName).getCurrentHero().equals(h)) {
+        } else if (!getGame(gameName).getCurrentHero().getHeroClass().equals(h.getHeroClass())) {
             return PassResponses.NOT_CURRENT_TURN;
         } else if (h.getCurrentHour() == 10 || (h.getWillPower() <= 2 && h.getCurrentHour() >= 7)) {
             return PassResponses.MUST_END_DAY;
