@@ -301,9 +301,6 @@ public class GameDatabase {
                 getGame(gameName).setGoldenShields(1);
             }
 
-            // testing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! DELETE LATER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            getGame(gameName).setGoldenShields(10000);
-
             for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
                 masterDatabase.getMasterGameBCM().get(getGame(gameName).getPlayers()[i].getUsername()).touch();
             }
@@ -338,17 +335,6 @@ public class GameDatabase {
                 getGame(gameName).getPlayers()[i].getHero().setItems(itemDistribution.getArcherItems());
                 getGame(gameName).appendToDistributedItemsMessage(getGame(gameName).getPlayers()[i].getHero().getHeroClass() + ": " + itemDistribution.getArcherGold() + " Gold and " + itemDistribution.getArcherItems().size() + " Wineskins");
             }
-        }
-
-        // TESTING !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        for (int i = 0; i < getGame(gameName).getCurrentNumPlayers(); i++) {
-            if (i == 0) {
-                MasterDatabase.getInstance().getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().getRuneStones().add(new RuneStone(Colour.BLUE));
-                MasterDatabase.getInstance().getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().getRuneStones().add(new RuneStone(Colour.GREEN));
-                MasterDatabase.getInstance().getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().getRuneStones().add(new RuneStone(Colour.YELLOW));
-            }
-
-            MasterDatabase.getInstance().getMasterGameDatabase().getGame(gameName).getPlayers()[i].getHero().setGold(10000);
         }
 
         MasterDatabase masterDatabase = MasterDatabase.getInstance();
@@ -2609,6 +2595,7 @@ public class GameDatabase {
                 g = gg;
             }
         }
+        g = new Gson().fromJson(new Gson().toJson(g), Game.class);
 
         if (getGame(gameName).getCurrentNumPlayers() == 1) {
             return LoadGameResponses.NOT_ENOUGH_PLAYERS;
