@@ -4,7 +4,7 @@ Server code for the Legends of Andor board game. Client code can be found at [Le
 A description of the project is below. 
 
 
-Implemented the Legends of Andor board game into a multi-player, turn-based application for android devices. Used a client-server architecture as well as implemented an in-game chat room for players. Used android studio and springboot to develop the app. Can be played by 1-4 players. 
+Implemented the Legends of Andor board game into a multi-player, turn-based application for android devices. Used a client-server architecture as well as implemented an in-game chat room for players. Used android studio and springboot to develop the app. Can be played by 2-4 players. 
 
 
 Contributors: 
